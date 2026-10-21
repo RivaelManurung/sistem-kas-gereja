@@ -39,7 +39,7 @@
 
 ### Task 1: Rencana Implementasi Fase 6
 - [x] Tulis dokumen rencana ke `docs/superpowers/plans/2026-10-21-fase-6-dashboard-transparansi-portal.md`.
-- [ ] Commit rencana implementasi.
+- [x] Commit rencana implementasi.
 
 ---
 
@@ -68,17 +68,17 @@
       - `uncountedSessions`: list of service sessions yang belum memiliki berita acara
   - UI `resources/js/pages/dashboard.tsx` dengan kartu ringkasan saldo, alert banner untuk item yang memerlukan aksi, tabel saldo dana & rekening, dan visualisasi tren pemasukan vs pengeluaran bulanan.
 
-- [ ] **Step 1: Tulis test fitur untuk Dashboard** di `tests/Feature/Dashboard/DashboardMetricsTest.php`
+- [x] **Step 1: Tulis test fitur untuk Dashboard** di `tests/Feature/Dashboard/DashboardMetricsTest.php`
   - Test metrik saldo per dana dan rekening cocok dengan buku besar.
   - Test kalkulasi tren bulanan pemasukan dan pengeluaran.
   - Test alert berita acara menunggu konfirmasi dan verifikasi.
   - Test alert pengeluaran kas menunggu persetujuan (dan penandaan badge melebihi ambang batas).
   - Test alert sesi ibadah yang belum dihitung.
-- [ ] **Step 2: Jalankan test — pastikan FAIL**.
-- [ ] **Step 3: Implementasi `DashboardController` dan update rute**.
-- [ ] **Step 4: Implementasi UI `resources/js/pages/dashboard.tsx`** dengan gaya shadcn/ui dan `DESIGN.md`.
-- [ ] **Step 5: Jalankan test — pastikan PASS**.
-- [ ] **Step 6: Commit** `feat(dashboard): internal dashboard with balances, trends and action alerts`.
+- [x] **Step 2: Jalankan test — pastikan FAIL**.
+- [x] **Step 3: Implementasi `DashboardController` dan update rute**.
+- [x] **Step 4: Implementasi UI `resources/js/pages/dashboard.tsx`** dengan gaya shadcn/ui dan `DESIGN.md`.
+- [x] **Step 5: Jalankan test — pastikan PASS**.
+- [x] **Step 6: Commit** `feat(dashboard): internal dashboard with balances, trends and action alerts`.
 
 ---
 
@@ -106,17 +106,17 @@
     - `summary`: `{ totalBalance, totalIncome, totalExpense }`
   - UI `resources/js/pages/transparency/index.tsx` dengan desain bersih berstandar laporan publik.
 
-- [ ] **Step 1: Tulis test fitur untuk Halaman Transparansi** di `tests/Feature/Transparency/PublicTransparencyTest.php`
+- [x] **Step 1: Tulis test fitur untuk Halaman Transparansi** di `tests/Feature/Transparency/PublicTransparencyTest.php`
   - Test akses publik tanpa perlu login jika `public_page_enabled` aktif.
   - Test respons 404 jika `public_page_enabled` nonaktif.
   - Test kalkulasi agregat pemasukan & pengeluaran kategori publik.
   - Test bahwa kategori non-publik (`is_public = false`) dikecualikan dari agregat publik.
   - Test sanitasi data: pastikan respon tidak membocorkan nama jemaat, persembahan per orang, atau payee.
-- [ ] **Step 2: Jalankan test — pastikan FAIL**.
-- [ ] **Step 3: Implementasi `TransparencyController` dan rute**.
-- [ ] **Step 4: Implementasi UI `resources/js/pages/transparency/index.tsx`**.
-- [ ] **Step 5: Jalankan test — pastikan PASS**.
-- [ ] **Step 6: Commit** `feat(transparency): public transparency page with strict privacy sanitization`.
+- [x] **Step 2: Jalankan test — pastikan FAIL**.
+- [x] **Step 3: Implementasi `TransparencyController` dan rute**.
+- [x] **Step 4: Implementasi UI `resources/js/pages/transparency/index.tsx`**.
+- [x] **Step 5: Jalankan test — pastikan PASS**.
+- [x] **Step 6: Commit** `feat(transparency): public transparency page with strict privacy sanitization`.
 
 ---
 
@@ -144,17 +144,17 @@
     - `summary`: `{ thisYearTotal, allTimeTotal, count, byCategory }`
     - `availableYears`: list tahun persembahan
 
-- [ ] **Step 1: Tulis test fitur untuk Portal Jemaat** di `tests/Feature/Portal/MemberPortalTest.php`
+- [x] **Step 1: Tulis test fitur untuk Portal Jemaat** di `tests/Feature/Portal/MemberPortalTest.php`
   - Test jemaat dapat login dan melihat riwayat persembahan atas nama sendiri.
   - Test jemaat tidak melihat persembahan milik jemaat lain di riwayat.
   - Test akses kwitansi tunggal `/portal/receipt/{donation}` hanya milik sendiri (IDOR check melempar 403).
   - Test laporan tahunan `/portal/statement?year=YYYY` hanya menghitung persembahan jemaat yang sedang login.
   - Test perilaku user tanpa profil jemaat terhubung.
-- [ ] **Step 2: Jalankan test — pastikan FAIL**.
-- [ ] **Step 3: Implementasi `MemberPortalController` dan rute**.
-- [ ] **Step 4: Implementasi UI `resources/js/pages/portal/index.tsx` & `statement.tsx`**.
-- [ ] **Step 5: Jalankan test — pastikan PASS**.
-- [ ] **Step 6: Commit** `feat(portal): member portal with strict idor protection and annual contribution statement`.
+- [x] **Step 2: Jalankan test — pastikan FAIL**.
+- [x] **Step 3: Implementasi `MemberPortalController` dan rute**.
+- [x] **Step 4: Implementasi UI `resources/js/pages/portal/index.tsx` & `statement.tsx`**.
+- [x] **Step 5: Jalankan test — pastikan PASS**.
+- [x] **Step 6: Commit** `feat(portal): member portal with strict idor protection and annual contribution statement`.
 
 ---
 
@@ -171,9 +171,9 @@
   - Invarian 3: Batas Isolasi Data Jemaat (IDOR immunity).
   - Invarian 4: Konsistensi Saldo Buku Besar vs Total Kas.
 
-- [ ] **Step 1: Tulis tes invarian di `tests/Feature/Invariants/SystemInvariantsTest.php`**.
-- [ ] **Step 2: Jalankan test — pastikan PASS**.
-- [ ] **Step 3: Commit** `test(invariants): cross-phase financial and security invariant verification`.
+- [x] **Step 1: Tulis tes invarian di `tests/Feature/Invariants/SystemInvariantsTest.php`**.
+- [x] **Step 2: Jalankan test — pastikan PASS**.
+- [x] **Step 3: Commit** `test(invariants): cross-phase financial and security invariant verification`.
 
 ---
 
@@ -184,7 +184,7 @@
   - `README.md` (Panduan lengkap arsitektur, instalasi, matriks peran, dan alur kerja dalam Bahasa Indonesia)
   - `docs/WORKFLOW.md` (Update checklist progres Fase 6)
 
-- [ ] **Step 1: Tulis dokumentasi arsitektur, konfigurasi, peran & alur kerja di `README.md`**.
-- [ ] **Step 2: Update checklist di `docs/WORKFLOW.md`**.
-- [ ] **Step 3: Jalankan seluruh test suite (`php artisan test`) dan static typing (`./node_modules/.bin/tsc --noEmit`)**.
-- [ ] **Step 4: Commit** `docs: comprehensive system documentation, architecture, role matrix and workflows`.
+- [x] **Step 1: Tulis dokumentasi arsitektur, konfigurasi, peran & alur kerja di `README.md`**.
+- [x] **Step 2: Update checklist di `docs/WORKFLOW.md`**.
+- [x] **Step 3: Jalankan seluruh test suite (`php artisan test`) dan static typing (`./node_modules/.bin/tsc --noEmit`)**.
+- [x] **Step 4: Commit** `docs: comprehensive system documentation, architecture, role matrix and workflows`.

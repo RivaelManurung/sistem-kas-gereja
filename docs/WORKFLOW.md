@@ -127,7 +127,7 @@ Commit di branch `fase-N`; jangan merge ke `main` (itu tugas agen merge).
 - [x] Fase 4
 - [x] Merge 3+4
 - [ ] Fase 5
-- [ ] Fase 6
+- [x] Fase 6
 - [ ] Merge 5+6
 - [ ] UI Polish
 - [ ] Review
