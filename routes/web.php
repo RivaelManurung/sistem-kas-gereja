@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BankDepositController;
 use App\Http\Controllers\CountConfirmationController;
 use App\Http\Controllers\CountSheetController;
 use App\Http\Controllers\DonationController;
@@ -22,6 +23,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('counting/{counting}/verify', [CountConfirmationController::class, 'verify'])->name('counting.verify');
     Route::post('counting/{counting}/lock', [CountConfirmationController::class, 'lock'])->name('counting.lock');
     Route::resource('donations', DonationController::class);
+    Route::resource('deposits', BankDepositController::class)->only(['index', 'create', 'store']);
 });
 
 require __DIR__.'/settings.php';

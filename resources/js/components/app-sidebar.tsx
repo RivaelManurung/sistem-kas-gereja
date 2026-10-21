@@ -3,7 +3,23 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutGrid, Users } from 'lucide-react';
+import {
+    ArrowRightLeft,
+    Calculator,
+    Calendar,
+    CalendarCheck,
+    FileText,
+    LayoutGrid,
+    PieChart,
+    Settings,
+    ShieldCheck,
+    Sliders,
+    Split,
+    Tag,
+    UserCheck,
+    Users,
+    Wallet,
+} from 'lucide-react';
 import AppLogo from './app-logo';
 
 type PermittedNavItem = NavItem & { permission: string };
@@ -14,9 +30,40 @@ const mainNavItems: NavItem[] = [
         url: '/dashboard',
         icon: LayoutGrid,
     },
+    {
+        title: 'Sesi Ibadah',
+        url: '/sessions',
+        icon: Calendar,
+    },
+    {
+        title: 'Berita Acara Hitung',
+        url: '/counting',
+        icon: Calculator,
+    },
+    {
+        title: 'Persembahan Atas Nama',
+        url: '/donations',
+        icon: FileText,
+    },
+    {
+        title: 'Setoran Bank',
+        url: '/deposits',
+        icon: ArrowRightLeft,
+    },
 ];
 
-const adminNavItems: PermittedNavItem[] = [{ title: 'Pengguna', url: '/admin/users', icon: Users, permission: 'users.manage' }];
+const adminNavItems: PermittedNavItem[] = [
+    { title: 'Pengguna', url: '/admin/users', icon: Users, permission: 'users.manage' },
+    { title: 'Anggota Jemaat', url: '/admin/members', icon: UserCheck, permission: 'members.manage' },
+    { title: 'Rekening Kas', url: '/admin/accounts', icon: Wallet, permission: 'master.manage' },
+    { title: 'Pos Dana', url: '/admin/funds', icon: PieChart, permission: 'master.manage' },
+    { title: 'Kategori Kas', url: '/admin/categories', icon: Tag, permission: 'master.manage' },
+    { title: 'Aturan Alokasi', url: '/admin/allocations', icon: Split, permission: 'master.manage' },
+    { title: 'Jadwal Ibadah', url: '/admin/schedules', icon: CalendarCheck, permission: 'master.manage' },
+    { title: 'Field Kustom (EAV)', url: '/admin/attributes', icon: Sliders, permission: 'master.manage' },
+    { title: 'Pengaturan Gereja', url: '/admin/settings', icon: Settings, permission: 'settings.manage' },
+    { title: 'Audit Trail', url: '/admin/audit', icon: ShieldCheck, permission: 'audit.view' },
+];
 
 export function AppSidebar() {
     const { auth } = usePage<SharedData>().props;
@@ -39,7 +86,7 @@ export function AppSidebar() {
 
             <SidebarContent>
                 <NavMain items={mainNavItems} />
-                {visibleAdminItems.length > 0 && <NavMain label="Administrasi" items={visibleAdminItems} />}
+                {visibleAdminItems.length > 0 && <NavMain label="Administrasi & Master" items={visibleAdminItems} />}
             </SidebarContent>
 
             <SidebarFooter>

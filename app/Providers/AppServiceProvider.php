@@ -8,6 +8,7 @@ use App\Models\AttributeValue;
 use App\Models\Category;
 use App\Models\ChurchSetting;
 use App\Models\AllocationRule;
+use App\Models\BankDeposit;
 use App\Models\CountConfirmation;
 use App\Models\CountLine;
 use App\Models\CountSheet;
@@ -47,6 +48,7 @@ class AppServiceProvider extends ServiceProvider
             'count_line' => CountLine::class,
             'count_confirmation' => CountConfirmation::class,
             'allocation_rule' => AllocationRule::class,
+            'bank_deposit' => BankDeposit::class,
             'donation' => Donation::class,
         ]);
     }
