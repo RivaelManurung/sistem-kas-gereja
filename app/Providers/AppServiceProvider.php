@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Account;
+use App\Models\Category;
 use App\Models\ChurchSetting;
 use App\Models\Fund;
 use App\Models\User;
@@ -24,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
             'church_setting' => ChurchSetting::class,
             'account' => Account::class,
             'fund' => Fund::class,
+            'category' => Category::class,
         ]);
     }
 }
