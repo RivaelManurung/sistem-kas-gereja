@@ -13,12 +13,15 @@ use App\Http\Controllers\EventMemberController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\FundTransferController;
 use App\Http\Controllers\ServiceSessionController;
+use App\Http\Controllers\TransparencyController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
+
+Route::get('transparansi', [TransparencyController::class, 'index'])->name('transparency.index');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
