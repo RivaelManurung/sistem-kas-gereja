@@ -40,7 +40,7 @@ const statusBadge = (status: SheetSummary['status']) => {
         case 'verified':
             return <Badge className="bg-amber-600 text-white hover:bg-amber-700">Terverifikasi Bendahara</Badge>;
         case 'locked':
-            return <Badge className="bg-emerald-600 text-white hover:bg-emerald-700">Terkunci (Buku Besar)</Badge>;
+            return <Badge className="bg-slate-700 text-slate-100 hover:bg-slate-800 dark:bg-slate-800 dark:text-slate-200">Terkunci (Buku Besar)</Badge>;
     }
 };
 
@@ -90,7 +90,7 @@ export default function CountingIndex({ sheets }: { sheets: Paginated<SheetSumma
                                 </TableCell>
                                 <TableCell>{sheet.account.name}</TableCell>
                                 <TableCell>{sheet.creator?.name ?? '-'}</TableCell>
-                                <TableCell className="text-right font-mono font-semibold">
+                                <TableCell className="text-right font-mono font-semibold tabular-nums">
                                     {formatRupiah(sheet.total_amount)}
                                 </TableCell>
                                 <TableCell>{statusBadge(sheet.status)}</TableCell>

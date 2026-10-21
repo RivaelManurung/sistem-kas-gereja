@@ -23,6 +23,7 @@ class BankDepositRequest extends FormRequest
             'amount' => ['required', 'integer', 'min:1'],
             'reference_number' => ['nullable', 'string', 'max:100'],
             'proof_path' => ['nullable', 'string', 'max:255'],
+            'idempotency_key' => ['nullable', 'string', 'max:64'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }

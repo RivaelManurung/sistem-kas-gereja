@@ -1,26 +1,10 @@
 import InputError from '@/components/input-error';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Head, Link, useForm } from '@inertiajs/react';
-import {
-    ArrowRight,
-    Building2,
-    Check,
-    KeyRound,
-    LoaderCircle,
-    Lock,
-    LogIn,
-    Mail,
-    Shield,
-    Sparkles,
-    User,
-    Users,
-    Wallet,
-} from 'lucide-react';
+import { ArrowRight, ClipboardCheck, Church, Eye, EyeOff, FileText, LoaderCircle, Lock, Mail, ShieldCheck } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 
 interface LoginForm {
@@ -35,61 +19,90 @@ interface LoginProps {
     canResetPassword: boolean;
 }
 
-const DEMO_ACCOUNTS = [
-    {
-        role: 'Admin',
-        email: 'admin@gereja.test',
-        icon: Shield,
-        desc: 'Pengaturan & Master Data',
-        badgeColor: 'border-indigo-200 bg-indigo-50 text-indigo-700 dark:border-indigo-900/60 dark:bg-indigo-950/40 dark:text-indigo-300',
-    },
-    {
-        role: 'Bendahara',
-        email: 'bendahara@gereja.test',
-        icon: Wallet,
-        desc: 'Verifikasi, Buku Besar & Pengeluaran',
-        badgeColor: 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-300',
-    },
-    {
-        role: 'Majelis',
-        email: 'majelis@gereja.test',
-        icon: Building2,
-        desc: 'Persetujuan Pengeluaran & Laporan',
-        badgeColor: 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-300',
-    },
-    {
-        role: 'Penghitung',
-        email: 'penghitung@gereja.test',
-        icon: Users,
-        desc: 'Hitung Kolekte & Berita Acara',
-        badgeColor: 'border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-900/60 dark:bg-sky-950/40 dark:text-sky-300',
-    },
-    {
-        role: 'Jemaat',
-        email: 'jemaat@gereja.test',
-        icon: User,
-        desc: 'Portal Riwayat Persembahan Pribadi',
-        badgeColor: 'border-purple-200 bg-purple-50 text-purple-700 dark:border-purple-900/60 dark:bg-purple-950/40 dark:text-purple-300',
-    },
+const FEATURES = [
+    { icon: ClipboardCheck, title: 'Kolekte & berita acara', desc: 'Dihitung bersama saksi, lalu dikunci ke buku besar' },
+    { icon: FileText, title: 'Pengeluaran & laporan', desc: 'Persetujuan berjenjang dan laporan bertanda tangan' },
+    { icon: ShieldCheck, title: 'Transparansi jemaat', desc: 'Ringkasan publik tanpa data pribadi jemaat' },
 ];
 
+/** Interior gereja: sinar jendela, salib kayu, bangku, dan Alkitab. Ganti dengan foto bila ada. */
+function ChurchScene() {
+    return (
+        <svg className="absolute inset-0 size-full" viewBox="0 0 768 1024" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <defs>
+                <linearGradient id="ls-wall" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stopColor="#a39a8d" />
+                    <stop offset="0.55" stopColor="#6e665b" />
+                    <stop offset="1" stopColor="#24201c" />
+                </linearGradient>
+                <linearGradient id="ls-wood" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0" stopColor="#7a5c3d" />
+                    <stop offset="1" stopColor="#4d3926" />
+                </linearGradient>
+                <linearGradient id="ls-pew" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stopColor="#6a4a30" />
+                    <stop offset="1" stopColor="#1c130d" />
+                </linearGradient>
+                <linearGradient id="ls-beam" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stopColor="#fff4dc" stopOpacity="0.5" />
+                    <stop offset="1" stopColor="#fff4dc" stopOpacity="0" />
+                </linearGradient>
+                <filter id="ls-soft" x="-10%" y="-10%" width="120%" height="120%">
+                    <feGaussianBlur stdDeviation="2.5" />
+                </filter>
+                <filter id="ls-blur" x="-30%" y="-30%" width="160%" height="160%">
+                    <feGaussianBlur stdDeviation="14" />
+                </filter>
+            </defs>
+
+            <rect width="768" height="1024" fill="url(#ls-wall)" />
+
+            {/* kusen jendela di kanan */}
+            <rect x="700" y="0" width="68" height="780" fill="#2a3446" opacity="0.85" />
+            <rect x="716" y="0" width="14" height="780" fill="#1b2231" />
+
+            {/* sinar jendela */}
+            <g className="login-light" filter="url(#ls-blur)">
+                <polygon points="520,0 700,0 330,760 90,760" fill="url(#ls-beam)" opacity="0.55" />
+                <polygon points="400,0 470,0 180,760 90,760" fill="url(#ls-beam)" opacity="0.4" />
+            </g>
+
+            {/* salib kayu */}
+            <g filter="url(#ls-soft)">
+                <rect x="526" y="96" width="30" height="430" fill="url(#ls-wood)" />
+                <rect x="440" y="212" width="204" height="28" fill="url(#ls-wood)" />
+            </g>
+
+            {/* tanaman */}
+            <g filter="url(#ls-blur)" opacity="0.9">
+                <ellipse cx="640" cy="640" rx="120" ry="170" fill="#2f3b2c" />
+                <ellipse cx="700" cy="720" rx="90" ry="120" fill="#232d21" />
+            </g>
+
+            {/* bangku */}
+            <polygon points="0,806 768,720 768,1024 0,1024" fill="url(#ls-pew)" />
+            <polygon points="0,806 768,720 768,736 0,822" fill="#8a6542" opacity="0.7" />
+
+            {/* Alkitab */}
+            <g transform="translate(110 800) rotate(-6)">
+                <polygon points="0,40 300,0 390,34 90,100" fill="#15110e" />
+                <polygon points="90,100 390,34 390,66 90,132" fill="#e8dcc0" />
+                <polygon points="90,100 390,34 390,42 90,108" fill="#b9a67a" />
+                <polygon points="0,40 90,100 90,132 0,72" fill="#0d0a08" />
+                <path d="M150 40 L210 28 M180 22 L180 56" stroke="#8c7a4c" strokeWidth="2" opacity="0.6" />
+            </g>
+        </svg>
+    );
+}
+
 export default function Login({ status, canResetPassword }: LoginProps) {
-    const [selectedRole, setSelectedRole] = useState<string | null>(null);
+    const [showPassword, setShowPassword] = useState(false);
 
     const { data, setData, post, processing, errors, reset } = useForm<LoginForm>({
         email: '',
         password: '',
         remember: false,
     });
-
-    const handleSelectDemoAccount = (acc: (typeof DEMO_ACCOUNTS)[0]) => {
-        setSelectedRole(acc.role);
-        setData({
-            ...data,
-            email: acc.email,
-            password: 'password',
-        });
-    };
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -99,180 +112,145 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     };
 
     return (
-        <div className="flex min-h-screen w-full items-center justify-center bg-neutral-100/70 p-4 sm:p-6 lg:p-8 dark:bg-neutral-950">
-            <Head title="Masuk ke Akun — Sistem Kas Gereja" />
+        <div className="grid min-h-dvh w-full lg:grid-cols-2">
+            <Head title="Masuk — Kas Gereja" />
 
-            <div className="w-full max-w-md space-y-5">
-                {/* Church Header & Identity */}
-                <div className="flex flex-col items-center text-center">
-                    <Link href="/" className="group mb-2 flex items-center gap-2.5 transition-transform hover:scale-105">
-                        <div className="flex size-11 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-                            <Building2 className="size-6" />
+            {/* Panel kiri */}
+            <aside className="relative hidden flex-col overflow-hidden bg-neutral-900 p-12 text-white lg:flex">
+                <ChurchScene />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/55 via-black/25 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-black/30" />
+
+                <Link href={route('home')} className="relative z-10 flex items-center gap-2.5 text-lg font-semibold">
+                    <Church className="size-7" aria-hidden="true" />
+                    Kas Gereja
+                </Link>
+
+                <div className="relative z-10 my-auto max-w-md">
+                    <h1 className="text-4xl leading-[1.15] font-semibold tracking-tight text-balance">Bersama mengelola pelayanan gereja</h1>
+                    <p className="mt-5 max-w-sm text-base leading-relaxed text-white/80">
+                        Sistem kas dan persembahan yang membuat keuangan gereja lebih tertib, transparan, dan mudah dipertanggungjawabkan.
+                    </p>
+
+                    <ul className="mt-10 space-y-5">
+                        {FEATURES.map(({ icon: Icon, title, desc }) => (
+                            <li key={title} className="flex items-start gap-3.5">
+                                <Icon className="mt-0.5 size-5 shrink-0 text-white/90" aria-hidden="true" />
+                                <div>
+                                    <p className="text-sm font-medium">{title}</p>
+                                    <p className="text-sm text-white/65">{desc}</p>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </aside>
+
+            {/* Panel kanan */}
+            <main className="bg-background flex flex-col items-center justify-center px-6 py-10 sm:px-10">
+                <div className="w-full max-w-md">
+                    <div className="flex flex-col items-center text-center">
+                        <div className="bg-muted flex size-16 text-[#1f2d4d] dark:text-white items-center justify-center rounded-2xl shadow-xs">
+                            <Church className="size-8" aria-hidden="true" />
                         </div>
-                    </Link>
-                    <h1 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
-                        Sistem Kas & Persembahan Gereja
-                    </h1>
-                    <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                        Pengelolaan keuangan transparan, akuntabel, dan terpercaya
+                        <h2 className="mt-7 text-3xl font-semibold tracking-tight">Masuk ke akun</h2>
+                        <p className="text-muted-foreground mt-2 max-w-xs text-sm text-balance">Silakan masuk untuk melanjutkan ke sistem Kas Gereja.</p>
+                    </div>
+
+                    {status && (
+                        <div className="mt-6 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-center text-sm font-medium text-emerald-800 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-300">
+                            {status}
+                        </div>
+                    )}
+
+                    <form onSubmit={submit} className="mt-8 space-y-5">
+                        <div className="space-y-2">
+                            <Label htmlFor="email">Email</Label>
+                            <div className="relative">
+                                <Mail className="text-muted-foreground pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2" aria-hidden="true" />
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    required
+                                    autoFocus
+                                    autoComplete="email"
+                                    tabIndex={1}
+                                    value={data.email}
+                                    onChange={(e) => setData('email', e.target.value)}
+                                    placeholder="contoh@gereja.org"
+                                    className="h-12 pl-10"
+                                    aria-invalid={!!errors.email}
+                                />
+                            </div>
+                            <InputError message={errors.email} />
+                        </div>
+
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                                <Label htmlFor="password">Kata sandi</Label>
+                                {canResetPassword && (
+                                    <Link href={route('password.request')} tabIndex={5} className="text-primary text-sm font-medium hover:underline">
+                                        Lupa kata sandi?
+                                    </Link>
+                                )}
+                            </div>
+                            <div className="relative">
+                                <Lock className="text-muted-foreground pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2" aria-hidden="true" />
+                                <Input
+                                    id="password"
+                                    type={showPassword ? 'text' : 'password'}
+                                    required
+                                    autoComplete="current-password"
+                                    tabIndex={2}
+                                    value={data.password}
+                                    onChange={(e) => setData('password', e.target.value)}
+                                    placeholder="Masukkan kata sandi"
+                                    className="h-12 pr-11 pl-10"
+                                    aria-invalid={!!errors.password}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword((v) => !v)}
+                                    aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
+                                    aria-pressed={showPassword}
+                                    className="text-muted-foreground hover:text-foreground focus-visible:ring-ring absolute top-1/2 right-2 flex size-9 -translate-y-1/2 items-center justify-center rounded-md focus-visible:ring-2 focus-visible:outline-hidden"
+                                >
+                                    {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                                </button>
+                            </div>
+                            <InputError message={errors.password} />
+                        </div>
+
+                        <div className="flex items-center gap-2.5">
+                            <Checkbox
+                                id="remember"
+                                name="remember"
+                                tabIndex={3}
+                                checked={data.remember}
+                                onCheckedChange={(checked) => setData('remember', checked === true)}
+                            />
+                            <Label htmlFor="remember" className="text-muted-foreground font-normal">
+                                Ingat saya di perangkat ini
+                            </Label>
+                        </div>
+
+                        <Button type="submit" size="lg" className="h-12 w-full gap-2 bg-[#1f2d4d] text-base text-white hover:bg-[#2a3b63] dark:bg-[#2f4373] dark:hover:bg-[#3a5190]" tabIndex={4} disabled={processing}>
+                            {processing ? <LoaderCircle className="size-4 animate-spin" /> : null}
+                            Masuk
+                            {!processing && <ArrowRight className="size-4" />}
+                        </Button>
+                    </form>
+
+                    <p className="text-muted-foreground mt-8 text-center text-sm">
+                        Ingin melihat laporan kas?{' '}
+                        <Link href="/transparansi" className="text-primary font-medium hover:underline">
+                            Buka halaman transparansi
+                        </Link>
                     </p>
                 </div>
 
-                {/* Main Shadcn Login Card */}
-                <Card className="border border-neutral-200/80 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
-                    <CardHeader className="space-y-1 pb-4">
-                        <CardTitle className="text-lg font-bold text-neutral-900 dark:text-neutral-100">
-                            Masuk ke Akun
-                        </CardTitle>
-                        <CardDescription className="text-xs text-neutral-500 dark:text-neutral-400">
-                            Silakan masukkan email dan kata sandi akun pelayanan Anda
-                        </CardDescription>
-                    </CardHeader>
-
-                    <CardContent className="space-y-4">
-                        {status && (
-                            <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-2.5 text-center text-xs font-medium text-emerald-800 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-300">
-                                {status}
-                            </div>
-                        )}
-
-                        {/* Quick Demo Accounts Helper Box */}
-                        <div className="rounded-xl border border-sky-200 bg-sky-50/60 p-3 dark:border-sky-900/50 dark:bg-sky-950/20">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-1.5 text-xs font-semibold text-sky-900 dark:text-sky-200">
-                                    <KeyRound className="size-3.5 text-sky-600 dark:text-sky-400" />
-                                    <span>Akun Demo Cepat</span>
-                                </div>
-                                <Badge className="bg-sky-600 font-mono text-[10px] text-white hover:bg-sky-700">
-                                    Password: password
-                                </Badge>
-                            </div>
-                            <p className="mt-1 text-[11px] text-sky-800/80 dark:text-sky-300/80">
-                                Klik salah satu peran untuk mengisi email & kata sandi secara otomatis:
-                            </p>
-
-                            <div className="mt-2.5 flex flex-wrap gap-1.5">
-                                {DEMO_ACCOUNTS.map((acc) => {
-                                    const Icon = acc.icon;
-                                    const isSelected = selectedRole === acc.role;
-
-                                    return (
-                                        <button
-                                            key={acc.role}
-                                            type="button"
-                                            onClick={() => handleSelectDemoAccount(acc)}
-                                            className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs font-medium transition-all ${
-                                                isSelected
-                                                    ? 'border-primary bg-primary text-primary-foreground shadow-xs'
-                                                    : 'border-neutral-200 bg-white text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-200'
-                                            }`}
-                                            title={`${acc.role}: ${acc.email} (${acc.desc})`}
-                                        >
-                                            <Icon className="size-3" />
-                                            <span>{acc.role}</span>
-                                            {isSelected && <Check className="size-3" />}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        </div>
-
-                        {/* Form Inputs */}
-                        <form onSubmit={submit} className="space-y-3.5">
-                            <div className="space-y-1.5">
-                                <Label htmlFor="email" className="text-xs font-medium text-neutral-700 dark:text-neutral-300">
-                                    Alamat Email
-                                </Label>
-                                <div className="relative">
-                                    <Mail className="absolute top-2.5 left-3 size-4 text-neutral-400" />
-                                    <Input
-                                        id="email"
-                                        type="email"
-                                        required
-                                        autoFocus
-                                        autoComplete="email"
-                                        tabIndex={1}
-                                        value={data.email}
-                                        onChange={(e) => {
-                                            setSelectedRole(null);
-                                            setData('email', e.target.value);
-                                        }}
-                                        placeholder="admin@gereja.test"
-                                        className="h-9 pl-9 text-xs"
-                                    />
-                                </div>
-                                <InputError message={errors.email} />
-                            </div>
-
-                            <div className="space-y-1.5">
-                                <div className="flex items-center justify-between">
-                                    <Label htmlFor="password" className="text-xs font-medium text-neutral-700 dark:text-neutral-300">
-                                        Kata Sandi
-                                    </Label>
-                                    <span className="text-[11px] font-mono text-neutral-500">
-                                        (default: <strong className="text-neutral-800 dark:text-neutral-200">password</strong>)
-                                    </span>
-                                </div>
-                                <div className="relative">
-                                    <Lock className="absolute top-2.5 left-3 size-4 text-neutral-400" />
-                                    <Input
-                                        id="password"
-                                        type="password"
-                                        required
-                                        tabIndex={2}
-                                        autoComplete="current-password"
-                                        value={data.password}
-                                        onChange={(e) => setData('password', e.target.value)}
-                                        placeholder="Masukkan kata sandi"
-                                        className="h-9 pl-9 text-xs"
-                                    />
-                                </div>
-                                <InputError message={errors.password} />
-                            </div>
-
-                            <div className="flex items-center justify-between pt-1">
-                                <div className="flex items-center space-x-2">
-                                    <Checkbox
-                                        id="remember"
-                                        name="remember"
-                                        tabIndex={3}
-                                        checked={data.remember}
-                                        onCheckedChange={(checked) => setData('remember', checked === true)}
-                                    />
-                                    <Label htmlFor="remember" className="text-xs text-neutral-600 dark:text-neutral-400">
-                                        Ingat saya di perangkat ini
-                                    </Label>
-                                </div>
-                            </div>
-
-                            <Button type="submit" className="mt-2 h-9 w-full gap-1.5 text-xs font-semibold shadow-xs" tabIndex={4} disabled={processing}>
-                                {processing ? (
-                                    <LoaderCircle className="size-4 animate-spin" />
-                                ) : (
-                                    <LogIn className="size-4" />
-                                )}
-                                Masuk ke Sistem
-                            </Button>
-                        </form>
-                    </CardContent>
-
-                    <CardFooter className="flex flex-col gap-2 border-t border-neutral-100 pt-3 text-center dark:border-neutral-800">
-                        <Link
-                            href="/transparansi"
-                            className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
-                        >
-                            <Sparkles className="size-3 text-emerald-500" />
-                            <span>Lihat Halaman Transparansi Publik (Tanpa Login)</span>
-                            <ArrowRight className="size-3" />
-                        </Link>
-                    </CardFooter>
-                </Card>
-
-                {/* Footer copyright */}
-                <div className="text-center text-[11px] text-neutral-500">
-                    &copy; {new Date().getFullYear()} Sistem Kas & Persembahan Gereja
-                </div>
-            </div>
+                <p className="text-muted-foreground mt-12 text-xs">&copy; {new Date().getFullYear()} Kas Gereja. Semua hak dilindungi.</p>
+            </main>
         </div>
     );
 }

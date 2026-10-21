@@ -382,10 +382,11 @@ export default function CountingForm({
                                                             <div className="font-bold text-xs sm:text-sm text-foreground">
                                                                 {formatRupiah(denom)}
                                                             </div>
-                                                            <div className="my-1.5 flex items-center justify-center gap-1">
+                                                            <div className="my-2 flex items-center justify-center gap-1.5">
                                                                 <button
                                                                     type="button"
-                                                                    className="h-7 w-7 rounded bg-muted hover:bg-muted/80 text-foreground text-sm font-bold active:scale-95 transition"
+                                                                    aria-label={`Kurang ${formatRupiah(denom)}`}
+                                                                    className="h-11 w-11 rounded-md bg-muted hover:bg-muted/80 text-foreground text-base font-bold active:scale-95 transition flex items-center justify-center"
                                                                     onClick={() => incrementDenomination(lineIndex, denom, -1)}
                                                                 >
                                                                     -
@@ -394,7 +395,7 @@ export default function CountingForm({
                                                                     type="number"
                                                                     inputMode="numeric"
                                                                     min={0}
-                                                                    className="w-14 h-7 text-center font-mono font-bold text-sm border rounded bg-background"
+                                                                    className="w-16 h-11 text-center font-mono font-bold text-base tabular-nums border rounded-md bg-background focus:ring-2 focus:ring-primary"
                                                                     value={count === 0 ? '' : count}
                                                                     placeholder="0"
                                                                     onChange={(e) =>
@@ -407,23 +408,24 @@ export default function CountingForm({
                                                                 />
                                                                 <button
                                                                     type="button"
-                                                                    className="h-7 w-7 rounded bg-primary text-primary-foreground text-sm font-bold active:scale-95 transition"
+                                                                    aria-label={`Tambah ${formatRupiah(denom)}`}
+                                                                    className="h-11 w-11 rounded-md bg-primary text-primary-foreground text-base font-bold active:scale-95 transition flex items-center justify-center"
                                                                     onClick={() => incrementDenomination(lineIndex, denom, 1)}
                                                                 >
                                                                     +
                                                                 </button>
                                                             </div>
-                                                            <div className="flex justify-center gap-1 mt-1">
+                                                            <div className="flex justify-center gap-1.5 mt-1.5">
                                                                 <button
                                                                     type="button"
-                                                                    className="text-[10px] px-1.5 py-0.5 rounded bg-muted/60 hover:bg-muted font-medium"
+                                                                    className="h-7 px-2.5 rounded bg-muted hover:bg-muted/80 text-xs font-medium"
                                                                     onClick={() => incrementDenomination(lineIndex, denom, 5)}
                                                                 >
                                                                     +5
                                                                 </button>
                                                                 <button
                                                                     type="button"
-                                                                    className="text-[10px] px-1.5 py-0.5 rounded bg-muted/60 hover:bg-muted font-medium"
+                                                                    className="h-7 px-2.5 rounded bg-muted hover:bg-muted/80 text-xs font-medium"
                                                                     onClick={() => incrementDenomination(lineIndex, denom, 10)}
                                                                 >
                                                                     +10

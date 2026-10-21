@@ -2,6 +2,7 @@ import { LucideIcon } from 'lucide-react';
 
 export interface Auth {
     user: User;
+    roles?: string[];
     permissions: string[];
 }
 
@@ -133,7 +134,15 @@ export interface EventItem {
     financial_summary?: EventFinancialSummary;
     members?: EventMember[];
     categories?: Category[];
-    count_sheets?: any[];
+    count_sheets?: Array<{
+        id: number;
+        date: string;
+        sheet_number?: string;
+        total_amount?: number;
+        status?: string;
+        account?: { name: string };
+        creator?: { name: string };
+    }>;
     created_at: string;
     updated_at: string;
 }

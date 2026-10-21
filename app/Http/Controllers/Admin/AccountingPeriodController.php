@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\AccountingPeriodRequest;
 use App\Models\Account;
 use App\Models\AccountingPeriod;
 use App\Models\Fund;
+use App\Models\LedgerEntry;
 use App\Services\AccountingPeriodService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -45,6 +46,18 @@ class AccountingPeriodController extends Controller
     {
         $data = $request->validated();
         $user = $request->user();
+
+        $hasPriorPeriods = AccountingPeriod::exists();
+        $hasPriorEntries = LedgerEntry::exists();
+
+        if (($hasPriorPeriods || $hasPriorEntries) && ! empty($data['opening_balances'])) {
+            $hasPositiveAmount = collect($data['opening_balances'])->contains(fn ($b) => (int) ($b['amount'] ?? 0) > 0);
+            if ($hasPositiveAmount) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'opening_balances' => 'Saldo awal hanya dapat dicatat saat inisialisasi awal sistem. Periode berikutnya membawa saldo secara otomatis dari buku besar.',
+                ]);
+            }
+        }
 
         DB::transaction(function () use ($data, $user, $periodService, $request) {
             $period = AccountingPeriod::create([

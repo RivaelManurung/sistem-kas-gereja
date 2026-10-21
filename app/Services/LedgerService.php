@@ -29,6 +29,14 @@ class LedgerService
 
     public static function reverse(LedgerEntry $original, string $reason): LedgerEntry
     {
+        if ($original->reverses_id !== null) {
+            throw new \LogicException('Entri pembalik tidak dapat dibalikkan kembali.');
+        }
+
+        if ($original->reversals()->exists()) {
+            throw new \LogicException("Entri jurnal #{$original->id} sudah pernah dibalikkan sebelumnya.");
+        }
+
         return DB::transaction(function () use ($original, $reason) {
             $reversedDirection = $original->direction === Direction::In ? Direction::Out : Direction::In;
 

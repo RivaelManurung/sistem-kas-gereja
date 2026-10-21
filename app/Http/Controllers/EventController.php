@@ -23,13 +23,18 @@ class EventController extends Controller
 {
     public function index(Request $request): Response
     {
+        $this->authorize('viewAny', Event::class);
+
         $query = Event::query()
             ->with(['fund'])
             ->when($request->query('status'), fn ($q, $status) => $q->where('status', $status))
-            ->when($request->query('search'), fn ($q, $search) => $q->where(function ($sub) use ($search) {
-                $sub->where('name', 'ilike', "%{$search}%")
-                    ->orWhere('theme', 'ilike', "%{$search}%");
-            }))
+            ->when($request->query('search'), function ($q, $search) {
+                $escaped = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $search);
+                $q->where(function ($sub) use ($escaped) {
+                    $sub->where('name', 'ilike', "%{$escaped}%")
+                        ->orWhere('theme', 'ilike', "%{$escaped}%");
+                });
+            })
             ->orderByDesc('start_date')
             ->orderByDesc('id');
 
@@ -66,6 +71,8 @@ class EventController extends Controller
 
     public function create(): Response
     {
+        $this->authorize('create', Event::class);
+
         $attributeDefinitions = AttributeDefinition::active()
             ->where('entity_type', AttributeEntity::Event->value)
             ->whereNull('scope_event_id')
@@ -80,6 +87,8 @@ class EventController extends Controller
 
     public function store(EventRequest $request): RedirectResponse
     {
+        $this->authorize('create', Event::class);
+
         $data = $request->validated();
 
         $event = DB::transaction(function () use ($data) {
@@ -106,6 +115,8 @@ class EventController extends Controller
 
     public function show(Event $event): Response
     {
+        $this->authorize('view', $event);
+
         $event->load([
             'fund',
             'members.user',
@@ -166,6 +177,8 @@ class EventController extends Controller
 
     public function edit(Event $event): Response
     {
+        $this->authorize('update', $event);
+
         $attributeDefinitions = AttributeDefinition::active()
             ->where('entity_type', AttributeEntity::Event->value)
             ->where(fn ($q) => $q->whereNull('scope_event_id')->orWhere('scope_event_id', $event->id))
@@ -181,6 +194,8 @@ class EventController extends Controller
 
     public function update(EventRequest $request, Event $event): RedirectResponse
     {
+        $this->authorize('update', $event);
+
         $data = $request->validated();
 
         DB::transaction(function () use ($event, $data) {
@@ -205,6 +220,8 @@ class EventController extends Controller
 
     public function destroy(Event $event): RedirectResponse
     {
+        $this->authorize('delete', $event);
+
         if ($event->isClosed()) {
             return redirect()->route('events.show', $event)
                 ->with('error', 'Acara yang sudah ditutup tidak dapat dihapus.');

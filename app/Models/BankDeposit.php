@@ -20,6 +20,7 @@ class BankDeposit extends Model
         'proof_path',
         'notes',
         'status',
+        'idempotency_key',
         'created_by',
     ];
 

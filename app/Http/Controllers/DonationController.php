@@ -20,9 +20,10 @@ class DonationController extends Controller
         $donations = Donation::query()
             ->with(['member', 'category', 'countSheet'])
             ->when($request->query('search'), function ($q, $search) {
-                $q->where('receipt_number', 'ilike', "%{$search}%")
-                    ->orWhere('donor_name', 'ilike', "%{$search}%")
-                    ->orWhereHas('member', fn ($mq) => $mq->where('name', 'ilike', "%{$search}%"));
+                $escaped = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $search);
+                $q->where('receipt_number', 'ilike', "%{$escaped}%")
+                    ->orWhere('donor_name', 'ilike', "%{$escaped}%")
+                    ->orWhereHas('member', fn ($mq) => $mq->where('name', 'ilike', "%{$escaped}%"));
             })
             ->when($request->query('category_id'), fn ($q, $catId) => $q->where('category_id', $catId))
             ->orderByDesc('id')

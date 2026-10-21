@@ -64,7 +64,7 @@ export default function SchedulesIndex({ schedules }: { schedules: Paginated<Sch
                                 </TableCell>
                                 <TableCell className="text-right space-x-2">
                                     <Button variant="ghost" size="sm" asChild>
-                                        <Link href={route('admin.schedules.edit', schedule.id)}>Edit</Link>
+                                        <Link href={route('admin.schedules.edit', schedule.id)}>Ubah</Link>
                                     </Button>
                                     <Button variant="ghost" size="sm" onClick={() => toggle(schedule)}>
                                         {schedule.is_active ? 'Nonaktifkan' : 'Aktifkan'}

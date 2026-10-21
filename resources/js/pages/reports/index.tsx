@@ -153,7 +153,7 @@ export default function ReportsIndex({
             case 'rejected':
                 return <Badge variant="destructive">Ditolak</Badge>;
             default:
-                return <Badge variant="outline">Draft</Badge>;
+                return <Badge variant="outline">Draf</Badge>;
         }
     };
 

@@ -11,6 +11,8 @@ class EventMemberController extends Controller
 {
     public function store(EventMemberRequest $request, Event $event): RedirectResponse
     {
+        $this->authorize('manageMembers', $event);
+
         $data = $request->validated();
         $event->members()->create($data);
 
@@ -20,6 +22,8 @@ class EventMemberController extends Controller
 
     public function destroy(Event $event, EventMember $member): RedirectResponse
     {
+        $this->authorize('manageMembers', $event);
+
         if ($member->event_id !== $event->id) {
             abort(404);
         }

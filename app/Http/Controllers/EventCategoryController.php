@@ -13,6 +13,8 @@ class EventCategoryController extends Controller
 {
     public function store(Request $request, Event $event): RedirectResponse
     {
+        $this->authorize('update', $event);
+
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'direction' => ['required', new Enum(Direction::class)],

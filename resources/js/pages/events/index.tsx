@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { formatRupiah } from '@/lib/money';
 import { type BreadcrumbItem, type EventItem, type EventStatus, type Paginated } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { Calendar, PartyPopper, PlusCircle, Search } from 'lucide-react';
@@ -25,15 +26,7 @@ const statusVariants: Record<EventStatus, 'default' | 'secondary' | 'outline' | 
     planning: 'secondary',
     active: 'default',
     completed: 'outline',
-    closed: 'destructive',
-};
-
-const formatRupiah = (val?: number) => {
-    return new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        maximumFractionDigits: 0,
-    }).format(val ?? 0);
+    closed: 'outline',
 };
 
 export default function EventsIndex({

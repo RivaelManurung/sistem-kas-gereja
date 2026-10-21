@@ -139,7 +139,7 @@ export default function MembersIndex({
                                 </TableCell>
                                 <TableCell className="text-right space-x-2">
                                     <Button variant="ghost" size="sm" asChild>
-                                        <Link href={route('admin.members.edit', member.id)}>Edit</Link>
+                                        <Link href={route('admin.members.edit', member.id)}>Ubah</Link>
                                     </Button>
                                     <Button variant="ghost" size="sm" onClick={() => toggle(member)}>
                                         {member.is_active ? 'Nonaktifkan' : 'Aktifkan'}

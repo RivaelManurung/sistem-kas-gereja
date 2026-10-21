@@ -58,15 +58,6 @@ class FundTransferService
             abort(403, 'Anda tidak memiliki wewenang untuk menyetujui pindah dana.');
         }
 
-        // Negative balance protection on from_fund
-        $setting = ChurchSetting::current();
-        $sourceBalance = LedgerEntry::getBalance($transfer->from_fund_id);
-        if ($sourceBalance < $transfer->amount && ! $setting->allow_negative_balance) {
-            throw ValidationException::withMessages([
-                'amount' => 'Saldo dana asal tidak mencukupi untuk pemindahan dana ini.',
-            ]);
-        }
-
         if (AccountingPeriod::isDateClosed($transfer->transfer_date)) {
             throw ValidationException::withMessages([
                 'transfer_date' => 'Periode akuntansi pada tanggal pemindahan dana ini sudah ditutup.',
@@ -74,6 +65,18 @@ class FundTransferService
         }
 
         return DB::transaction(function () use ($transfer, $approver, $notes) {
+            // Pessimistic locks on Fund and Account
+            \App\Models\Fund::where('id', $transfer->from_fund_id)->lockForUpdate()->first();
+            \App\Models\Account::where('id', $transfer->account_id)->lockForUpdate()->first();
+
+            $setting = ChurchSetting::current();
+            $sourceBalance = LedgerEntry::getBalance($transfer->from_fund_id);
+            if ($sourceBalance < $transfer->amount && ! $setting->allow_negative_balance) {
+                throw ValidationException::withMessages([
+                    'amount' => 'Saldo dana asal tidak mencukupi untuk pemindahan dana ini.',
+                ]);
+            }
+
             $transfer->load(['fromFund', 'toFund']);
             $dateString = $transfer->transfer_date->toDateString();
 

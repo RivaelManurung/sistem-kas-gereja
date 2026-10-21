@@ -27,6 +27,15 @@ beforeEach(function () {
         'code' => 'UMUM',
         'name' => 'Dana Umum Operasional',
     ]);
+
+    LedgerEntry::create([
+        'entry_date' => '2026-10-25',
+        'account_id' => $this->cashAccount->id,
+        'fund_id' => $this->fund->id,
+        'amount' => 10000000,
+        'direction' => Direction::In->value,
+        'description' => 'Saldo awal kas tunai',
+    ]);
 });
 
 it('creates bank deposit and moves money between accounts on completion', function () {

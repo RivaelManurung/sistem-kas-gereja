@@ -11,6 +11,8 @@ class EventClosingController extends Controller
 {
     public function close(EventCloseRequest $request, Event $event, EventClosingService $service): RedirectResponse
     {
+        $this->authorize('close', $event);
+
         $targetFundId = $request->input('target_fund_id') ? (int) $request->input('target_fund_id') : null;
         $notes = $request->input('notes');
 

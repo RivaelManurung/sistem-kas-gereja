@@ -19,6 +19,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
+import { formatRupiah } from '@/lib/money';
 import {
     type Account,
     type BreadcrumbItem,
@@ -63,7 +64,7 @@ const statusVariants: Record<EventStatus, 'default' | 'secondary' | 'outline' | 
     planning: 'secondary',
     active: 'default',
     completed: 'outline',
-    closed: 'destructive',
+    closed: 'outline',
 };
 
 const roleLabels: Record<EventRole, string> = {
@@ -73,13 +74,14 @@ const roleLabels: Record<EventRole, string> = {
     anggota: 'Anggota',
 };
 
-const formatRupiah = (val?: number) => {
-    return new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        maximumFractionDigits: 0,
-    }).format(val ?? 0);
-};
+interface EventExpenseEntry {
+    id: number;
+    entry_date: string;
+    amount: number;
+    description: string;
+    account?: { id: number; name: string };
+    category?: { id: number; name: string };
+}
 
 export default function EventShow({
     event,
@@ -94,7 +96,7 @@ export default function EventShow({
 }: {
     event: EventItem;
     financialSummary: EventFinancialSummary;
-    expenseEntries?: any[];
+    expenseEntries?: EventExpenseEntry[];
     accounts?: Account[];
     targetFunds?: Fund[];
     users?: User[];

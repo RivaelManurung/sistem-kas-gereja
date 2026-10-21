@@ -79,6 +79,7 @@ class ReportFreezeService
     public function approve(FrozenReport $report, ReportApproval $approval, User $user, ?string $notes = null): FrozenReport
     {
         return DB::transaction(function () use ($report, $approval, $user, $notes) {
+            abort_if((int) $approval->frozen_report_id !== (int) $report->id, 404, 'Posisi penanda tangan tidak sesuai dengan laporan ini.');
             abort_if($report->status !== FrozenReport::STATUS_PENDING, 400, 'Laporan tidak dalam status menunggu persetujuan.');
 
             // Verify authority
@@ -90,6 +91,8 @@ class ReportFreezeService
                     403,
                     'Peran akun Anda tidak berwenang untuk menandatangani posisi ini.'
                 );
+            } else {
+                abort(403, 'Konfigurasi penanda tangan tidak valid.');
             }
 
             // Verify signature exists

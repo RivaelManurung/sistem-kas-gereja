@@ -30,14 +30,14 @@ class AllocationRuleRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             $items = $this->input('items', []);
-            $total = 0;
             $fundIds = [];
+            $sumBasisPoints = 0;
 
             foreach ($items as $item) {
                 $percentage = (float) ($item['percentage'] ?? 0);
                 $fundId = $item['fund_id'] ?? null;
 
-                $total += $percentage;
+                $sumBasisPoints += (int) round($percentage * 100);
 
                 if ($fundId) {
                     if (in_array($fundId, $fundIds, true)) {
@@ -47,9 +47,9 @@ class AllocationRuleRequest extends FormRequest
                 }
             }
 
-            // Allow small floating delta tolerance (e.g. 99.999 to 100.001)
-            if (abs($total - 100.00) > 0.01) {
-                $totalFormatted = number_format($total, 2);
+            // Require strictly exact 100.00% (10,000 basis points)
+            if ($sumBasisPoints !== 10000) {
+                $totalFormatted = number_format($sumBasisPoints / 100, 2);
                 $validator->errors()->add('items', "Total persentase pembagian harus tepat 100.00% (saat ini: {$totalFormatted}%).");
             }
         });

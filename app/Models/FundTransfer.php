@@ -23,6 +23,7 @@ class FundTransfer extends Model
         'requested_by',
         'approved_by',
         'approved_at',
+        'idempotency_key',
         'notes',
     ];
 

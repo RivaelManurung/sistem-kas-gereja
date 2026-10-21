@@ -134,14 +134,6 @@ class ExpenseService
             abort(403, 'Hanya Bendahara atau Admin yang berhak melakukan pembayaran pengeluaran.');
         }
 
-        $setting = ChurchSetting::current();
-        $balance = LedgerEntry::getBalance($expense->fund_id);
-        if ($balance < $expense->amount && ! $setting->allow_negative_balance) {
-            throw ValidationException::withMessages([
-                'fund_id' => 'Saldo dana tidak mencukupi untuk membayar pengeluaran ini.',
-            ]);
-        }
-
         if (AccountingPeriod::isDateClosed($expense->date)) {
             throw ValidationException::withMessages([
                 'date' => 'Periode akuntansi pada tanggal pengeluaran ini sudah ditutup.',
@@ -149,6 +141,28 @@ class ExpenseService
         }
 
         return DB::transaction(function () use ($expense) {
+            // Pessimistic locks on Fund and Account to prevent concurrent race condition
+            \App\Models\Fund::where('id', $expense->fund_id)->lockForUpdate()->first();
+            \App\Models\Account::where('id', $expense->account_id)->lockForUpdate()->first();
+
+            $setting = ChurchSetting::current();
+
+            // 1. Fund balance check
+            $balance = LedgerEntry::getBalance($expense->fund_id);
+            if ($balance < $expense->amount && ! $setting->allow_negative_balance) {
+                throw ValidationException::withMessages([
+                    'fund_id' => 'Saldo dana tidak mencukupi untuk membayar pengeluaran ini.',
+                ]);
+            }
+
+            // 2. Account balance overdraft check
+            $accountBalance = LedgerEntry::getAccountBalance($expense->account_id);
+            if ($accountBalance < $expense->amount && ! $setting->allow_negative_balance) {
+                throw ValidationException::withMessages([
+                    'account_id' => 'Saldo rekening kas tidak mencukupi untuk membayar pengeluaran ini.',
+                ]);
+            }
+
             LedgerService::record([
                 'entry_date' => $expense->date->toDateString(),
                 'account_id' => $expense->account_id,

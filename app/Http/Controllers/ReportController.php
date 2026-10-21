@@ -153,6 +153,8 @@ class ReportController extends Controller
         ReportApproval $approval,
         ReportFreezeService $freezeService
     ): RedirectResponse {
+        abort_if((int) $approval->frozen_report_id !== (int) $report->id, 404, 'Posisi penanda tangan tidak sesuai dengan laporan ini.');
+
         $notes = $request->input('notes');
 
         $freezeService->approve($report, $approval, $request->user(), $notes);

@@ -107,7 +107,7 @@ export default function CategoriesIndex({
                                 </TableCell>
                                 <TableCell className="text-right space-x-2">
                                     <Button variant="ghost" size="sm" asChild>
-                                        <Link href={route('admin.categories.edit', cat.id)}>Edit</Link>
+                                        <Link href={route('admin.categories.edit', cat.id)}>Ubah</Link>
                                     </Button>
                                     <Button variant="ghost" size="sm" onClick={() => toggle(cat)}>
                                         {cat.is_active ? 'Nonaktifkan' : 'Aktifkan'}

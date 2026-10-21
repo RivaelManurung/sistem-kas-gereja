@@ -114,7 +114,7 @@ export default function AttributesIndex({
                                 </TableCell>
                                 <TableCell className="text-right space-x-2">
                                     <Button variant="ghost" size="sm" asChild>
-                                        <Link href={route('admin.attributes.edit', def.id)}>Edit</Link>
+                                        <Link href={route('admin.attributes.edit', def.id)}>Ubah</Link>
                                     </Button>
                                     <Button variant="ghost" size="sm" onClick={() => toggle(def)}>
                                         {def.is_active ? 'Nonaktifkan' : 'Aktifkan'}

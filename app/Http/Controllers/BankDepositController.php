@@ -8,6 +8,7 @@ use App\Http\Requests\BankDepositRequest;
 use App\Models\Account;
 use App\Models\BankDeposit;
 use App\Models\Fund;
+use App\Models\LedgerEntry;
 use App\Services\LedgerService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -48,7 +49,29 @@ class BankDepositController extends Controller
         $data = $request->validated();
         $user = $request->user();
 
+        // Idempotency check: if key provided and already processed, return existing
+        if (! empty($data['idempotency_key'])) {
+            $existing = BankDeposit::where('idempotency_key', $data['idempotency_key'])->first();
+            if ($existing) {
+                return redirect()->route('deposits.index')
+                    ->with('success', 'Setoran bank berhasil dibukukan.');
+            }
+        }
+
         DB::transaction(function () use ($data, $user, $ledgerService) {
+            // Lock source and destination accounts
+            Account::where('id', $data['from_account_id'])->lockForUpdate()->first();
+            Account::where('id', $data['to_account_id'])->lockForUpdate()->first();
+
+            // Account balance check on source cash account
+            $setting = \App\Models\ChurchSetting::current();
+            $sourceBalance = LedgerEntry::getAccountBalance($data['from_account_id']);
+            if ($sourceBalance < $data['amount'] && ! $setting->allow_negative_balance) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'amount' => 'Saldo rekening kas sumber tidak mencukupi untuk setoran bank ini.',
+                ]);
+            }
+
             $deposit = BankDeposit::create([
                 ...$data,
                 'status' => 'completed',
@@ -57,7 +80,15 @@ class BankDepositController extends Controller
 
             // General fund is used for account balance transfer
             $fund = Fund::where('code', 'UMUM')->first() ?? Fund::first();
-            $fundId = $fund ? $fund->id : 1;
+            if (! $fund) {
+                $fund = Fund::create([
+                    'code' => 'UMUM',
+                    'name' => 'Dana Umum',
+                    'type' => 'unrestricted',
+                    'is_active' => true,
+                ]);
+            }
+            $fundId = $fund->id;
             $dateString = $deposit->deposit_date->toDateString();
 
             // 1. OUT from Cash

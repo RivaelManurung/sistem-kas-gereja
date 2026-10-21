@@ -156,3 +156,23 @@
         @apply bg-background text-foreground;
     }
 }
+
+/* Login: cahaya jendela yang bergeser pelan di panel kiri */
+@keyframes login-light-drift {
+    from {
+        transform: translateX(-14px);
+    }
+    to {
+        transform: translateX(18px);
+    }
+}
+
+.login-light {
+    animation: login-light-drift 16s ease-in-out infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .login-light {
+        animation: none;
+    }
+}

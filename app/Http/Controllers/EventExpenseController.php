@@ -11,6 +11,8 @@ class EventExpenseController extends Controller
 {
     public function store(EventExpenseRequest $request, Event $event, EventExpenseService $service): RedirectResponse
     {
+        $this->authorize('submitExpense', $event);
+
         $service->recordExpense($event, $request->validated());
 
         return redirect()->route('events.show', $event)

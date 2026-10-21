@@ -129,9 +129,9 @@ Commit di branch `fase-N`; jangan merge ke `main` (itu tugas agen merge).
 - [x] Fase 5
 - [x] Fase 6
 - [x] Merge 5+6
-- [ ] UI Polish
-- [ ] Review
-- [ ] Fix
+- [x] UI Polish (`ebf9616`)
+- [x] Review (3 lensa paralel: Keuangan, Keamanan, Frontend)
+- [x] Fix (Penyelesaian temuan audit 3 lensa)
 
 ## 10. Format laporan per langkah
 

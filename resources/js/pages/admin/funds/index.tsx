@@ -60,7 +60,7 @@ export default function FundsIndex({ funds }: { funds: Paginated<FundRow> }) {
                                 </TableCell>
                                 <TableCell className="text-right space-x-2">
                                     <Button variant="ghost" size="sm" asChild>
-                                        <Link href={route('admin.funds.edit', fund.id)}>Edit</Link>
+                                        <Link href={route('admin.funds.edit', fund.id)}>Ubah</Link>
                                     </Button>
                                     <Button variant="ghost" size="sm" onClick={() => toggle(fund)}>
                                         {fund.is_active ? 'Nonaktifkan' : 'Aktifkan'}

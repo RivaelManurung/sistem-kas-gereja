@@ -95,6 +95,9 @@ class AllocationService
 
                     // Remainder rounding strictly to the first fund
                     $remainder = $line->amount - $allocatedSum;
+                    if ($remainder < 0) {
+                        throw new LogicException("Sisa alokasi tidak boleh negatif ({$remainder}) untuk baris {$line->id}.");
+                    }
                     if ($remainder > 0 && count($allocations) > 0) {
                         $allocations[0]['amount'] += $remainder;
                     }
