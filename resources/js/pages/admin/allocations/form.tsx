@@ -3,10 +3,12 @@ import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import AppLayout from '@/layouts/app-layout';
+import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Plus, Trash2 } from 'lucide-react';
@@ -143,7 +145,7 @@ export default function AllocationForm({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={isEdit ? 'Edit Aturan Alokasi' : 'Tambah Aturan Alokasi'} />
-            <div className="space-y-6 p-4 max-w-3xl">
+            <div className="space-y-6 p-4 md:p-6">
                 <PageHeader
                     title={isEdit ? 'Edit Aturan Alokasi' : 'Tambah Aturan Alokasi Pos Dana'}
                     description="Tentukan porsi persentase pembagian persembahan ke setiap pos dana."
@@ -157,7 +159,7 @@ export default function AllocationForm({
                     <CardContent>
                         <form onSubmit={submit} className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-1">
+                                <div className="space-y-2">
                                     <Label htmlFor="category">Kategori Persembahan</Label>
                                     <Select
                                         value={data.category_id}
@@ -177,20 +179,19 @@ export default function AllocationForm({
                                     <InputError message={errors.category_id} />
                                 </div>
 
-                                <div className="space-y-1">
+                                <div className="space-y-2">
                                     <Label htmlFor="valid_from">Berlaku Mulai Tanggal</Label>
-                                    <Input
+                                    <DatePicker
                                         id="valid_from"
-                                        type="date"
-                                        value={data.valid_from}
-                                        onChange={(e) => setData('valid_from', e.target.value)}
+                                        value={formatDate(data.valid_from)}
+                                        onChange={(v) => setData('valid_from', v)}
                                         required
                                     />
                                     <InputError message={errors.valid_from} />
                                 </div>
                             </div>
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="name">Nama Aturan</Label>
                                 <Input
                                     id="name"
@@ -280,7 +281,7 @@ export default function AllocationForm({
                                 <div
                                     className={`flex items-center justify-between p-3 rounded-lg border text-sm font-semibold ${
                                         isTotalValid
-                                            ? 'bg-emerald-50 text-emerald-800 border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-300'
+                                            ? 'bg-income/10 text-income border-income/30'
                                             : 'bg-destructive/10 text-destructive border-destructive/30'
                                     }`}
                                 >

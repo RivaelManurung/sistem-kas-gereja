@@ -1,90 +1,71 @@
 import { useForm } from '@inertiajs/react';
-import { FormEventHandler, useRef } from 'react';
+import { FormEventHandler, useRef, useState } from 'react';
 
-// Components...
+import { ConfirmDialog } from '@/components/app/confirm-dialog';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-
-import HeadingSmall from '@/components/heading-small';
-
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { SettingsSection } from '@/layouts/settings/layout';
 
 export default function DeleteUser() {
     const passwordInput = useRef<HTMLInputElement>(null);
-    const { data, setData, delete: destroy, processing, reset, errors, clearErrors } = useForm({ password: '' });
+    const [open, setOpen] = useState(false);
+    const { data, setData, delete: destroy, processing, reset, errors } = useForm({ password: '' });
 
-    const deleteUser: FormEventHandler = (e) => {
-        e.preventDefault();
-
+    const destroyAccount = () => {
         destroy(route('profile.destroy'), {
             preserveScroll: true,
-            onSuccess: () => closeModal(),
             onError: () => passwordInput.current?.focus(),
             onFinish: () => reset(),
         });
     };
 
-    const closeModal = () => {
-        clearErrors();
-        reset();
+    const requestDelete: FormEventHandler = (e) => {
+        e.preventDefault();
+        setOpen(true);
     };
 
     return (
-        <div className="space-y-6">
-            <HeadingSmall title="Hapus Akun" description="Hapus akun Anda beserta seluruh data terkait secara permanen" />
-            <div className="space-y-4 rounded-lg border border-rose-200 bg-rose-50 p-4 dark:border-rose-900/30 dark:bg-rose-950/20">
-                <div className="relative space-y-0.5 text-rose-700 dark:text-rose-300">
-                    <p className="font-medium">Peringatan</p>
-                    <p className="text-sm">Harap berhati-hati, tindakan ini bersifat permanen dan tidak dapat dibatalkan.</p>
-                </div>
+        <SettingsSection title="Hapus akun" description="Menghapus akun akan menghilangkan seluruh data terkait secara permanen.">
+            <Card className="border-destructive/30">
+                <form onSubmit={requestDelete}>
+                    <CardContent className="space-y-5 p-5 md:p-6">
+                        <p className="text-sm text-muted-foreground">
+                            Tindakan ini tidak dapat dibatalkan. Masukkan kata sandi Anda untuk melanjutkan.
+                        </p>
+                        <div className="grid gap-2">
+                            <Label htmlFor="delete_password">Kata sandi</Label>
+                            <Input
+                                id="delete_password"
+                                type="password"
+                                name="password"
+                                ref={passwordInput}
+                                value={data.password}
+                                onChange={(e) => setData('password', e.target.value)}
+                                autoComplete="current-password"
+                            />
+                            <InputError message={errors.password} />
+                        </div>
+                    </CardContent>
+                    <CardFooter className="justify-end rounded-b-xl border-t border-destructive/30 bg-destructive/5 px-5 py-4 md:px-6">
+                        <Button type="submit" variant="destructive" disabled={processing || data.password === ''}>
+                            Hapus akun
+                        </Button>
+                    </CardFooter>
+                </form>
+            </Card>
 
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button variant="destructive">Hapus Akun</Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogTitle>Apakah Anda yakin ingin menghapus akun Anda?</DialogTitle>
-                        <DialogDescription>
-                            Setelah akun Anda dihapus, semua data profil Anda akan dihapus secara permanen. Silakan masukkan kata sandi Anda
-                            untuk mengonfirmasi penghapusan akun.
-                        </DialogDescription>
-                        <form className="space-y-6" onSubmit={deleteUser}>
-                            <div className="grid gap-2">
-                                <Label htmlFor="password" className="sr-only">
-                                    Kata Sandi
-                                </Label>
-
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    name="password"
-                                    ref={passwordInput}
-                                    value={data.password}
-                                    onChange={(e) => setData('password', e.target.value)}
-                                    placeholder="Kata sandi"
-                                    autoComplete="current-password"
-                                />
-
-                                <InputError message={errors.password} />
-                            </div>
-
-                            <DialogFooter>
-                                <DialogClose asChild>
-                                    <Button variant="secondary" onClick={closeModal}>
-                                        Batal
-                                    </Button>
-                                </DialogClose>
-
-                                <Button variant="destructive" disabled={processing} asChild>
-                                    <button type="submit">Hapus Akun</button>
-                                </Button>
-                            </DialogFooter>
-                        </form>
-                    </DialogContent>
-                </Dialog>
-            </div>
-        </div>
+            <ConfirmDialog
+                open={open}
+                onOpenChange={setOpen}
+                title="Hapus akun Anda?"
+                description="Akun dan seluruh data profil Anda akan dihapus secara permanen dan tidak dapat dipulihkan."
+                confirmLabel="Hapus akun"
+                destructive
+                onConfirm={destroyAccount}
+            />
+        </SettingsSection>
     );
 }

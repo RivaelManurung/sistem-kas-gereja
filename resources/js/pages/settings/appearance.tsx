@@ -1,11 +1,10 @@
 import { Head } from '@inertiajs/react';
 
 import AppearanceTabs from '@/components/appearance-tabs';
-import HeadingSmall from '@/components/heading-small';
 import { type BreadcrumbItem } from '@/types';
 
 import AppLayout from '@/layouts/app-layout';
-import SettingsLayout from '@/layouts/settings/layout';
+import SettingsLayout, { SettingsSection } from '@/layouts/settings/layout';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -20,10 +19,9 @@ export default function Appearance() {
             <Head title="Pengaturan Tampilan" />
 
             <SettingsLayout>
-                <div className="space-y-6">
-                    <HeadingSmall title="Tema Tampilan" description="Atur preferensi tema tampilan antarmuka akun Anda" />
+                <SettingsSection title="Tema" description="Pilih tema antarmuka. Pilihan disimpan di perangkat ini.">
                     <AppearanceTabs />
-                </div>
+                </SettingsSection>
             </SettingsLayout>
         </AppLayout>
     );

@@ -3,10 +3,12 @@ import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
+import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
@@ -84,7 +86,7 @@ export default function SessionCreate({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Buka Sesi Ibadah" />
-            <div className="space-y-6 p-4 max-w-2xl">
+            <div className="space-y-6 p-4 md:p-6">
                 <PageHeader
                     title="Buka Sesi Ibadah"
                     description="Mulai sesi ibadah baru untuk mencatat kehadiran dan berita acara penghitungan kolekte."
@@ -99,7 +101,7 @@ export default function SessionCreate({
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={submit} className="space-y-4">
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="schedule">Jadwal Ibadah</Label>
                                 <Select
                                     value={data.service_schedule_id}
@@ -120,7 +122,7 @@ export default function SessionCreate({
                                 <InputError message={errors.service_schedule_id} />
                             </div>
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="name">Nama Ibadah</Label>
                                 <Input
                                     id="name"
@@ -133,19 +135,18 @@ export default function SessionCreate({
                                 <InputError message={errors.name} />
                             </div>
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="date">Tanggal Pelaksanaan</Label>
-                                <Input
+                                <DatePicker
                                     id="date"
-                                    type="date"
-                                    value={data.date}
-                                    onChange={(e) => setData('date', e.target.value)}
+                                    value={formatDate(data.date)}
+                                    onChange={(v) => setData('date', v)}
                                     required
                                 />
                                 <InputError message={errors.date} />
                             </div>
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="notes">Catatan Tambahan (Opsional)</Label>
                                 <Textarea
                                     id="notes"

@@ -1,3 +1,6 @@
+import { ConfirmDialog } from '@/components/app/confirm-dialog';
+import { LinkRow } from '@/components/app/link-row';
+import { RowActions } from '@/components/app/row-actions';
 import InputError from '@/components/input-error';
 import PageHeader from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
@@ -13,6 +16,8 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { MoneyInput } from '@/components/ui/money-input';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -20,37 +25,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { formatRupiah } from '@/lib/money';
-import {
-    type Account,
-    type BreadcrumbItem,
-    type Category,
-    type EventFinancialSummary,
-    type EventItem,
-    type EventRole,
-    type EventStatus,
-    type Fund,
-    type Member,
-    type User,
-} from '@/types';
+import { formatDate } from '@/lib/date';
+import { type Account, type BreadcrumbItem, type EventFinancialSummary, type EventItem, type EventRole, type EventStatus, type Fund, type Member, type User } from '@/types';
 import { type AttributeDefinition } from '@/types/attributes';
 import { Head, Link, useForm } from '@inertiajs/react';
-import {
-    AlertCircle,
-    ArrowDownLeft,
-    ArrowUpRight,
-    Calendar,
-    CheckCircle2,
-    DollarSign,
-    Edit,
-    FileSpreadsheet,
-    Lock,
-    PieChart,
-    Plus,
-    PlusCircle,
-    Tag,
-    Trash2,
-    Users,
-} from 'lucide-react';
+import { ArrowDownLeft, ArrowUpRight, Calendar, DollarSign, Edit, Lock, PieChart, Plus, PlusCircle, Eye, Trash2 } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 
 const statusLabels: Record<EventStatus, string> = {
@@ -113,6 +92,7 @@ export default function EventShow({
     const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
     const [isExpenseDialogOpen, setIsExpenseDialogOpen] = useState(false);
     const [isCloseDialogOpen, setIsCloseDialogOpen] = useState(false);
+    const [memberToRemove, setMemberToRemove] = useState<number | null>(null);
 
     // Form: Member
     const memberForm = useForm({
@@ -189,7 +169,7 @@ export default function EventShow({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={event.name} />
-            <div className="space-y-6 p-4">
+            <div className="space-y-6 p-4 md:p-6">
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-5">
                     <div>
@@ -207,7 +187,7 @@ export default function EventShow({
                         <div className="flex items-center gap-4 text-xs text-muted-foreground mt-2">
                             <span className="flex items-center gap-1">
                                 <Calendar className="h-3.5 w-3.5" />
-                                {event.start_date} {event.end_date && `s/d ${event.end_date}`}
+                                {formatDate(event.start_date)} {event.end_date && `s/d ${formatDate(event.end_date)}`}
                             </span>
                             {event.fund && (
                                 <span className="flex items-center gap-1">
@@ -246,13 +226,13 @@ export default function EventShow({
                                         <form onSubmit={submitClose} className="space-y-4 py-2">
                                             <div className="rounded-lg border p-3 bg-muted/40 space-y-1">
                                                 <div className="text-xs text-muted-foreground">Sisa Saldo Kas Acara Saat Ini:</div>
-                                                <div className="text-lg font-bold font-mono text-foreground">
+                                                <div className="text-lg font-bold text-foreground tabular-nums">
                                                     {formatRupiah(financialSummary.remaining_balance)}
                                                 </div>
                                             </div>
 
                                             {financialSummary.remaining_balance > 0 ? (
-                                                <div className="space-y-1">
+                                                <div className="space-y-2">
                                                     <Label htmlFor="target_fund_id">
                                                         Pindahkan Sisa Saldo ke Pos Dana: <span className="text-destructive">*</span>
                                                     </Label>
@@ -279,7 +259,7 @@ export default function EventShow({
                                                 </p>
                                             )}
 
-                                            <div className="space-y-1">
+                                            <div className="space-y-2">
                                                 <Label htmlFor="close_notes">Catatan Penutupan</Label>
                                                 <Textarea
                                                     id="close_notes"
@@ -322,7 +302,7 @@ export default function EventShow({
                             <DollarSign className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold font-mono">{formatRupiah(financialSummary.target_budget)}</div>
+                            <div className="text-2xl font-bold ">{formatRupiah(financialSummary.target_budget)}</div>
                             <p className="text-xs text-muted-foreground mt-1">
                                 Realisasi pengeluaran: {financialSummary.budget_realization_pct}%
                             </p>
@@ -332,10 +312,10 @@ export default function EventShow({
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                             <CardTitle className="text-sm font-medium text-muted-foreground">Total Pemasukan</CardTitle>
-                            <ArrowDownLeft className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                            <ArrowDownLeft className="h-4 w-4 text-income" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400">
+                            <div className="text-2xl font-bold text-income tabular-nums">
                                 {formatRupiah(financialSummary.total_income)}
                             </div>
                             <p className="text-xs text-muted-foreground mt-1">
@@ -347,10 +327,10 @@ export default function EventShow({
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                             <CardTitle className="text-sm font-medium text-muted-foreground">Total Pengeluaran</CardTitle>
-                            <ArrowUpRight className="h-4 w-4 text-rose-600 dark:text-rose-400" />
+                            <ArrowUpRight className="h-4 w-4 text-expense" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold font-mono text-rose-600 dark:text-rose-400">
+                            <div className="text-2xl font-bold text-expense tabular-nums">
                                 {formatRupiah(financialSummary.total_expenses)}
                             </div>
                             <p className="text-xs text-muted-foreground mt-1">
@@ -365,7 +345,7 @@ export default function EventShow({
                             <PieChart className="h-4 w-4 text-primary" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold font-mono text-foreground">
+                            <div className="text-2xl font-bold text-foreground tabular-nums">
                                 {formatRupiah(financialSummary.remaining_balance)}
                             </div>
                             <p className="text-xs text-muted-foreground mt-1">
@@ -410,7 +390,7 @@ export default function EventShow({
                                         </DialogHeader>
 
                                         <form onSubmit={submitMember} className="space-y-4 py-2">
-                                            <div className="space-y-1">
+                                            <div className="space-y-2">
                                                 <Label htmlFor="user_id">Akun Pengguna Sistem (Opsional)</Label>
                                                 <Select
                                                     value={memberForm.data.user_id}
@@ -430,7 +410,7 @@ export default function EventShow({
                                                 </Select>
                                             </div>
 
-                                            <div className="space-y-1">
+                                            <div className="space-y-2">
                                                 <Label htmlFor="member_id">Anggota Jemaat (Opsional)</Label>
                                                 <Select
                                                     value={memberForm.data.member_id}
@@ -450,7 +430,7 @@ export default function EventShow({
                                                 </Select>
                                             </div>
 
-                                            <div className="space-y-1">
+                                            <div className="space-y-2">
                                                 <Label htmlFor="role_in_event">
                                                     Peran dalam Acara <span className="text-destructive">*</span>
                                                 </Label>
@@ -471,7 +451,7 @@ export default function EventShow({
                                                 <InputError message={memberForm.errors.role_in_event} />
                                             </div>
 
-                                            <div className="space-y-1">
+                                            <div className="space-y-2">
                                                 <Label htmlFor="member_notes">Catatan / Seksi</Label>
                                                 <Input
                                                     id="member_notes"
@@ -506,7 +486,7 @@ export default function EventShow({
                                         <TableHead>Nama Petugas</TableHead>
                                         <TableHead>Peran</TableHead>
                                         <TableHead>Keterangan / Seksi</TableHead>
-                                        <TableHead className="text-right">Aksi</TableHead>
+                                        <TableHead className="w-12"><span className="sr-only">Aksi</span></TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -534,20 +514,17 @@ export default function EventShow({
                                                     {m.notes || '-'}
                                                 </TableCell>
                                                 <TableCell className="text-right">
-                                                    {event.status !== 'closed' && (
-                                                        <Button
-                                                            size="icon"
-                                                            variant="ghost"
-                                                            className="text-destructive hover:bg-destructive/10 h-8 w-8"
-                                                            onClick={() => {
-                                                                if (confirm('Hapus anggota panitia ini?')) {
-                                                                    memberForm.delete(route('events.members.destroy', [event.id, m.id]));
-                                                                }
-                                                            }}
-                                                        >
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
-                                                    )}
+                                                    <RowActions
+                                                        actions={[
+                                                            {
+                                                                label: 'Hapus dari panitia',
+                                                                icon: Trash2,
+                                                                onSelect: () => setMemberToRemove(m.id),
+                                                                destructive: true,
+                                                                hidden: event.status === 'closed',
+                                                            },
+                                                        ]}
+                                                    />
                                                 </TableCell>
                                             </TableRow>
                                         ))
@@ -585,7 +562,7 @@ export default function EventShow({
                                         <TableHead>Pencatat</TableHead>
                                         <TableHead className="text-right">Total Nominal</TableHead>
                                         <TableHead className="text-center">Status</TableHead>
-                                        <TableHead className="text-right">Aksi</TableHead>
+                                        <TableHead className="w-12"><span className="sr-only">Aksi</span></TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -597,25 +574,21 @@ export default function EventShow({
                                         </TableRow>
                                     ) : (
                                         event.count_sheets.map((cs) => (
-                                            <TableRow key={cs.id}>
+                                            <LinkRow key={cs.id} href={route('counting.show', cs.id)}>
                                                 <TableCell className="font-mono text-xs">#{cs.id}</TableCell>
-                                                <TableCell className="text-sm font-medium">{cs.date}</TableCell>
+                                                <TableCell className="text-sm font-medium">{formatDate(cs.date)}</TableCell>
                                                 <TableCell className="text-sm">{cs.account?.name ?? '-'}</TableCell>
                                                 <TableCell className="text-xs text-muted-foreground">{cs.creator?.name ?? '-'}</TableCell>
-                                                <TableCell className="text-right font-mono font-semibold tabular-nums text-emerald-600 dark:text-emerald-400">
+                                                <TableCell className="text-right font-semibold tabular-nums text-income">
                                                     +{formatRupiah(cs.total_amount)}
                                                 </TableCell>
                                                 <TableCell className="text-center">
                                                     <Badge variant="outline">{cs.status}</Badge>
                                                 </TableCell>
                                                 <TableCell className="text-right">
-                                                    <Button size="sm" variant="ghost" asChild>
-                                                        <Link href={route('counting.show', cs.id)}>
-                                                            Lihat
-                                                        </Link>
-                                                    </Button>
+                                                    <RowActions actions={[{ label: 'Lihat detail', icon: Eye, href: route('counting.show', cs.id) }]} />
                                                 </TableCell>
-                                            </TableRow>
+                                            </LinkRow>
                                         ))
                                     )}
                                 </TableBody>
@@ -648,18 +621,17 @@ export default function EventShow({
                                         </DialogHeader>
 
                                         <form onSubmit={submitExpense} className="space-y-4 py-2">
-                                            <div className="space-y-1">
+                                            <div className="space-y-2">
                                                 <Label htmlFor="entry_date">Tanggal Pengeluaran <span className="text-destructive">*</span></Label>
-                                                <Input
+                                                <DatePicker
                                                     id="entry_date"
-                                                    type="date"
-                                                    value={expenseForm.data.entry_date}
-                                                    onChange={(e) => expenseForm.setData('entry_date', e.target.value)}
+                                                    value={formatDate(expenseForm.data.entry_date)}
+                                                    onChange={(v) => expenseForm.setData('entry_date', v)}
                                                 />
-                                                <InputError message={expenseForm.errors.entry_date} />
+                                                <InputError message={formatDate(expenseForm.errors.entry_date)} />
                                             </div>
 
-                                            <div className="space-y-1">
+                                            <div className="space-y-2">
                                                 <Label htmlFor="account_id">Rekening Sumber Kas <span className="text-destructive">*</span></Label>
                                                 <Select
                                                     value={expenseForm.data.account_id}
@@ -679,7 +651,7 @@ export default function EventShow({
                                                 <InputError message={expenseForm.errors.account_id} />
                                             </div>
 
-                                            <div className="space-y-1">
+                                            <div className="space-y-2">
                                                 <Label htmlFor="category_id">Kategori Pengeluaran <span className="text-destructive">*</span></Label>
                                                 <Select
                                                     value={expenseForm.data.category_id}
@@ -705,20 +677,13 @@ export default function EventShow({
                                                 <InputError message={expenseForm.errors.category_id} />
                                             </div>
 
-                                            <div className="space-y-1">
+                                            <div className="space-y-2">
                                                 <Label htmlFor="amount">Nominal Pengeluaran (Rupiah) <span className="text-destructive">*</span></Label>
-                                                <Input
-                                                    id="amount"
-                                                    type="number"
-                                                    min="1"
-                                                    placeholder="Contoh: 500000"
-                                                    value={expenseForm.data.amount}
-                                                    onChange={(e) => expenseForm.setData('amount', e.target.value)}
-                                                />
+                                                <MoneyInput id="amount" value={expenseForm.data.amount} onChange={(v) => expenseForm.setData('amount', String(v))} />
                                                 <InputError message={expenseForm.errors.amount} />
                                             </div>
 
-                                            <div className="space-y-1">
+                                            <div className="space-y-2">
                                                 <Label htmlFor="description">Keterangan Belanja</Label>
                                                 <Input
                                                     id="description"
@@ -767,13 +732,13 @@ export default function EventShow({
                                     ) : (
                                         expenseEntries.map((e) => (
                                             <TableRow key={e.id}>
-                                                <TableCell className="font-mono text-sm">{e.entry_date}</TableCell>
+                                                <TableCell className="text-sm">{formatDate(e.entry_date)}</TableCell>
                                                 <TableCell className="text-sm">{e.account?.name ?? '-'}</TableCell>
                                                 <TableCell>
                                                     <Badge variant="outline">{e.category?.name ?? 'Pengeluaran'}</Badge>
                                                 </TableCell>
                                                 <TableCell className="text-sm">{e.description}</TableCell>
-                                                <TableCell className="text-right font-mono font-semibold tabular-nums text-rose-600 dark:text-rose-400">
+                                                <TableCell className="text-right font-semibold tabular-nums text-expense">
                                                     -{formatRupiah(e.amount)}
                                                 </TableCell>
                                             </TableRow>
@@ -809,7 +774,7 @@ export default function EventShow({
                                         </DialogHeader>
 
                                         <form onSubmit={submitCategory} className="space-y-4 py-2">
-                                            <div className="space-y-1">
+                                            <div className="space-y-2">
                                                 <Label htmlFor="cat_name">Nama Kategori <span className="text-destructive">*</span></Label>
                                                 <Input
                                                     id="cat_name"
@@ -820,7 +785,7 @@ export default function EventShow({
                                                 <InputError message={categoryForm.errors.name} />
                                             </div>
 
-                                            <div className="space-y-1">
+                                            <div className="space-y-2">
                                                 <Label htmlFor="cat_dir">Arah Aliran Dana <span className="text-destructive">*</span></Label>
                                                 <Select
                                                     value={categoryForm.data.direction}
@@ -945,6 +910,19 @@ export default function EventShow({
                     </TabsContent>
                 </Tabs>
             </div>
+
+            <ConfirmDialog
+                open={memberToRemove !== null}
+                onOpenChange={(open) => !open && setMemberToRemove(null)}
+                title="Hapus anggota panitia?"
+                description="Anggota ini dikeluarkan dari susunan panitia acara dan tidak lagi dapat mengakses acara ini sebagai panitia."
+                confirmLabel="Hapus"
+                destructive
+                onConfirm={() => {
+                    if (memberToRemove !== null) memberForm.delete(route('events.members.destroy', [event.id, memberToRemove]));
+                    setMemberToRemove(null);
+                }}
+            />
         </AppLayout>
     );
 }

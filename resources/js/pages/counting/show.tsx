@@ -1,3 +1,5 @@
+import { ConfirmDialog } from '@/components/app/confirm-dialog';
+import { LinkRow } from '@/components/app/link-row';
 import PageHeader from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -5,8 +7,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { formatRupiah } from '@/lib/money';
+import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { useState } from 'react';
 import { CheckCircle2, Edit, Lock, Trash2, Users } from 'lucide-react';
 
 interface ConfirmationUser {
@@ -102,22 +106,22 @@ export default function CountingShow({
     const isConfirmed = sheet.status === 'confirmed';
     const isDraft = sheet.status === 'draft';
 
+    const [confirmDelete, setConfirmDelete] = useState(false);
+
     const handleDelete = () => {
-        if (confirm('Yakin ingin menghapus draf berita acara ini?')) {
-            destroy(route('counting.destroy', sheet.id));
-        }
+        destroy(route('counting.destroy', sheet.id));
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Berita Acara BA-${String(sheet.id).padStart(5, '0')}`} />
-            <div className="space-y-6 p-4 max-w-5xl">
+            <div className="space-y-6 p-4 md:p-6">
                 <PageHeader
                     title={`Berita Acara Penghitungan #BA-${String(sheet.id).padStart(5, '0')}`}
                     description={
                         sheet.service_session
-                            ? `Sesi: ${sheet.service_session.name} (${sheet.service_session.date})`
-                            : `Penerimaan Kas - Tanggal ${sheet.date}`
+                            ? `Sesi: ${sheet.service_session.name} (${formatDate(sheet.service_session.date)})`
+                            : `Penerimaan Kas - Tanggal ${formatDate(sheet.date)}`
                     }
                     actions={
                         <div className="flex items-center gap-2">
@@ -134,7 +138,7 @@ export default function CountingShow({
                                 <Button
                                     variant="ghost"
                                     className="text-destructive hover:bg-destructive/10"
-                                    onClick={handleDelete}
+                                    onClick={() => setConfirmDelete(true)}
                                     disabled={deleting}
                                 >
                                     <Trash2 className="mr-2 h-4 w-4" />
@@ -156,15 +160,15 @@ export default function CountingShow({
                         <CardContent>
                             {sheet.status === 'draft' && <Badge variant="outline">Draf Penghitungan</Badge>}
                             {sheet.status === 'confirmed' && (
-                                <Badge variant="secondary" className="bg-blue-100 text-blue-800 border-blue-300">
+                                <Badge variant="secondary" className="bg-info/10 text-info border-info/30">
                                     Terkonfirmasi Saksi ({confirmationsCount}/{requiredConfirmations})
                                 </Badge>
                             )}
                             {sheet.status === 'verified' && (
-                                <Badge className="bg-amber-600 text-white">Terverifikasi Bendahara</Badge>
+                                <Badge className="border-warning/30 bg-warning/10 text-warning">Terverifikasi Bendahara</Badge>
                             )}
                             {sheet.status === 'locked' && (
-                                <Badge className="bg-emerald-600 text-white flex items-center gap-1 w-fit">
+                                <Badge className="border-income/30 bg-income/10 text-income flex items-center gap-1 w-fit">
                                     <Lock className="h-3 w-3" /> Terkunci di Buku Besar
                                 </Badge>
                             )}
@@ -178,7 +182,7 @@ export default function CountingShow({
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold font-mono text-primary">
+                            <div className="text-2xl font-bold text-primary tabular-nums">
                                 {formatRupiah(sheet.total_amount)}
                             </div>
                         </CardContent>
@@ -203,7 +207,7 @@ export default function CountingShow({
                         </CardHeader>
                         <CardContent>
                             <div className="font-medium text-sm">{sheet.creator.name}</div>
-                            <div className="text-muted-foreground text-xs">{sheet.date}</div>
+                            <div className="text-muted-foreground text-xs">{formatDate(sheet.date)}</div>
                         </CardContent>
                     </Card>
                 </div>
@@ -231,7 +235,7 @@ export default function CountingShow({
                                 >
                                     {hasCurrentUserConfirmed ? (
                                         <>
-                                            <CheckCircle2 className="mr-2 h-4 w-4 text-emerald-600" />
+                                            <CheckCircle2 className="mr-2 h-4 w-4 text-income" />
                                             Anda Sudah Mengonfirmasi
                                         </>
                                     ) : (
@@ -249,7 +253,7 @@ export default function CountingShow({
 
                             {/* Verifikasi Bendahara */}
                             {isConfirmed && ['bendahara', 'admin'].includes(userRole) && (
-                                <Button variant="outline" className="border-amber-600 text-amber-700" asChild>
+                                <Button variant="outline" className="border-warning/30 text-warning" asChild>
                                     <Link href={`/counting/${sheet.id}/verify`} method="post" as="button">
                                         Verifikasi Sebagai Bendahara
                                     </Link>
@@ -258,7 +262,7 @@ export default function CountingShow({
 
                             {/* Kunci ke Buku Besar */}
                             {isVerified && ['bendahara', 'admin'].includes(userRole) && (
-                                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" asChild>
+                                <Button className="border-income/30 bg-income/10 text-income" asChild>
                                     <Link href={`/counting/${sheet.id}/lock`} method="post" as="button">
                                         <Lock className="mr-2 h-4 w-4" />
                                         Kunci & Bukukan ke Buku Besar
@@ -303,7 +307,7 @@ export default function CountingShow({
                                     </div>
                                     <div className="text-right">
                                         <div className="text-xs text-muted-foreground uppercase">Subtotal</div>
-                                        <div className="text-lg font-mono font-bold text-primary">
+                                        <div className="text-lg font-bold text-primary tabular-nums">
                                             {formatRupiah(line.amount)}
                                         </div>
                                     </div>
@@ -334,7 +338,7 @@ export default function CountingShow({
                                                                     <TableCell className="text-center font-mono">
                                                                         {c.toLocaleString('id-ID')}
                                                                     </TableCell>
-                                                                    <TableCell className="text-right font-mono font-semibold">
+                                                                    <TableCell className="text-right font-semibold tabular-nums">
                                                                         {formatRupiah(d * c)}
                                                                     </TableCell>
                                                                 </TableRow>
@@ -380,16 +384,16 @@ export default function CountingShow({
                                 </TableHeader>
                                 <TableBody>
                                     {sheet.donations.map((don) => (
-                                        <TableRow key={don.id}>
+                                        <LinkRow key={don.id} href={route('donations.show', don.id)}>
                                             <TableCell className="font-mono text-xs">{don.receipt_number}</TableCell>
                                             <TableCell className="font-medium">
                                                 {don.member ? don.member.name : don.donor_name}
                                             </TableCell>
                                             <TableCell>{don.category?.name ?? '-'}</TableCell>
-                                            <TableCell className="text-right font-mono font-semibold">
+                                            <TableCell className="text-right font-semibold tabular-nums">
                                                 {formatRupiah(don.amount)}
                                             </TableCell>
-                                        </TableRow>
+                                        </LinkRow>
                                     ))}
                                 </TableBody>
                             </Table>
@@ -401,6 +405,16 @@ export default function CountingShow({
                     </CardContent>
                 </Card>
             </div>
+
+            <ConfirmDialog
+                open={confirmDelete}
+                onOpenChange={setConfirmDelete}
+                title="Hapus draf berita acara?"
+                description="Draf berita acara ini beserta rincian hitungnya akan dihapus permanen dan tidak dapat dikembalikan."
+                confirmLabel="Hapus"
+                destructive
+                onConfirm={handleDelete}
+            />
         </AppLayout>
     );
 }

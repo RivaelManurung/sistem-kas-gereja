@@ -26,7 +26,7 @@ class FundRequest extends FormRequest
         return [
             'code' => ['required', 'string', 'max:20', Rule::unique('funds', 'code')->ignore($fundId)],
             'name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
+            'description' => ['nullable', 'string', 'max:500'],
             'is_active' => ['boolean'],
         ];
     }

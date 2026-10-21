@@ -31,7 +31,7 @@ class FundTransfer extends Model
     {
         return [
             'amount' => 'integer',
-            'transfer_date' => 'date',
+            'transfer_date' => 'date:Y-m-d',
             'status' => FundTransferStatus::class,
             'approved_at' => 'datetime',
         ];

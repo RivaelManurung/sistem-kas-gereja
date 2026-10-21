@@ -4,10 +4,13 @@ import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { MoneyInput } from '@/components/ui/money-input';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
+import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem, type EventItem, type EventStatus } from '@/types';
 import { type AttributeDefinition } from '@/types/attributes';
 import { Head, Link, useForm } from '@inertiajs/react';
@@ -65,7 +68,7 @@ export default function EventForm({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={isEdit ? `Edit ${event?.name}` : 'Buat Acara Baru'} />
-            <div className="space-y-6 p-4 max-w-3xl">
+            <div className="space-y-6 p-4 md:p-6">
                 <PageHeader
                     title={isEdit ? `Edit Acara: ${event?.name}` : 'Buat Acara Baru'}
                     description={
@@ -92,7 +95,7 @@ export default function EventForm({
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="name">
                                     Nama Acara <span className="text-destructive">*</span>
                                 </Label>
@@ -105,7 +108,7 @@ export default function EventForm({
                                 <InputError message={errors.name} />
                             </div>
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="theme">Tema Acara (Opsional)</Label>
                                 <Input
                                     id="theme"
@@ -117,33 +120,31 @@ export default function EventForm({
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="space-y-1">
+                                <div className="space-y-2">
                                     <Label htmlFor="start_date">
                                         Tanggal Mulai <span className="text-destructive">*</span>
                                     </Label>
-                                    <Input
+                                    <DatePicker
                                         id="start_date"
-                                        type="date"
-                                        value={data.start_date}
-                                        onChange={(e) => setData('start_date', e.target.value)}
+                                        value={formatDate(data.start_date)}
+                                        onChange={(v) => setData('start_date', v)}
                                     />
                                     <InputError message={errors.start_date} />
                                 </div>
 
-                                <div className="space-y-1">
+                                <div className="space-y-2">
                                     <Label htmlFor="end_date">Tanggal Selesai (Opsional)</Label>
-                                    <Input
+                                    <DatePicker
                                         id="end_date"
-                                        type="date"
-                                        value={data.end_date}
-                                        onChange={(e) => setData('end_date', e.target.value)}
+                                        value={formatDate(data.end_date)}
+                                        onChange={(v) => setData('end_date', v)}
                                     />
                                     <InputError message={errors.end_date} />
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="space-y-1">
+                                <div className="space-y-2">
                                     <Label htmlFor="status">Status Pelaksanaan</Label>
                                     <Select
                                         value={data.status}
@@ -162,21 +163,14 @@ export default function EventForm({
                                     <InputError message={errors.status} />
                                 </div>
 
-                                <div className="space-y-1">
+                                <div className="space-y-2">
                                     <Label htmlFor="target_budget">Target Anggaran (Rupiah)</Label>
-                                    <Input
-                                        id="target_budget"
-                                        type="number"
-                                        min="0"
-                                        placeholder="0"
-                                        value={data.target_budget}
-                                        onChange={(e) => setData('target_budget', e.target.value)}
-                                    />
+                                    <MoneyInput id="target_budget" value={data.target_budget} onChange={(v) => setData('target_budget', String(v))} />
                                     <InputError message={errors.target_budget} />
                                 </div>
                             </div>
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="description">Deskripsi & Catatan Acara</Label>
                                 <Textarea
                                     id="description"

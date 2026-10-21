@@ -21,7 +21,7 @@ class EventRequest extends FormRequest
             'start_date' => ['required', 'date'],
             'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
             'status' => ['nullable', new Enum(EventStatus::class)],
-            'target_budget' => ['nullable', 'numeric', 'min:0'],
+            'target_budget' => ['nullable', 'integer', 'min:0', 'max:999999999999'],
             'description' => ['nullable', 'string', 'max:5000'],
             'attributes' => ['nullable', 'array'],
         ];

@@ -1,12 +1,17 @@
 import PageHeader from '@/components/page-header';
 import Pagination from '@/components/pagination';
+import { ConfirmDialog } from '@/components/app/confirm-dialog';
+import { RowActions } from '@/components/app/row-actions';
+import StatusBadge from '@/components/status-badge';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem, type Paginated } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { Edit, PlusCircle, Split } from 'lucide-react';
+import { Pencil, PlusCircle, Power } from 'lucide-react';
+import { useState } from 'react';
 
 interface AllocationRuleRow {
     id: number;
@@ -33,14 +38,18 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function AllocationsIndex({ rules }: { rules: Paginated<AllocationRuleRow> }) {
-    const toggleActive = (id: number) => {
-        router.patch(route('admin.allocations.toggle', id));
+    const [target, setTarget] = useState<AllocationRuleRow | null>(null);
+
+    const confirmToggle = () => {
+        if (!target) return;
+        router.patch(route('admin.allocations.toggle', target.id), {}, { preserveScroll: true });
+        setTarget(null);
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Aturan Alokasi Pos Dana" />
-            <div className="space-y-6 p-4">
+            <div className="space-y-6 p-4 md:p-6">
                 <PageHeader
                     title="Aturan Alokasi Pos Dana"
                     description="Pembagian persentase persembahan ke pos dana gereja (berlaku bertanggal/berversi)."
@@ -62,7 +71,9 @@ export default function AllocationsIndex({ rules }: { rules: Paginated<Allocatio
                             <TableHead>Berlaku Mulai</TableHead>
                             <TableHead>Rincian Pembagian Pos Dana</TableHead>
                             <TableHead>Status</TableHead>
-                            <TableHead className="text-right">Aksi</TableHead>
+                            <TableHead className="w-12">
+                                <span className="sr-only">Aksi</span>
+                            </TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -72,7 +83,7 @@ export default function AllocationsIndex({ rules }: { rules: Paginated<Allocatio
                                 <TableCell>
                                     <Badge variant="outline">{rule.category.name}</Badge>
                                 </TableCell>
-                                <TableCell className="font-mono text-sm">{rule.valid_from}</TableCell>
+                                <TableCell className="text-sm">{formatDate(rule.valid_from)}</TableCell>
                                 <TableCell>
                                     <div className="flex flex-wrap gap-1.5">
                                         {rule.items.map((item) => (
@@ -83,28 +94,27 @@ export default function AllocationsIndex({ rules }: { rules: Paginated<Allocatio
                                     </div>
                                 </TableCell>
                                 <TableCell>
-                                    <Button
-                                        size="sm"
-                                        variant={rule.is_active ? 'default' : 'secondary'}
-                                        onClick={() => toggleActive(rule.id)}
-                                    >
-                                        {rule.is_active ? 'Aktif' : 'Nonaktif'}
-                                    </Button>
+                                    <StatusBadge active={rule.is_active} />
                                 </TableCell>
-                                <TableCell className="text-right space-x-2">
-                                    <Button size="sm" variant="outline" asChild>
-                                        <Link href={route('admin.allocations.edit', rule.id)}>
-                                            <Edit className="mr-1 h-3.5 w-3.5" />
-                                            Edit
-                                        </Link>
-                                    </Button>
+                                <TableCell className="text-right">
+                                    <RowActions
+                                        actions={[
+                                            { label: 'Ubah', icon: Pencil, href: route('admin.allocations.edit', rule.id) },
+                                            {
+                                                label: rule.is_active ? 'Nonaktifkan' : 'Aktifkan',
+                                                icon: Power,
+                                                onSelect: () => setTarget(rule),
+                                                destructive: rule.is_active,
+                                                separated: true,
+                                            },
+                                        ]}
+                                    />
                                 </TableCell>
                             </TableRow>
                         ))}
                         {rules.data.length === 0 && (
                             <TableRow>
                                 <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                                    <Split className="mx-auto h-8 w-8 mb-2 opacity-50" />
                                     Belum ada aturan alokasi berversi yang dibuat.
                                 </TableCell>
                             </TableRow>
@@ -113,6 +123,20 @@ export default function AllocationsIndex({ rules }: { rules: Paginated<Allocatio
                 </Table>
 
                 <Pagination links={rules.links} />
+
+                <ConfirmDialog
+                    open={target !== null}
+                    onOpenChange={(open) => !open && setTarget(null)}
+                    title={target?.is_active ? 'Nonaktifkan aturan alokasi?' : 'Aktifkan aturan alokasi?'}
+                    description={
+                        target?.is_active
+                            ? `Aturan "${target?.name}" tidak lagi dipakai untuk membagi persembahan baru ke pos dana. Data lama tidak berubah.`
+                            : `Aturan "${target?.name}" akan dipakai kembali untuk membagi persembahan baru ke pos dana.`
+                    }
+                    confirmLabel={target?.is_active ? 'Nonaktifkan' : 'Aktifkan'}
+                    destructive={target?.is_active}
+                    onConfirm={confirmToggle}
+                />
             </div>
         </AppLayout>
     );

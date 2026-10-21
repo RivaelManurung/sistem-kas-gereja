@@ -35,7 +35,7 @@ class Expense extends Model
     {
         return [
             'amount' => 'integer',
-            'date' => 'date',
+            'date' => 'date:Y-m-d',
             'status' => ExpenseStatus::class,
             'approved_at' => 'datetime',
             'paid_at' => 'datetime',

@@ -77,7 +77,7 @@ export default function CategoryForm({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={isEdit ? 'Edit Kategori' : 'Tambah Kategori'} />
-            <div className="space-y-6 p-4 max-w-2xl">
+            <div className="space-y-6 p-4 md:p-6">
                 <PageHeader
                     title={isEdit ? 'Edit Kategori' : 'Tambah Kategori'}
                     description={
@@ -92,7 +92,7 @@ export default function CategoryForm({
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={submit} className="space-y-4">
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="direction">Arah Kas *</Label>
                                 <Select
                                     value={data.direction}
@@ -118,7 +118,7 @@ export default function CategoryForm({
                                 <InputError message={errors.direction} />
                             </div>
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="name">Nama Kategori *</Label>
                                 <Input
                                     id="name"
@@ -130,7 +130,7 @@ export default function CategoryForm({
                                 <InputError message={errors.name} />
                             </div>
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="default_fund_id">Pos Dana Default *</Label>
                                 <Select
                                     value={String(data.default_fund_id)}
@@ -150,7 +150,7 @@ export default function CategoryForm({
                                 <InputError message={errors.default_fund_id} />
                             </div>
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="sort_order">Nomor Urutan Tampilan</Label>
                                 <Input
                                     id="sort_order"

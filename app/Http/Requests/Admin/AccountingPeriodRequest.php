@@ -21,7 +21,7 @@ class AccountingPeriodRequest extends FormRequest
             'opening_balances' => ['nullable', 'array'],
             'opening_balances.*.account_id' => ['required_with:opening_balances', 'exists:accounts,id'],
             'opening_balances.*.fund_id' => ['required_with:opening_balances', 'exists:funds,id'],
-            'opening_balances.*.amount' => ['required_with:opening_balances', 'numeric', 'min:0'],
+            'opening_balances.*.amount' => ['required_with:opening_balances', 'integer', 'min:0', 'max:999999999999'],
         ];
     }
 

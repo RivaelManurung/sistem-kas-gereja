@@ -2,12 +2,15 @@ import InputError from '@/components/input-error';
 import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+
+import { MoneyInput } from '@/components/ui/money-input';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
-import { formatRupiah } from '@/lib/money';
+
+import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeftRight } from 'lucide-react';
@@ -64,7 +67,7 @@ export default function TransfersCreate({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Ajukan Pindah Dana Antar-Pos" />
-            <div className="space-y-6 p-4 max-w-2xl">
+            <div className="space-y-6 p-4 md:p-6">
                 <PageHeader
                     title="Permohonan Pindah Dana Antar-Pos"
                     description="Pencatatan mutasi alokasi dana antar pos (mis. penutupan defisit Diakonia oleh Kas Umum)."
@@ -79,20 +82,19 @@ export default function TransfersCreate({
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={submit} className="space-y-4">
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="date">Tanggal Pemindahan</Label>
-                                <Input
+                                <DatePicker
                                     id="date"
-                                    type="date"
-                                    value={data.transfer_date}
-                                    onChange={(e) => setData('transfer_date', e.target.value)}
+                                    value={formatDate(data.transfer_date)}
+                                    onChange={(v) => setData('transfer_date', v)}
                                     required
                                 />
                                 <InputError message={errors.transfer_date} />
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-1">
+                                <div className="space-y-2">
                                     <Label htmlFor="from_fund">Dari Pos Dana (Sumber)</Label>
                                     <Select
                                         value={data.from_fund_id}
@@ -112,7 +114,7 @@ export default function TransfersCreate({
                                     <InputError message={errors.from_fund_id} />
                                 </div>
 
-                                <div className="space-y-1">
+                                <div className="space-y-2">
                                     <Label htmlFor="to_fund">Ke Pos Dana (Tujuan)</Label>
                                     <Select
                                         value={data.to_fund_id}
@@ -133,7 +135,7 @@ export default function TransfersCreate({
                                 </div>
                             </div>
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="account">Rekening Transaksi</Label>
                                 <Select
                                     value={data.account_id}
@@ -153,27 +155,13 @@ export default function TransfersCreate({
                                 <InputError message={errors.account_id} />
                             </div>
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="amount">Nominal Pemindahan (Rp)</Label>
-                                <Input
-                                    id="amount"
-                                    type="number"
-                                    inputMode="numeric"
-                                    min={1}
-                                    value={data.amount || ''}
-                                    placeholder="0"
-                                    onChange={(e) => setData('amount', Number(e.target.value) || 0)}
-                                    required
-                                />
-                                {data.amount > 0 && (
-                                    <p className="text-xs text-muted-foreground font-mono">
-                                        Terbilang: {formatRupiah(data.amount)}
-                                    </p>
-                                )}
+                                <MoneyInput id="amount" value={data.amount} onChange={(v) => setData('amount', v)} required />
                                 <InputError message={errors.amount} />
                             </div>
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="reason">Alasan Pemindahan Dana</Label>
                                 <Textarea
                                     id="reason"
@@ -186,7 +174,7 @@ export default function TransfersCreate({
                                 <InputError message={errors.reason} />
                             </div>
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="notes">Catatan Tambahan (Opsional)</Label>
                                 <Textarea
                                     id="notes"

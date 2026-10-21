@@ -18,7 +18,7 @@ class ExpenseRequest extends FormRequest
 
         return [
             'payee' => ['required', 'string', 'max:255'],
-            'amount' => ['required', 'numeric', 'min:1'],
+            'amount' => ['required', 'integer', 'min:1', 'max:999999999999'],
             'date' => ['required', 'date'],
             'account_id' => ['required', 'exists:accounts,id'],
             'fund_id' => ['required', 'exists:funds,id'],

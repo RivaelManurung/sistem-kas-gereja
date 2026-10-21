@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Permission;
 use App\Enums\Direction;
 use App\Enums\FundTransferStatus;
 use App\Enums\Role;
@@ -54,7 +55,7 @@ class FundTransferService
             abort(403, 'Pemohon tidak boleh menyetujui permohonan pindah dana sendiri.');
         }
 
-        if (! $approver->hasAnyRole([Role::Bendahara->value, Role::Majelis->value, Role::Admin->value])) {
+        if (! $approver->can(Permission::TransfersApprove->value)) {
             abort(403, 'Anda tidak memiliki wewenang untuk menyetujui pindah dana.');
         }
 
@@ -127,7 +128,7 @@ class FundTransferService
             abort(403, 'Pemohon tidak dapat memproses permohonan pindah dananya sendiri.');
         }
 
-        if (! $user->hasAnyRole([Role::Bendahara->value, Role::Majelis->value, Role::Admin->value])) {
+        if (! $user->can(Permission::TransfersApprove->value)) {
             abort(403, 'Anda tidak memiliki wewenang untuk menolak pindah dana.');
         }
 

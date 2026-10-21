@@ -4,10 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
+import { MoneyInput } from '@/components/ui/money-input';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { formatRupiah } from '@/lib/money';
+import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { CalendarDays, Plus, Trash2 } from 'lucide-react';
@@ -100,7 +104,7 @@ export default function PeriodsForm({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Buat Periode Akuntansi & Saldo Awal" />
-            <div className="space-y-6 p-4 max-w-3xl">
+            <div className="space-y-6 p-4 md:p-6">
                 <PageHeader
                     title="Buat Periode Akuntansi Baru"
                     description="Menentukan rentang periode akuntansi buku kas dan opsional mencatat saldo awal pembuka."
@@ -115,7 +119,7 @@ export default function PeriodsForm({
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={submit} className="space-y-6">
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="name">Nama Periode</Label>
                                 <Input
                                     id="name"
@@ -128,25 +132,23 @@ export default function PeriodsForm({
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-1">
+                                <div className="space-y-2">
                                     <Label htmlFor="start_date">Tanggal Mulai</Label>
-                                    <Input
+                                    <DatePicker
                                         id="start_date"
-                                        type="date"
-                                        value={data.start_date}
-                                        onChange={(e) => setData('start_date', e.target.value)}
+                                        value={formatDate(data.start_date)}
+                                        onChange={(v) => setData('start_date', v)}
                                         required
                                     />
                                     <InputError message={errors.start_date} />
                                 </div>
 
-                                <div className="space-y-1">
+                                <div className="space-y-2">
                                     <Label htmlFor="end_date">Tanggal Selesai</Label>
-                                    <Input
+                                    <DatePicker
                                         id="end_date"
-                                        type="date"
-                                        value={data.end_date}
-                                        onChange={(e) => setData('end_date', e.target.value)}
+                                        value={formatDate(data.end_date)}
+                                        onChange={(v) => setData('end_date', v)}
                                         required
                                     />
                                     <InputError message={errors.end_date} />
@@ -186,59 +188,35 @@ export default function PeriodsForm({
                                             {openingBalances.map((line, idx) => (
                                                 <TableRow key={idx}>
                                                     <TableCell>
-                                                        <select
-                                                            className="w-full text-xs p-2 border rounded-md bg-background"
-                                                            value={line.account_id}
-                                                            onChange={(e) =>
-                                                                updateOpeningBalanceLine(
-                                                                    idx,
-                                                                    'account_id',
-                                                                    Number(e.target.value)
-                                                                )
-                                                            }
-                                                        >
-                                                            {accounts.map((a) => (
-                                                                <option key={a.id} value={a.id}>
-                                                                    {a.name}
-                                                                </option>
-                                                            ))}
-                                                        </select>
+                                                        <Select value={String(line.account_id)} onValueChange={(v) => updateOpeningBalanceLine(idx, 'account_id', Number(v))}>
+                                                            <SelectTrigger className="h-9 text-xs">
+                                                                <SelectValue />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {accounts.map((o) => (
+                                                                    <SelectItem key={o.id} value={String(o.id)}>
+                                                                        {o.name}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
                                                     </TableCell>
                                                     <TableCell>
-                                                        <select
-                                                            className="w-full text-xs p-2 border rounded-md bg-background"
-                                                            value={line.fund_id}
-                                                            onChange={(e) =>
-                                                                updateOpeningBalanceLine(
-                                                                    idx,
-                                                                    'fund_id',
-                                                                    Number(e.target.value)
-                                                                )
-                                                            }
-                                                        >
-                                                            {funds.map((f) => (
-                                                                <option key={f.id} value={f.id}>
-                                                                    {f.name}
-                                                                </option>
-                                                            ))}
-                                                        </select>
+                                                        <Select value={String(line.fund_id)} onValueChange={(v) => updateOpeningBalanceLine(idx, 'fund_id', Number(v))}>
+                                                            <SelectTrigger className="h-9 text-xs">
+                                                                <SelectValue />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {funds.map((o) => (
+                                                                    <SelectItem key={o.id} value={String(o.id)}>
+                                                                        {o.name}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
                                                     </TableCell>
                                                     <TableCell className="text-right">
-                                                        <Input
-                                                            type="number"
-                                                            inputMode="numeric"
-                                                            min={0}
-                                                            className="text-right font-mono"
-                                                            value={line.amount || ''}
-                                                            placeholder="0"
-                                                            onChange={(e) =>
-                                                                updateOpeningBalanceLine(
-                                                                    idx,
-                                                                    'amount',
-                                                                    Number(e.target.value) || 0
-                                                                )
-                                                            }
-                                                        />
+                                                        <MoneyInput className="text-right" value={line.amount} onChange={(v) => updateOpeningBalanceLine(idx, 'amount', v)} />
                                                         {line.amount > 0 && (
                                                             <span className="text-[10px] text-muted-foreground block mt-0.5">
                                                                 {formatRupiah(line.amount)}

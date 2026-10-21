@@ -46,7 +46,8 @@ export interface SharedData {
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
-    flash: { success: string | null };
+    brand: { name: string; church_name: string; logo_url: string | null; favicon_url: string | null };
+    flash: { success: string | null; error: string | null };
     [key: string]: unknown;
 }
 

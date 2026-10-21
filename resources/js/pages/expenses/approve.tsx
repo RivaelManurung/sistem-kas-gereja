@@ -74,7 +74,7 @@ export default function ExpensesApprove({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Persetujuan Pengeluaran ${expense.expense_number}`} />
-            <div className="space-y-6 p-4 max-w-3xl">
+            <div className="space-y-6 p-4 md:p-6">
                 <Button variant="ghost" size="sm" asChild>
                     <Link href={route('expenses.show', expense.id)}>
                         <ArrowLeft className="h-4 w-4 mr-1" />
@@ -99,8 +99,8 @@ export default function ExpensesApprove({
                 )}
 
                 {needsMajelis && (
-                    <Alert className="bg-amber-500/10 border-amber-500 text-amber-900 dark:text-amber-200">
-                        <Clock className="h-4 w-4 text-amber-600" />
+                    <Alert className="bg-warning/10 border-warning/30 text-warning">
+                        <Clock className="h-4 w-4 text-warning" />
                         <AlertTitle>Wewenang Persetujuan Majelis / Ketua</AlertTitle>
                         <AlertDescription>
                             Karena nominal pengeluaran ({formatRupiah(expense.amount)}) melebihi ambang batas{' '}
@@ -117,7 +117,7 @@ export default function ExpensesApprove({
                         <CardContent className="space-y-2 text-sm">
                             <div>
                                 <span className="text-xs text-muted-foreground block">Nominal</span>
-                                <span className="text-xl font-bold font-mono text-rose-600">
+                                <span className="text-xl font-bold text-expense tabular-nums">
                                     {formatRupiah(expense.amount)}
                                 </span>
                             </div>
@@ -210,7 +210,7 @@ export default function ExpensesApprove({
                                         Tolak Pengeluaran
                                     </Button>
                                     <Button
-                                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                                        className="border-income/30 bg-income/10 text-income"
                                         onClick={handleApprove}
                                         disabled={!canApprove || isBalanceInsufficient}
                                     >

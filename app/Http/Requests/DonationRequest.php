@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\CountSheet;
 use App\Models\Donation;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
 class DonationRequest extends FormRequest
@@ -22,8 +23,8 @@ class DonationRequest extends FormRequest
             'member_id' => ['nullable', 'exists:members,id'],
             'donor_name' => ['nullable', 'string', 'max:255'],
             'category_id' => ['required', 'exists:categories,id'],
-            'amount' => ['required', 'integer', 'min:1'],
-            'payment_method' => ['nullable', 'in:cash,transfer,qris'],
+            'amount' => ['required', 'integer', 'min:1', 'max:999999999999'],
+            'payment_method' => ['nullable', Rule::exists('lookup_options', 'value')->where('group', 'payment_method')->where('is_active', true)],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }

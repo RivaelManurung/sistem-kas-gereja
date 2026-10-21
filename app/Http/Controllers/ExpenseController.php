@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Permission;
 use App\Enums\Direction;
 use App\Enums\ExpenseStatus;
 use App\Enums\Role;
@@ -79,12 +80,12 @@ class ExpenseController extends Controller
 
         $user = auth()->user();
         $isSubmitter = $user && $expense->submitted_by === $user->id;
-        $isMajelisOrAdmin = $user && $user->hasAnyRole([Role::Majelis->value, Role::Admin->value]);
-        $isBendaharaOrAdmin = $user && $user->hasAnyRole([Role::Bendahara->value, Role::Admin->value]);
+        $canApproveLarge = $user && $user->can(Permission::ExpensesApproveLarge->value);
+        $canApproveAny = $user && ($canApproveLarge || $user->can(Permission::ExpensesApprove->value));
         $needsMajelis = $setting->expense_approval_threshold > 0 && $expense->amount > $setting->expense_approval_threshold;
 
-        $canApprove = ! $isSubmitter && $expense->status === ExpenseStatus::Pending && ($needsMajelis ? $isMajelisOrAdmin : ($isBendaharaOrAdmin || $isMajelisOrAdmin));
-        $canPay = $expense->status === ExpenseStatus::Approved && $isBendaharaOrAdmin;
+        $canApprove = ! $isSubmitter && $expense->status === ExpenseStatus::Pending && ($needsMajelis ? $canApproveLarge : $canApproveAny);
+        $canPay = $expense->status === ExpenseStatus::Approved && $user && $user->can(Permission::ExpensesPay->value);
 
         return Inertia::render('expenses/show', [
             'expense' => $expense,
@@ -104,11 +105,11 @@ class ExpenseController extends Controller
 
         $user = auth()->user();
         $isSubmitter = $user && $expense->submitted_by === $user->id;
-        $isMajelisOrAdmin = $user && $user->hasAnyRole([Role::Majelis->value, Role::Admin->value]);
-        $isBendaharaOrAdmin = $user && $user->hasAnyRole([Role::Bendahara->value, Role::Admin->value]);
+        $canApproveLarge = $user && $user->can(Permission::ExpensesApproveLarge->value);
+        $canApproveAny = $user && ($canApproveLarge || $user->can(Permission::ExpensesApprove->value));
         $needsMajelis = $setting->expense_approval_threshold > 0 && $expense->amount > $setting->expense_approval_threshold;
 
-        $canApprove = ! $isSubmitter && $expense->status === ExpenseStatus::Pending && ($needsMajelis ? $isMajelisOrAdmin : ($isBendaharaOrAdmin || $isMajelisOrAdmin));
+        $canApprove = ! $isSubmitter && $expense->status === ExpenseStatus::Pending && ($needsMajelis ? $canApproveLarge : $canApproveAny);
 
         return Inertia::render('expenses/approve', [
             'expense' => $expense,

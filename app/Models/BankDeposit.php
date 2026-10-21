@@ -25,7 +25,7 @@ class BankDeposit extends Model
     ];
 
     protected $casts = [
-        'deposit_date' => 'date',
+        'deposit_date' => 'date:Y-m-d',
         'amount' => 'integer',
     ];
 

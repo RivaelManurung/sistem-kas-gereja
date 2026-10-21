@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Enums\EventRole;
 use App\Enums\Permission;
-use App\Enums\Role;
 use App\Models\Event;
 use App\Models\EventMember;
 use App\Models\User;
@@ -13,12 +12,7 @@ class EventPolicy
 {
     private function isStaffOrAuditor(User $user): bool
     {
-        return $user->hasAnyRole([
-            Role::Admin->value,
-            Role::Bendahara->value,
-            Role::Majelis->value,
-            Role::Pemeriksa->value,
-        ]) || $user->can(Permission::EventsManage->value);
+        return $user->canAny([Permission::EventsView->value, Permission::EventsManage->value]);
     }
 
     public function viewAny(User $user): bool
@@ -27,7 +21,8 @@ class EventPolicy
             return true;
         }
 
-        return EventMember::where('user_id', $user->id)->exists();
+        return $user->can(Permission::EventsParticipate->value)
+            && EventMember::where('user_id', $user->id)->exists();
     }
 
     public function view(User $user, Event $event): bool
@@ -41,13 +36,12 @@ class EventPolicy
 
     public function create(User $user): bool
     {
-        return $user->hasAnyRole([Role::Admin->value, Role::Bendahara->value])
-            || $user->can(Permission::EventsManage->value);
+        return $user->can(Permission::EventsManage->value);
     }
 
     public function update(User $user, Event $event): bool
     {
-        if ($user->hasAnyRole([Role::Admin->value, Role::Bendahara->value]) || $user->can(Permission::EventsManage->value)) {
+        if ($user->can(Permission::EventsManage->value)) {
             return true;
         }
 
@@ -59,12 +53,12 @@ class EventPolicy
 
     public function delete(User $user, Event $event): bool
     {
-        return $user->hasAnyRole([Role::Admin->value, Role::Bendahara->value]);
+        return $user->can(Permission::EventsManage->value);
     }
 
     public function close(User $user, Event $event): bool
     {
-        if ($user->hasAnyRole([Role::Admin->value, Role::Bendahara->value])) {
+        if ($user->can(Permission::EventsManage->value)) {
             return true;
         }
 
@@ -85,7 +79,7 @@ class EventPolicy
 
     public function manageMembers(User $user, Event $event): bool
     {
-        if ($user->hasAnyRole([Role::Admin->value, Role::Bendahara->value]) || $user->can(Permission::EventsManage->value)) {
+        if ($user->can(Permission::EventsManage->value)) {
             return true;
         }
 

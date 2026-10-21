@@ -20,7 +20,7 @@ class BankDepositRequest extends FormRequest
             'deposit_date' => ['required', 'date'],
             'from_account_id' => ['required', 'exists:accounts,id'],
             'to_account_id' => ['required', 'exists:accounts,id', 'different:from_account_id'],
-            'amount' => ['required', 'integer', 'min:1'],
+            'amount' => ['required', 'integer', 'min:1', 'max:999999999999'],
             'reference_number' => ['nullable', 'string', 'max:100'],
             'proof_path' => ['nullable', 'string', 'max:255'],
             'idempotency_key' => ['nullable', 'string', 'max:64'],

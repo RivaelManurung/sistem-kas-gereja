@@ -18,7 +18,7 @@ class FundTransferRequest extends FormRequest
             'from_fund_id' => ['required', 'exists:funds,id', 'different:to_fund_id'],
             'to_fund_id' => ['required', 'exists:funds,id', 'different:from_fund_id'],
             'account_id' => ['required', 'exists:accounts,id'],
-            'amount' => ['required', 'numeric', 'min:1'],
+            'amount' => ['required', 'integer', 'min:1', 'max:999999999999'],
             'transfer_date' => ['required', 'date'],
             'reason' => ['required', 'string', 'max:2000'],
             'notes' => ['nullable', 'string', 'max:1000'],

@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
+use Spatie\Permission\Models\Role as RoleModel;
 
 class UserController extends Controller
 {
@@ -27,12 +28,12 @@ class UserController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
                 'is_active' => $user->is_active,
-                'roles' => $user->roles->pluck('name')->all(),
+                'roles' => $user->roles->map(fn ($r) => $r->label ?? Role::tryFrom($r->name)?->label() ?? $r->name)->all(),
             ]);
 
         return Inertia::render('admin/users/index', [
             'users' => $users,
-            'roleOptions' => Role::options(),
+            'roleOptions' => $this->roleOptions(),
         ]);
     }
 
@@ -42,7 +43,7 @@ class UserController extends Controller
 
         return Inertia::render('admin/users/form', [
             'user' => null,
-            'roleOptions' => Role::options(),
+            'roleOptions' => $this->roleOptions(),
         ]);
     }
 
@@ -72,7 +73,7 @@ class UserController extends Controller
                 'email' => $user->email,
                 'roles' => $user->getRoleNames()->all(),
             ],
-            'roleOptions' => Role::options(),
+            'roleOptions' => $this->roleOptions(),
         ]);
     }
 
@@ -99,6 +100,14 @@ class UserController extends Controller
         $user->update(['is_active' => ! $user->is_active]);
 
         return back()->with('success', $user->is_active ? 'Pengguna diaktifkan.' : 'Pengguna dinonaktifkan.');
+    }
+
+    /** @return list<array{value: string, label: string}> */
+    private function roleOptions(): array
+    {
+        return RoleModel::query()->orderBy('label')->get(['name', 'label'])
+            ->map(fn (RoleModel $r) => ['value' => $r->name, 'label' => $r->label ?? Role::tryFrom($r->name)?->label() ?? $r->name])
+            ->all();
     }
 
     /**

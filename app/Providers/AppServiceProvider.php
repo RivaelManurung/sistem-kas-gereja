@@ -24,7 +24,10 @@ use App\Models\Member;
 use App\Models\ServiceSchedule;
 use App\Models\ServiceSession;
 use App\Models\User;
+use App\Policies\RolePolicy;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Facades\Gate;
+use Spatie\Permission\Models\Role;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -37,8 +40,12 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Aliases double as AttributeEntity values and audit_logs.auditable_type.
+        Gate::policy(Role::class, RolePolicy::class);
+
         Relation::enforceMorphMap([
             'user' => User::class,
+            'role' => Role::class,
+            'lookup_option' => \App\Models\LookupOption::class,
             'church_setting' => ChurchSetting::class,
             'account' => Account::class,
             'fund' => Fund::class,

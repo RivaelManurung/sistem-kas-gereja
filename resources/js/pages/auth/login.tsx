@@ -3,8 +3,10 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowRight, ClipboardCheck, Church, Eye, EyeOff, FileText, LoaderCircle, Lock, Mail, ShieldCheck } from 'lucide-react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { BrandMark } from '@/components/brand-mark';
+import { type SharedData } from '@/types';
+import { ArrowRight, ClipboardCheck, Eye, EyeOff, FileText, LoaderCircle, Lock, Mail, ShieldCheck } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 
 interface LoginForm {
@@ -96,6 +98,7 @@ function ChurchScene() {
 }
 
 export default function Login({ status, canResetPassword }: LoginProps) {
+    const { brand } = usePage<SharedData>().props;
     const [showPassword, setShowPassword] = useState(false);
 
     const { data, setData, post, processing, errors, reset } = useForm<LoginForm>({
@@ -113,7 +116,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
 
     return (
         <div className="grid min-h-dvh w-full lg:grid-cols-2">
-            <Head title="Masuk — Kas Gereja" />
+            <Head title="Masuk" />
 
             {/* Panel kiri */}
             <aside className="relative hidden flex-col overflow-hidden bg-neutral-900 p-12 text-white lg:flex">
@@ -122,8 +125,8 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                 <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-black/30" />
 
                 <Link href={route('home')} className="relative z-10 flex items-center gap-2.5 text-lg font-semibold">
-                    <Church className="size-7" aria-hidden="true" />
-                    Kas Gereja
+                    <BrandMark className="size-8" />
+                    {brand.name}
                 </Link>
 
                 <div className="relative z-10 my-auto max-w-md">
@@ -150,11 +153,11 @@ export default function Login({ status, canResetPassword }: LoginProps) {
             <main className="bg-background flex flex-col items-center justify-center px-6 py-10 sm:px-10">
                 <div className="w-full max-w-md">
                     <div className="flex flex-col items-center text-center">
-                        <div className="bg-muted flex size-16 text-[#1f2d4d] dark:text-white items-center justify-center rounded-2xl shadow-xs">
-                            <Church className="size-8" aria-hidden="true" />
+                        <div className="bg-muted flex size-16 text-primary items-center justify-center rounded-2xl shadow-xs">
+                            <BrandMark className="size-9" />
                         </div>
                         <h2 className="mt-7 text-3xl font-semibold tracking-tight">Masuk ke akun</h2>
-                        <p className="text-muted-foreground mt-2 max-w-xs text-sm text-balance">Silakan masuk untuk melanjutkan ke sistem Kas Gereja.</p>
+                        <p className="text-muted-foreground mt-2 max-w-xs text-sm text-balance">Silakan masuk untuk melanjutkan ke sistem {brand.name}.</p>
                     </div>
 
                     {status && (
@@ -234,7 +237,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             </Label>
                         </div>
 
-                        <Button type="submit" size="lg" className="h-12 w-full gap-2 bg-[#1f2d4d] text-base text-white hover:bg-[#2a3b63] dark:bg-[#2f4373] dark:hover:bg-[#3a5190]" tabIndex={4} disabled={processing}>
+                        <Button type="submit" size="lg" className="h-12 w-full gap-2 text-base" tabIndex={4} disabled={processing}>
                             {processing ? <LoaderCircle className="size-4 animate-spin" /> : null}
                             Masuk
                             {!processing && <ArrowRight className="size-4" />}
@@ -249,7 +252,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     </p>
                 </div>
 
-                <p className="text-muted-foreground mt-12 text-xs">&copy; {new Date().getFullYear()} Kas Gereja. Semua hak dilindungi.</p>
+                <p className="text-muted-foreground mt-12 text-xs">&copy; {new Date().getFullYear()} {brand.church_name}. Semua hak dilindungi.</p>
             </main>
         </div>
     );

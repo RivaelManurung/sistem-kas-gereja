@@ -1,9 +1,10 @@
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { formatRupiah } from '@/lib/money';
+import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, Building2, CheckCircle2, Printer, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Building2, Printer, ShieldCheck } from 'lucide-react';
 
 interface MemberInfo {
     id: number;
@@ -61,64 +62,64 @@ export default function ReceiptView({ churchName, member, donation }: ReceiptPro
                 </div>
 
                 {/* Printable Receipt Card */}
-                <div className="w-full max-w-2xl rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm sm:p-10 print:border-none print:p-0 print:shadow-none dark:border-neutral-800 dark:bg-neutral-900">
+                <div className="w-full max-w-2xl rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-10 print:border-none print:p-0 print:shadow-none">
                     {/* Header Kop */}
-                    <div className="border-b border-neutral-200 pb-6 text-center dark:border-neutral-800">
+                    <div className="border-b border-border pb-6 text-center">
                         <div className="flex items-center justify-center gap-2">
                             <Building2 className="size-6 text-primary" />
-                            <h2 className="text-lg font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
+                            <h2 className="text-lg font-bold tracking-tight text-foreground">
                                 {churchName}
                             </h2>
                         </div>
-                        <h1 className="mt-2 text-xl font-extrabold tracking-tight text-neutral-900 sm:text-2xl dark:text-neutral-100">
+                        <h1 className="mt-2 text-xl font-extrabold tracking-tight text-foreground sm:text-2xl">
                             BUKTI PENERIMAAN PERSEMBAHAN
                         </h1>
-                        <p className="mt-1 font-mono text-sm font-semibold text-neutral-500">
+                        <p className="mt-1 font-mono text-sm font-semibold text-muted-foreground">
                             Nomor: {donation.receipt_number}
                         </p>
                     </div>
 
                     {/* Receipt Details */}
                     <div className="my-6 space-y-4 text-sm">
-                        <div className="grid grid-cols-3 gap-2 border-b border-neutral-100 py-2 dark:border-neutral-800">
-                            <span className="text-neutral-500">Telah Diterima Dari</span>
-                            <span className="col-span-2 font-semibold text-neutral-900 dark:text-neutral-100">
+                        <div className="grid grid-cols-3 gap-2 border-b border-border py-2">
+                            <span className="text-muted-foreground">Telah Diterima Dari</span>
+                            <span className="col-span-2 font-semibold text-foreground">
                                 {member.name} ({member.member_number})
                             </span>
                         </div>
 
-                        <div className="grid grid-cols-3 gap-2 border-b border-neutral-100 py-2 dark:border-neutral-800">
-                            <span className="text-neutral-500">Tanggal Transaksi</span>
-                            <span className="col-span-2 text-neutral-900 dark:text-neutral-100">{donation.date}</span>
+                        <div className="grid grid-cols-3 gap-2 border-b border-border py-2">
+                            <span className="text-muted-foreground">Tanggal Transaksi</span>
+                            <span className="col-span-2 text-foreground">{formatDate(donation.date)}</span>
                         </div>
 
-                        <div className="grid grid-cols-3 gap-2 border-b border-neutral-100 py-2 dark:border-neutral-800">
-                            <span className="text-neutral-500">Pos Persembahan</span>
-                            <span className="col-span-2 font-medium text-neutral-900 dark:text-neutral-100">
+                        <div className="grid grid-cols-3 gap-2 border-b border-border py-2">
+                            <span className="text-muted-foreground">Pos Persembahan</span>
+                            <span className="col-span-2 font-medium text-foreground">
                                 {donation.category_name ?? 'Umum'}
                             </span>
                         </div>
 
-                        <div className="grid grid-cols-3 gap-2 border-b border-neutral-100 py-2 dark:border-neutral-800">
-                            <span className="text-neutral-500">Metode Pembayaran</span>
-                            <span className="col-span-2 capitalize text-neutral-900 dark:text-neutral-100">
+                        <div className="grid grid-cols-3 gap-2 border-b border-border py-2">
+                            <span className="text-muted-foreground">Metode Pembayaran</span>
+                            <span className="col-span-2 capitalize text-foreground">
                                 {donation.payment_method}
                             </span>
                         </div>
 
                         {donation.notes && (
-                            <div className="grid grid-cols-3 gap-2 border-b border-neutral-100 py-2 dark:border-neutral-800">
-                                <span className="text-neutral-500">Keterangan</span>
-                                <span className="col-span-2 text-neutral-800 dark:text-neutral-200">
+                            <div className="grid grid-cols-3 gap-2 border-b border-border py-2">
+                                <span className="text-muted-foreground">Keterangan</span>
+                                <span className="col-span-2 text-foreground">
                                     {donation.notes}
                                 </span>
                             </div>
                         )}
 
-                        <div className="mt-6 rounded-xl bg-neutral-50 p-4 dark:bg-neutral-950/60">
+                        <div className="mt-6 rounded-xl bg-muted/60 p-4">
                             <div className="flex items-center justify-between">
-                                <span className="text-sm font-semibold uppercase text-neutral-500">Jumlah Diterima:</span>
-                                <span className="text-2xl font-bold tracking-tight tabular-nums text-neutral-900 dark:text-neutral-100">
+                                <span className="text-sm font-semibold uppercase text-muted-foreground">Jumlah Diterima:</span>
+                                <span className="text-2xl font-bold tracking-tight tabular-nums text-foreground">
                                     {formatRupiah(donation.amount)}
                                 </span>
                             </div>
@@ -126,10 +127,10 @@ export default function ReceiptView({ churchName, member, donation }: ReceiptPro
                     </div>
 
                     {/* Verification & Signature Stamp */}
-                    <div className="mt-8 border-t border-dashed border-neutral-200 pt-6 dark:border-neutral-800">
-                        <div className="flex items-center justify-between text-xs text-neutral-500">
+                    <div className="mt-8 border-t border-dashed border-border pt-6">
+                        <div className="flex items-center justify-between text-xs text-muted-foreground">
                             <div className="flex items-center gap-2">
-                                <ShieldCheck className="size-4 text-emerald-600 dark:text-emerald-400" />
+                                <ShieldCheck className="size-4 text-income" />
                                 <span>Tercatat Resmi dalam Buku Besar Gereja</span>
                             </div>
                             <span>Dokumen Sah Elektronik</span>
@@ -137,11 +138,11 @@ export default function ReceiptView({ churchName, member, donation }: ReceiptPro
 
                         <div className="mt-8 flex justify-end">
                             <div className="w-48 text-center text-xs">
-                                <p className="text-neutral-500">Bagian Keuangan / Bendahara</p>
-                                <div className="my-6 text-emerald-600 dark:text-emerald-400 font-semibold">
+                                <p className="text-muted-foreground">Bagian Keuangan / Bendahara</p>
+                                <div className="my-6 text-income font-semibold">
                                     [ TERVERIFIKASI ]
                                 </div>
-                                <p className="font-semibold text-neutral-900 dark:text-neutral-100">{churchName}</p>
+                                <p className="font-semibold text-foreground">{churchName}</p>
                             </div>
                         </div>
                     </div>

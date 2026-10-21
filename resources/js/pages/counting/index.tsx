@@ -1,3 +1,5 @@
+import { LinkRow } from '@/components/app/link-row';
+import { RowActions } from '@/components/app/row-actions';
 import PageHeader from '@/components/page-header';
 import Pagination from '@/components/pagination';
 import { Badge } from '@/components/ui/badge';
@@ -5,9 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { formatRupiah } from '@/lib/money';
+import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem, type Paginated } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { Calculator, PlusCircle } from 'lucide-react';
+import { Eye, PlusCircle } from 'lucide-react';
 
 interface SheetSummary {
     id: number;
@@ -38,9 +41,9 @@ const statusBadge = (status: SheetSummary['status']) => {
         case 'confirmed':
             return <Badge variant="secondary">Terkonfirmasi</Badge>;
         case 'verified':
-            return <Badge className="bg-amber-600 text-white hover:bg-amber-700">Terverifikasi Bendahara</Badge>;
+            return <Badge className="border-warning/30 bg-warning/10 text-warning">Terverifikasi Bendahara</Badge>;
         case 'locked':
-            return <Badge className="bg-slate-700 text-slate-100 hover:bg-slate-800 dark:bg-slate-800 dark:text-slate-200">Terkunci (Buku Besar)</Badge>;
+            return <Badge className="bg-muted text-foreground hover:bg-muted/60">Terkunci (Buku Besar)</Badge>;
     }
 };
 
@@ -48,7 +51,7 @@ export default function CountingIndex({ sheets }: { sheets: Paginated<SheetSumma
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Berita Acara Penghitungan Kolekte" />
-            <div className="space-y-6 p-4">
+            <div className="space-y-6 p-4 md:p-6">
                 <PageHeader
                     title="Berita Acara Penghitungan"
                     description="Pencatatan fisik kolekte ibadah, persembahan amplop, dan penerimaan umum."
@@ -71,15 +74,15 @@ export default function CountingIndex({ sheets }: { sheets: Paginated<SheetSumma
                             <TableHead>Pencatat</TableHead>
                             <TableHead className="text-right">Total Fisik</TableHead>
                             <TableHead>Status</TableHead>
-                            <TableHead className="text-right">Aksi</TableHead>
+                            <TableHead className="w-12"><span className="sr-only">Aksi</span></TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {sheets.data.map((sheet) => (
-                            <TableRow key={sheet.id}>
+                            <LinkRow key={sheet.id} href={route('counting.show', sheet.id)}>
                                 <TableCell>
                                     <span className="font-semibold">BA-{String(sheet.id).padStart(5, '0')}</span>
-                                    <div className="text-muted-foreground text-xs">{sheet.date}</div>
+                                    <div className="text-muted-foreground text-xs">{formatDate(sheet.date)}</div>
                                 </TableCell>
                                 <TableCell>
                                     {sheet.service_session ? (
@@ -90,22 +93,19 @@ export default function CountingIndex({ sheets }: { sheets: Paginated<SheetSumma
                                 </TableCell>
                                 <TableCell>{sheet.account.name}</TableCell>
                                 <TableCell>{sheet.creator?.name ?? '-'}</TableCell>
-                                <TableCell className="text-right font-mono font-semibold tabular-nums">
+                                <TableCell className="text-right font-semibold tabular-nums">
                                     {formatRupiah(sheet.total_amount)}
                                 </TableCell>
                                 <TableCell>{statusBadge(sheet.status)}</TableCell>
-                                <TableCell className="text-right space-x-2">
-                                    <Button size="sm" variant="outline" asChild>
-                                        <Link href={route('counting.show', sheet.id)}>Lihat Detail</Link>
-                                    </Button>
+                                <TableCell className="text-right">
+                                    <RowActions actions={[{ label: 'Lihat detail', icon: Eye, href: route('counting.show', sheet.id) }]} />
                                 </TableCell>
-                            </TableRow>
+                            </LinkRow>
                         ))}
                         {sheets.data.length === 0 && (
                             <TableRow>
-                                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                                    <Calculator className="mx-auto h-8 w-8 mb-2 opacity-50" />
-                                    Belum ada berita acara penghitungan.
+                                <TableCell colSpan={7} className="text-muted-foreground py-8 text-center">
+                                                                        Belum ada berita acara penghitungan.
                                 </TableCell>
                             </TableRow>
                         )}

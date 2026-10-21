@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Permission;
 use App\Enums\Direction;
 use App\Enums\Role;
 use App\Models\ChurchSetting;
@@ -48,7 +49,7 @@ class ReportController extends Controller
             ->withQueryString();
 
         $user = $request->user();
-        $canInitiate = $user && $user->hasAnyRole([Role::Bendahara->value, Role::Admin->value]);
+        $canInitiate = $user && $user->can(Permission::ReportsManage->value);
 
         return Inertia::render('reports/index', [
             'period' => $resolved,
@@ -65,8 +66,8 @@ class ReportController extends Controller
     public function store(Request $request, ReportFreezeService $freezeService): RedirectResponse
     {
         $user = $request->user();
-        if (! $user->hasAnyRole([Role::Bendahara->value, Role::Admin->value])) {
-            abort(403, 'Hanya Bendahara atau Admin yang dapat mengajukan laporan untuk pengesahan.');
+        if (! $user->can(Permission::ReportsManage->value)) {
+            abort(403, 'Anda tidak memiliki wewenang untuk mengajukan laporan.');
         }
 
         $validated = $request->validate([

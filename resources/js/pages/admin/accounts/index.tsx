@@ -2,11 +2,15 @@ import PageHeader from '@/components/page-header';
 import Pagination from '@/components/pagination';
 import StatusBadge from '@/components/status-badge';
 import { Badge } from '@/components/ui/badge';
+import { ConfirmDialog } from '@/components/app/confirm-dialog';
+import { RowActions } from '@/components/app/row-actions';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Paginated } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
+import { Pencil, Power } from 'lucide-react';
+import { useState } from 'react';
 
 interface AccountRow {
     id: number;
@@ -27,17 +31,18 @@ const typeLabels: Record<string, string> = {
 };
 
 export default function AccountsIndex({ accounts }: { accounts: Paginated<AccountRow> }) {
-    const toggle = (account: AccountRow) => {
-        const verb = account.is_active ? 'menonaktifkan' : 'mengaktifkan';
-        if (confirm(`Yakin ingin ${verb} rekening ${account.name}?`)) {
-            router.patch(route('admin.accounts.toggle', account.id), {}, { preserveScroll: true });
-        }
+    const [target, setTarget] = useState<AccountRow | null>(null);
+
+    const confirmToggle = () => {
+        if (!target) return;
+        router.patch(route('admin.accounts.toggle', target.id), {}, { preserveScroll: true });
+        setTarget(null);
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Rekening" />
-            <div className="space-y-6 p-4">
+            <div className="space-y-6 p-4 md:p-6">
                 <PageHeader
                     title="Rekening / Kas"
                     description="Kelola rekening bank dan kas tunai fisik yang digunakan dalam transaksi gereja."
@@ -56,7 +61,9 @@ export default function AccountsIndex({ accounts }: { accounts: Paginated<Accoun
                             <TableHead>Jenis</TableHead>
                             <TableHead>Detail Bank</TableHead>
                             <TableHead>Status</TableHead>
-                            <TableHead className="text-right">Aksi</TableHead>
+                            <TableHead className="w-12">
+                                <span className="sr-only">Aksi</span>
+                            </TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -79,13 +86,19 @@ export default function AccountsIndex({ accounts }: { accounts: Paginated<Accoun
                                 <TableCell>
                                     <StatusBadge active={account.is_active} />
                                 </TableCell>
-                                <TableCell className="text-right space-x-2">
-                                    <Button variant="ghost" size="sm" asChild>
-                                        <Link href={route('admin.accounts.edit', account.id)}>Ubah</Link>
-                                    </Button>
-                                    <Button variant="ghost" size="sm" onClick={() => toggle(account)}>
-                                        {account.is_active ? 'Nonaktifkan' : 'Aktifkan'}
-                                    </Button>
+                                <TableCell className="text-right">
+                                    <RowActions
+                                        actions={[
+                                            { label: 'Ubah', icon: Pencil, href: route('admin.accounts.edit', account.id) },
+                                            {
+                                                label: account.is_active ? 'Nonaktifkan' : 'Aktifkan',
+                                                icon: Power,
+                                                onSelect: () => setTarget(account),
+                                                destructive: account.is_active,
+                                                separated: true,
+                                            },
+                                        ]}
+                                    />
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -100,6 +113,20 @@ export default function AccountsIndex({ accounts }: { accounts: Paginated<Accoun
                 </Table>
 
                 <Pagination links={accounts.links} />
+
+                <ConfirmDialog
+                    open={target !== null}
+                    onOpenChange={(open) => !open && setTarget(null)}
+                    title={target?.is_active ? 'Nonaktifkan rekening?' : 'Aktifkan rekening?'}
+                    description={
+                        target?.is_active
+                            ? `${target?.name} tidak akan muncul lagi sebagai pilihan baru. Data lama tetap tersimpan dan bisa diaktifkan kembali.`
+                            : `${target?.name} akan tersedia kembali sebagai pilihan.`
+                    }
+                    confirmLabel={target?.is_active ? 'Nonaktifkan' : 'Aktifkan'}
+                    destructive={target?.is_active}
+                    onConfirm={confirmToggle}
+                />
             </div>
         </AppLayout>
     );

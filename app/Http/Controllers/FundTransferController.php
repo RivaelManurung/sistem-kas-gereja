@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Permission;
 use App\Enums\FundTransferStatus;
 use App\Enums\Role;
 use App\Http\Requests\FundTransferRequest;
@@ -28,7 +29,7 @@ class FundTransferController extends Controller
             ->withQueryString();
 
         $user = auth()->user();
-        $canApproveRole = $user && $user->hasAnyRole([Role::Bendahara->value, Role::Majelis->value, Role::Admin->value]);
+        $canApproveRole = $user && $user->can(Permission::TransfersApprove->value);
 
         return Inertia::render('transfers/index', [
             'transfers' => $transfers,
@@ -65,7 +66,7 @@ class FundTransferController extends Controller
 
         $user = auth()->user();
         $isRequester = $user && $transfer->requested_by === $user->id;
-        $canApproveRole = $user && $user->hasAnyRole([Role::Bendahara->value, Role::Majelis->value, Role::Admin->value]);
+        $canApproveRole = $user && $user->can(Permission::TransfersApprove->value);
         $canApprove = ! $isRequester && $transfer->status === FundTransferStatus::Pending && $canApproveRole;
 
         return Inertia::render('transfers/index', [

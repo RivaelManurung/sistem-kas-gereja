@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { formatRupiah } from '@/lib/money';
+import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Building2, Printer, ShieldCheck } from 'lucide-react';
@@ -76,54 +77,54 @@ export default function AnnualStatement({
                 </div>
 
                 {/* Printable Document Sheet */}
-                <div className="w-full max-w-4xl rounded-xl border border-neutral-200 bg-white p-8 shadow-sm sm:p-12 print:border-none print:p-0 print:shadow-none dark:border-neutral-800 dark:bg-neutral-900">
+                <div className="w-full max-w-4xl rounded-xl border border-border bg-card p-8 shadow-sm sm:p-12 print:border-none print:p-0 print:shadow-none">
                     {/* Official Letterhead (Kop Surat) */}
-                    <div className="border-b-2 border-neutral-900 pb-4 text-center dark:border-neutral-100">
+                    <div className="border-b-2 border-border pb-4 text-center">
                         <div className="flex items-center justify-center gap-2">
                             <Building2 className="size-7 text-primary" />
-                            <h2 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
+                            <h2 className="text-xl font-bold tracking-tight text-foreground">
                                 {churchName}
                             </h2>
                         </div>
-                        <p className="mt-1 text-xs text-neutral-500">
+                        <p className="mt-1 text-xs text-muted-foreground">
                             Departemen Keuangan & Pembukuan Kas Jemaat
                         </p>
                     </div>
 
                     <div className="my-6 text-center">
-                        <h1 className="text-xl font-extrabold uppercase tracking-tight text-neutral-900 sm:text-2xl dark:text-neutral-100">
+                        <h1 className="text-xl font-extrabold uppercase tracking-tight text-foreground sm:text-2xl">
                             SURAT KETERANGAN KONTRIBUSI PERSEMBAHAN TAHUNAN
                         </h1>
-                        <p className="mt-1 text-sm font-semibold text-neutral-600 dark:text-neutral-400">
+                        <p className="mt-1 text-sm font-semibold text-muted-foreground">
                             Periode Tahun Takwim: {year}
                         </p>
                     </div>
 
                     {/* Member Information Box */}
-                    <div className="my-6 rounded-lg border border-neutral-200 bg-neutral-50/60 p-4 text-xs dark:border-neutral-800 dark:bg-neutral-950/40">
+                    <div className="my-6 rounded-lg border border-border bg-muted/60 p-4 text-xs">
                         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                             <div>
-                                <span className="text-neutral-500">Nama Anggota:</span>{' '}
-                                <strong className="text-neutral-900 dark:text-neutral-100">{member.name}</strong>
+                                <span className="text-muted-foreground">Nama Anggota:</span>{' '}
+                                <strong className="text-foreground">{member.name}</strong>
                             </div>
                             <div>
-                                <span className="text-neutral-500">Nomor Anggota:</span>{' '}
-                                <span className="font-mono font-semibold text-neutral-900 dark:text-neutral-100">
+                                <span className="text-muted-foreground">Nomor Anggota:</span>{' '}
+                                <span className="font-mono font-semibold text-foreground">
                                     {member.member_number}
                                 </span>
                             </div>
                             <div>
-                                <span className="text-neutral-500">No. Telepon:</span>{' '}
-                                <span className="text-neutral-800 dark:text-neutral-200">{member.phone || '-'}</span>
+                                <span className="text-muted-foreground">No. Telepon:</span>{' '}
+                                <span className="text-foreground">{member.phone || '-'}</span>
                             </div>
                             <div>
-                                <span className="text-neutral-500">Email:</span>{' '}
-                                <span className="text-neutral-800 dark:text-neutral-200">{member.email || '-'}</span>
+                                <span className="text-muted-foreground">Email:</span>{' '}
+                                <span className="text-foreground">{member.email || '-'}</span>
                             </div>
                             {member.address && (
                                 <div className="sm:col-span-2">
-                                    <span className="text-neutral-500">Alamat:</span>{' '}
-                                    <span className="text-neutral-800 dark:text-neutral-200">{member.address}</span>
+                                    <span className="text-muted-foreground">Alamat:</span>{' '}
+                                    <span className="text-foreground">{member.address}</span>
                                 </div>
                             )}
                         </div>
@@ -132,24 +133,24 @@ export default function AnnualStatement({
                     {/* Summary by Category */}
                     {byCategory.length > 0 && (
                         <div className="my-6">
-                            <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
+                            <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                                 Ringkasan per Pos Persembahan
                             </h3>
-                            <div className="rounded-lg border border-neutral-200 dark:border-neutral-800">
+                            <div className="rounded-lg border border-border">
                                 <table className="w-full text-left text-xs">
-                                    <thead className="border-b border-neutral-200 bg-neutral-50/80 text-neutral-600 dark:border-neutral-800 dark:bg-neutral-900">
+                                    <thead className="border-b border-border bg-muted/60 text-muted-foreground">
                                         <tr>
                                             <th className="px-3 py-2 font-semibold">Pos / Kategori</th>
                                             <th className="px-3 py-2 text-right font-semibold">Akumulasi Kontribusi</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
+                                    <tbody className="divide-y divide-border">
                                         {byCategory.map((cat) => (
                                             <tr key={cat.name}>
-                                                <td className="px-3 py-2 font-medium text-neutral-800 dark:text-neutral-200">
+                                                <td className="px-3 py-2 font-medium text-foreground">
                                                     {cat.name}
                                                 </td>
-                                                <td className="px-3 py-2 text-right font-semibold tabular-nums text-neutral-900 dark:text-neutral-100">
+                                                <td className="px-3 py-2 text-right font-semibold tabular-nums text-foreground">
                                                     {formatRupiah(cat.amount)}
                                                 </td>
                                             </tr>
@@ -162,12 +163,12 @@ export default function AnnualStatement({
 
                     {/* Detailed Transaction Table */}
                     <div className="my-6">
-                        <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-neutral-600 dark:text-neutral-400">
+                        <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                             Rincian Transaksi Persembahan Tahun {year}
                         </h3>
-                        <div className="rounded-lg border border-neutral-200 dark:border-neutral-800">
+                        <div className="rounded-lg border border-border">
                             <table className="w-full text-left text-xs">
-                                <thead className="border-b border-neutral-200 bg-neutral-50/80 text-neutral-600 dark:border-neutral-800 dark:bg-neutral-900">
+                                <thead className="border-b border-border bg-muted/60 text-muted-foreground">
                                     <tr>
                                         <th className="px-3 py-2 font-semibold">Tanggal</th>
                                         <th className="px-3 py-2 font-semibold">No. Kwitansi</th>
@@ -176,31 +177,31 @@ export default function AnnualStatement({
                                         <th className="px-3 py-2 text-right font-semibold">Nominal</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
+                                <tbody className="divide-y divide-border">
                                     {donations.map((d) => (
                                         <tr key={d.id}>
-                                            <td className="px-3 py-2 text-neutral-700 dark:text-neutral-300">{d.date}</td>
-                                            <td className="px-3 py-2 font-mono text-neutral-600 dark:text-neutral-400">
+                                            <td className="px-3 py-2 text-muted-foreground">{formatDate(d.date)}</td>
+                                            <td className="px-3 py-2 font-mono text-muted-foreground">
                                                 {d.receipt_number}
                                             </td>
-                                            <td className="px-3 py-2 text-neutral-800 dark:text-neutral-200">
+                                            <td className="px-3 py-2 text-foreground">
                                                 {d.category_name ?? 'Umum'}
                                             </td>
-                                            <td className="px-3 py-2 capitalize text-neutral-600 dark:text-neutral-400">
+                                            <td className="px-3 py-2 capitalize text-muted-foreground">
                                                 {d.payment_method}
                                             </td>
-                                            <td className="px-3 py-2 text-right font-semibold tabular-nums text-neutral-900 dark:text-neutral-100">
+                                            <td className="px-3 py-2 text-right font-semibold tabular-nums text-foreground">
                                                 {formatRupiah(d.amount)}
                                             </td>
                                         </tr>
                                     ))}
                                 </tbody>
-                                <tfoot className="border-t-2 border-neutral-300 bg-neutral-50 font-bold dark:border-neutral-700 dark:bg-neutral-900">
+                                <tfoot className="border-t-2 border-border bg-muted/60 font-bold">
                                     <tr>
-                                        <td colSpan={4} className="px-3 py-2.5 text-right uppercase text-neutral-700 dark:text-neutral-300">
+                                        <td colSpan={4} className="px-3 py-2.5 text-right uppercase text-muted-foreground">
                                             Total Kontribusi Tahun {year}:
                                         </td>
-                                        <td className="px-3 py-2.5 text-right text-sm tabular-nums text-neutral-900 dark:text-neutral-100">
+                                        <td className="px-3 py-2.5 text-right text-sm tabular-nums text-foreground">
                                             {formatRupiah(totalAmount)}
                                         </td>
                                     </tr>
@@ -210,25 +211,25 @@ export default function AnnualStatement({
                     </div>
 
                     {/* Closing Note & Signatures */}
-                    <div className="mt-8 border-t border-dashed border-neutral-200 pt-6 dark:border-neutral-800">
-                        <p className="text-xs leading-relaxed text-neutral-600 dark:text-neutral-400">
+                    <div className="mt-8 border-t border-dashed border-border pt-6">
+                        <p className="text-xs leading-relaxed text-muted-foreground">
                             Surat keterangan ini diterbitkan berdasarkan catatan resmi persembahan yang tercatat dalam sistem pembukuan
                             keuangan gereja dan diverifikasi oleh majelis perbendaharaan. Kiranya Tuhan senantiasa memberkati persembahan dan pelayanan jemaat.
                         </p>
 
                         <div className="mt-8 flex items-end justify-between text-xs">
-                            <div className="flex items-center gap-2 text-neutral-500">
-                                <ShieldCheck className="size-4 text-emerald-600 dark:text-emerald-400" />
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                                <ShieldCheck className="size-4 text-income" />
                                 <span>Dokumen Sah Sistem Kas Gereja</span>
                             </div>
 
                             <div className="w-52 text-center">
-                                <p className="text-neutral-500">Terverifikasi oleh,</p>
-                                <div className="my-8 font-semibold text-emerald-600 dark:text-emerald-400">
+                                <p className="text-muted-foreground">Terverifikasi oleh,</p>
+                                <div className="my-8 font-semibold text-income">
                                     [ DITANDATANGANI ELEKTRONIK ]
                                 </div>
-                                <p className="font-bold text-neutral-900 dark:text-neutral-100">Bendahara Gereja</p>
-                                <p className="text-[11px] text-neutral-500">{churchName}</p>
+                                <p className="font-bold text-foreground">Bendahara Gereja</p>
+                                <p className="text-[11px] text-muted-foreground">{churchName}</p>
                             </div>
                         </div>
                     </div>

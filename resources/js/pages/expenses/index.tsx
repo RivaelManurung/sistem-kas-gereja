@@ -1,3 +1,5 @@
+import { LinkRow } from '@/components/app/link-row';
+import { RowActions } from '@/components/app/row-actions';
 import PageHeader from '@/components/page-header';
 import Pagination from '@/components/pagination';
 import { Badge } from '@/components/ui/badge';
@@ -5,9 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { formatRupiah } from '@/lib/money';
+import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem, type Paginated } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { CheckCircle2, Eye, FileText, PlusCircle, Receipt } from 'lucide-react';
+import { CheckCircle2, Eye, PlusCircle } from 'lucide-react';
 
 interface ExpenseRow {
     id: number;
@@ -44,11 +47,11 @@ export default function ExpensesIndex({
     const getStatusBadge = (status: ExpenseRow['status']) => {
         switch (status) {
             case 'pending':
-                return <Badge className="bg-amber-500 text-white">Menunggu Persetujuan</Badge>;
+                return <Badge className="border-warning/30 bg-warning/10 text-warning">Menunggu Persetujuan</Badge>;
             case 'approved':
-                return <Badge className="bg-blue-600 text-white">Disetujui (Siap Bayar)</Badge>;
+                return <Badge className="border-info/30 bg-info/10 text-info">Disetujui (Siap Bayar)</Badge>;
             case 'paid':
-                return <Badge className="bg-emerald-600 text-white">Sudah Dibayar</Badge>;
+                return <Badge className="border-income/30 bg-income/10 text-income">Sudah Dibayar</Badge>;
             case 'rejected':
                 return <Badge variant="destructive">Ditolak</Badge>;
             default:
@@ -59,7 +62,7 @@ export default function ExpensesIndex({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Pengeluaran Kas Gereja" />
-            <div className="space-y-6 p-4">
+            <div className="space-y-6 p-4 md:p-6">
                 <PageHeader
                     title="Pengeluaran Kas"
                     description="Pengajuan, persetujuan bertingkat, dan pembayaran kas operasional serta pelayanan gereja."
@@ -127,50 +130,47 @@ export default function ExpensesIndex({
                             <TableHead className="text-right">Nominal</TableHead>
                             <TableHead>Pengaju</TableHead>
                             <TableHead>Status</TableHead>
-                            <TableHead className="text-right">Aksi</TableHead>
+                            <TableHead className="w-12"><span className="sr-only">Aksi</span></TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {expenses.data.map((expense) => (
-                            <TableRow key={expense.id}>
+                            <LinkRow key={expense.id} href={route('expenses.show', expense.id)}>
                                 <TableCell className="font-mono text-xs font-semibold">
                                     {expense.expense_number}
                                 </TableCell>
-                                <TableCell className="font-mono text-sm">{expense.date}</TableCell>
+                                <TableCell className="text-sm">{formatDate(expense.date)}</TableCell>
                                 <TableCell className="font-medium">{expense.payee}</TableCell>
                                 <TableCell>{expense.category.name}</TableCell>
                                 <TableCell>{expense.fund.name}</TableCell>
                                 <TableCell className="text-muted-foreground text-sm">
                                     {expense.account.name}
                                 </TableCell>
-                                <TableCell className="text-right font-mono font-bold text-rose-600">
+                                <TableCell className="text-right font-bold text-expense tabular-nums">
                                     {formatRupiah(expense.amount)}
                                 </TableCell>
                                 <TableCell className="text-sm">{expense.submitter.name}</TableCell>
                                 <TableCell>{getStatusBadge(expense.status)}</TableCell>
-                                <TableCell className="text-right space-x-1">
-                                    <Button variant="ghost" size="sm" asChild>
-                                        <Link href={route('expenses.show', expense.id)}>
-                                            <Eye className="h-4 w-4 mr-1" />
-                                            Detail
-                                        </Link>
-                                    </Button>
-                                    {expense.status === 'pending' && (
-                                        <Button variant="outline" size="sm" asChild>
-                                            <Link href={route('expenses.approve.view', expense.id)}>
-                                                <CheckCircle2 className="h-4 w-4 mr-1 text-emerald-600" />
-                                                Persetujuan
-                                            </Link>
-                                        </Button>
-                                    )}
+                                <TableCell className="text-right">
+                                    <RowActions
+                                        actions={[
+                                            { label: 'Lihat detail', icon: Eye, href: route('expenses.show', expense.id) },
+                                            {
+                                                label: 'Persetujuan',
+                                                icon: CheckCircle2,
+                                                href: route('expenses.approve.view', expense.id),
+                                                hidden: expense.status !== 'pending',
+                                                separated: true,
+                                            },
+                                        ]}
+                                    />
                                 </TableCell>
-                            </TableRow>
+                            </LinkRow>
                         ))}
                         {expenses.data.length === 0 && (
                             <TableRow>
-                                <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
-                                    <Receipt className="mx-auto h-8 w-8 mb-2 opacity-50" />
-                                    Belum ada catatan pengeluaran kas.
+                                <TableCell colSpan={10} className="text-muted-foreground py-8 text-center">
+                                                                        Belum ada catatan pengeluaran kas.
                                 </TableCell>
                             </TableRow>
                         )}

@@ -21,7 +21,7 @@ class AllocationRule extends Model
     ];
 
     protected $casts = [
-        'valid_from' => 'date',
+        'valid_from' => 'date:Y-m-d',
         'is_active' => 'boolean',
     ];
 

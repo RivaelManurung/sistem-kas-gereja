@@ -44,7 +44,7 @@ export default function FundForm({ fund }: { fund: FundData | null }) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={isEdit ? 'Edit Dana' : 'Tambah Dana'} />
-            <div className="space-y-6 p-4 max-w-2xl">
+            <div className="space-y-6 p-4 md:p-6">
                 <PageHeader
                     title={isEdit ? 'Edit Dana' : 'Tambah Dana'}
                     description={
@@ -59,7 +59,7 @@ export default function FundForm({ fund }: { fund: FundData | null }) {
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={submit} className="space-y-4">
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="code">Kode Dana *</Label>
                                 <Input
                                     id="code"
@@ -71,7 +71,7 @@ export default function FundForm({ fund }: { fund: FundData | null }) {
                                 <InputError message={errors.code} />
                             </div>
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="name">Nama Dana *</Label>
                                 <Input
                                     id="name"
@@ -83,7 +83,7 @@ export default function FundForm({ fund }: { fund: FundData | null }) {
                                 <InputError message={errors.name} />
                             </div>
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="description">Deskripsi</Label>
                                 <Textarea
                                     id="description"

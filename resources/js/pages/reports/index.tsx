@@ -1,3 +1,5 @@
+import { LinkRow } from '@/components/app/link-row';
+import { RowActions } from '@/components/app/row-actions';
 import PageHeader from '@/components/page-header';
 import Pagination from '@/components/pagination';
 import { Badge } from '@/components/ui/badge';
@@ -13,30 +15,17 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
 import { formatRupiah } from '@/lib/money';
+import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem, type Paginated } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import {
-    ArrowDownRight,
-    ArrowUpRight,
-    Calendar,
-    CheckCircle2,
-    Clock,
-    Download,
-    Eye,
-    FileSignature,
-    FileSpreadsheet,
-    FileText,
-    Newspaper,
-    PlusCircle,
-    ShieldCheck,
-    Wallet,
-} from 'lucide-react';
+import { ArrowDownRight, ArrowUpRight, CheckCircle2, Clock, Download, Eye, FileSignature, Newspaper, ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
 
 interface ReportRow {
@@ -138,14 +127,14 @@ export default function ReportsIndex({
         switch (status) {
             case 'approved':
                 return (
-                    <Badge className="bg-emerald-600 text-white">
+                    <Badge className="border-income/30 bg-income/10 text-income">
                         <CheckCircle2 className="mr-1 h-3 w-3" />
                         Disahkan &amp; Dibekukan
                     </Badge>
                 );
             case 'pending_approval':
                 return (
-                    <Badge className="bg-amber-500 text-white">
+                    <Badge className="border-warning/30 bg-warning/10 text-warning">
                         <Clock className="mr-1 h-3 w-3" />
                         Menunggu Pengesahan
                     </Badge>
@@ -161,7 +150,7 @@ export default function ReportsIndex({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Laporan Keuangan & Pengesahan" />
 
-            <div className="space-y-6 p-4">
+            <div className="space-y-6 p-4 md:p-6">
                 <PageHeader
                     title="Laporan Keuangan & Pengesahan"
                     description="Perhitungan saldo, penerimaan, pengeluaran kas, mutasi dana berkala, dan pengesahan resmi bertanda tangan."
@@ -177,7 +166,7 @@ export default function ReportsIndex({
                             {can_initiate && (
                                 <Dialog open={initiateDialogOpen} onOpenChange={setInitiateDialogOpen}>
                                     <DialogTrigger asChild>
-                                        <Button className="bg-blue-600 hover:bg-blue-700">
+                                        <Button>
                                             <FileSignature className="mr-2 h-4 w-4" />
                                             Ajukan Pengesahan
                                         </Button>
@@ -203,14 +192,14 @@ export default function ReportsIndex({
                                                     />
                                                 </div>
 
-                                                <div className="rounded-md bg-slate-50 p-3 text-sm dark:bg-slate-900 border">
+                                                <div className="rounded-md bg-muted/60 p-3 text-sm border">
                                                     <div className="flex justify-between">
                                                         <span className="text-muted-foreground">Periode Terpilih:</span>
-                                                        <span className="font-semibold">{period.start_date} s/d {period.end_date}</span>
+                                                        <span className="font-semibold">{formatDate(period.start_date)} s/d {formatDate(period.end_date)}</span>
                                                     </div>
                                                     <div className="flex justify-between mt-1">
                                                         <span className="text-muted-foreground">Posisi Saldo Kas Akhir:</span>
-                                                        <span className="font-bold tabular-nums text-emerald-600">
+                                                        <span className="font-bold tabular-nums text-income">
                                                             {formatRupiah(live_data.summary.total_closing)}
                                                         </span>
                                                     </div>
@@ -232,7 +221,7 @@ export default function ReportsIndex({
                 />
 
                 {/* Filter Bar */}
-                <Card className="p-4 bg-white dark:bg-slate-900 shadow-sm">
+                <Card className="p-4 bg-card shadow-sm">
                     <div className="flex flex-wrap items-end gap-3">
                         <div className="w-40 space-y-1">
                             <Label className="text-xs">Jenis Periode</Label>
@@ -254,19 +243,17 @@ export default function ReportsIndex({
 
                         <div className="w-36 space-y-1">
                             <Label className="text-xs">Dari Tanggal</Label>
-                            <Input
-                                type="date"
+                            <DatePicker
                                 value={fromDate}
-                                onChange={(e) => setFromDate(e.target.value)}
+                                onChange={(v) => setFromDate(v)}
                             />
                         </div>
 
                         <div className="w-36 space-y-1">
                             <Label className="text-xs">Sampai Tanggal</Label>
-                            <Input
-                                type="date"
+                            <DatePicker
                                 value={toDate}
-                                onChange={(e) => setToDate(e.target.value)}
+                                onChange={(v) => setToDate(v)}
                             />
                         </div>
 
@@ -278,7 +265,7 @@ export default function ReportsIndex({
 
                 {/* Summary Metrics */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                    <Card className="bg-white dark:bg-slate-900">
+                    <Card className="bg-card">
                         <CardHeader className="pb-2">
                             <CardDescription className="text-xs">Saldo Awal</CardDescription>
                             <CardTitle className="text-lg font-bold tabular-nums">
@@ -287,34 +274,34 @@ export default function ReportsIndex({
                         </CardHeader>
                     </Card>
 
-                    <Card className="bg-white dark:bg-slate-900">
+                    <Card className="bg-card">
                         <CardHeader className="pb-2">
-                            <CardDescription className="text-xs flex items-center text-emerald-600 font-medium">
+                            <CardDescription className="text-xs flex items-center text-income font-medium">
                                 <ArrowUpRight className="mr-1 h-3.5 w-3.5" /> Total Penerimaan
                             </CardDescription>
-                            <CardTitle className="text-lg font-bold tabular-nums text-emerald-600">
+                            <CardTitle className="text-lg font-bold tabular-nums text-income">
                                 {formatRupiah(live_data.summary.total_income)}
                             </CardTitle>
                         </CardHeader>
                     </Card>
 
-                    <Card className="bg-white dark:bg-slate-900">
+                    <Card className="bg-card">
                         <CardHeader className="pb-2">
-                            <CardDescription className="text-xs flex items-center text-rose-600 font-medium">
+                            <CardDescription className="text-xs flex items-center text-expense font-medium">
                                 <ArrowDownRight className="mr-1 h-3.5 w-3.5" /> Total Pengeluaran
                             </CardDescription>
-                            <CardTitle className="text-lg font-bold tabular-nums text-rose-600">
+                            <CardTitle className="text-lg font-bold tabular-nums text-expense">
                                 {formatRupiah(live_data.summary.total_expense)}
                             </CardTitle>
                         </CardHeader>
                     </Card>
 
-                    <Card className="bg-white dark:bg-slate-900">
+                    <Card className="bg-card">
                         <CardHeader className="pb-2">
                             <CardDescription className="text-xs">Surplus / Defisit</CardDescription>
                             <CardTitle
                                 className={`text-lg font-bold tabular-nums ${
-                                    live_data.summary.net_change >= 0 ? 'text-emerald-600' : 'text-rose-600'
+                                    live_data.summary.net_change >= 0 ? 'text-income' : 'text-expense'
                                 }`}
                             >
                                 {live_data.summary.net_change >= 0 ? '+' : ''}
@@ -323,12 +310,12 @@ export default function ReportsIndex({
                         </CardHeader>
                     </Card>
 
-                    <Card className="bg-blue-50 border-blue-200 dark:bg-blue-950/40 dark:border-blue-900">
+                    <Card className="bg-info/10 border-info/30">
                         <CardHeader className="pb-2">
-                            <CardDescription className="text-xs font-semibold text-blue-900 dark:text-blue-300">
+                            <CardDescription className="text-xs font-semibold text-info">
                                 Saldo Kas Akhir
                             </CardDescription>
-                            <CardTitle className="text-lg font-black tabular-nums text-blue-900 dark:text-blue-100">
+                            <CardTitle className="text-lg font-black tabular-nums text-info">
                                 {formatRupiah(live_data.summary.total_closing)}
                             </CardTitle>
                         </CardHeader>
@@ -336,7 +323,7 @@ export default function ReportsIndex({
                 </div>
 
                 {/* Tabbed Breakdowns */}
-                <Card className="bg-white dark:bg-slate-900">
+                <Card className="bg-card">
                     <Tabs defaultValue="incomes" className="p-4">
                         <TabsList className="mb-4">
                             <TabsTrigger value="incomes">Pemasukan ({live_data.incomes.by_category.length})</TabsTrigger>
@@ -361,14 +348,14 @@ export default function ReportsIndex({
                                             <TableRow key={idx}>
                                                 <TableCell>{idx + 1}</TableCell>
                                                 <TableCell className="font-medium">{item.category_name}</TableCell>
-                                                <TableCell className="text-right tabular-nums font-semibold text-emerald-600">
+                                                <TableCell className="text-right tabular-nums font-semibold text-income">
                                                     {formatRupiah(item.total)}
                                                 </TableCell>
                                             </TableRow>
                                         ))}
-                                        <TableRow className="bg-slate-50 font-bold dark:bg-slate-800">
+                                        <TableRow className="bg-muted/60 font-bold">
                                             <TableCell colSpan={2}>TOTAL PENERIMAAN KAS</TableCell>
-                                            <TableCell className="text-right tabular-nums text-emerald-600 font-bold">
+                                            <TableCell className="text-right tabular-nums text-income font-bold">
                                                 {formatRupiah(live_data.incomes.total)}
                                             </TableCell>
                                         </TableRow>
@@ -393,14 +380,14 @@ export default function ReportsIndex({
                                             <TableRow key={idx}>
                                                 <TableCell>{idx + 1}</TableCell>
                                                 <TableCell className="font-medium">{item.category_name}</TableCell>
-                                                <TableCell className="text-right tabular-nums font-semibold text-rose-600">
+                                                <TableCell className="text-right tabular-nums font-semibold text-expense">
                                                     {formatRupiah(item.total)}
                                                 </TableCell>
                                             </TableRow>
                                         ))}
-                                        <TableRow className="bg-slate-50 font-bold dark:bg-slate-800">
+                                        <TableRow className="bg-muted/60 font-bold">
                                             <TableCell colSpan={2}>TOTAL PENGELUARAN KAS</TableCell>
-                                            <TableCell className="text-right tabular-nums text-rose-600 font-bold">
+                                            <TableCell className="text-right tabular-nums text-expense font-bold">
                                                 {formatRupiah(live_data.expenses.total)}
                                             </TableCell>
                                         </TableRow>
@@ -430,8 +417,8 @@ export default function ReportsIndex({
                                                 <TableCell className="font-mono text-xs">{fund.fund_code}</TableCell>
                                                 <TableCell className="font-medium">{fund.fund_name}</TableCell>
                                                 <TableCell className="text-right tabular-nums">{formatRupiah(fund.opening_balance)}</TableCell>
-                                                <TableCell className="text-right tabular-nums text-emerald-600">+{formatRupiah(fund.income)}</TableCell>
-                                                <TableCell className="text-right tabular-nums text-rose-600">-{formatRupiah(fund.expense)}</TableCell>
+                                                <TableCell className="text-right tabular-nums text-income">+{formatRupiah(fund.income)}</TableCell>
+                                                <TableCell className="text-right tabular-nums text-expense">-{formatRupiah(fund.expense)}</TableCell>
                                                 <TableCell className="text-right tabular-nums">{formatRupiah(fund.net_transfer)}</TableCell>
                                                 <TableCell className="text-right tabular-nums font-bold">{formatRupiah(fund.closing_balance)}</TableCell>
                                             </TableRow>
@@ -465,8 +452,8 @@ export default function ReportsIndex({
                                                     <Badge variant="outline">{acc.account_type}</Badge>
                                                 </TableCell>
                                                 <TableCell className="text-right tabular-nums">{formatRupiah(acc.opening_balance)}</TableCell>
-                                                <TableCell className="text-right tabular-nums text-emerald-600">+{formatRupiah(acc.in_amount)}</TableCell>
-                                                <TableCell className="text-right tabular-nums text-rose-600">-{formatRupiah(acc.out_amount)}</TableCell>
+                                                <TableCell className="text-right tabular-nums text-income">+{formatRupiah(acc.in_amount)}</TableCell>
+                                                <TableCell className="text-right tabular-nums text-expense">-{formatRupiah(acc.out_amount)}</TableCell>
                                                 <TableCell className="text-right tabular-nums font-bold">{formatRupiah(acc.closing_balance)}</TableCell>
                                             </TableRow>
                                         ))}
@@ -478,10 +465,10 @@ export default function ReportsIndex({
                 </Card>
 
                 {/* Frozen & Official Reports List */}
-                <Card className="bg-white dark:bg-slate-900 shadow-sm">
+                <Card className="bg-card shadow-sm">
                     <CardHeader>
                         <CardTitle className="text-base flex items-center">
-                            <ShieldCheck className="mr-2 h-5 w-5 text-blue-600" />
+                            <ShieldCheck className="mr-2 h-5 w-5 text-info" />
                             Daftar Laporan Resmi &amp; Pengesahan
                         </CardTitle>
                         <CardDescription>
@@ -498,43 +485,41 @@ export default function ReportsIndex({
                                         <TableHead>Status</TableHead>
                                         <TableHead>Kode Verifikasi</TableHead>
                                         <TableHead>Diajukan Oleh</TableHead>
-                                        <TableHead className="text-right">Aksi</TableHead>
+                                        <TableHead className="w-12"><span className="sr-only">Aksi</span></TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {reports.data.length === 0 ? (
                                         <TableRow>
-                                            <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                                            <TableCell colSpan={6} className="text-muted-foreground py-8 text-center">
                                                 Belum ada laporan resmi yang diajukan.
                                             </TableCell>
                                         </TableRow>
                                     ) : (
                                         reports.data.map((rep) => (
-                                            <TableRow key={rep.id}>
+                                            <LinkRow key={rep.id} href={route('reports.show', rep.id)}>
                                                 <TableCell className="font-medium">{rep.title}</TableCell>
                                                 <TableCell className="text-xs text-muted-foreground">
-                                                    {rep.start_date} s/d {rep.end_date}
+                                                    {formatDate(rep.start_date)} s/d {formatDate(rep.end_date)}
                                                 </TableCell>
                                                 <TableCell>{getReportStatusBadge(rep.status)}</TableCell>
                                                 <TableCell className="font-mono text-xs">{rep.verification_code}</TableCell>
                                                 <TableCell className="text-xs">{rep.creator?.name ?? '—'}</TableCell>
                                                 <TableCell className="text-right">
-                                                    <div className="flex justify-end gap-1">
-                                                        <Button variant="ghost" size="sm" asChild>
-                                                            <Link href={route('reports.show', rep.id)}>
-                                                                <Eye className="mr-1 h-3.5 w-3.5" />
-                                                                Detail
-                                                            </Link>
-                                                        </Button>
-                                                        <Button variant="outline" size="sm" asChild>
-                                                            <a href={route('reports.pdf', rep.id)} download>
-                                                                <Download className="mr-1 h-3.5 w-3.5" />
-                                                                PDF
-                                                            </a>
-                                                        </Button>
-                                                    </div>
+                                                    <RowActions
+                                                        actions={[
+                                                            { label: 'Lihat detail', icon: Eye, href: route('reports.show', rep.id) },
+                                                            {
+                                                                label: 'Unduh PDF',
+                                                                icon: Download,
+                                                                onSelect: () => {
+                                                                    window.location.href = route('reports.pdf', rep.id);
+                                                                },
+                                                            },
+                                                        ]}
+                                                    />
                                                 </TableCell>
-                                            </TableRow>
+                                            </LinkRow>
                                         ))
                                     )}
                                 </TableBody>

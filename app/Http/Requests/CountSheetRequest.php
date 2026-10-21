@@ -43,7 +43,7 @@ class CountSheetRequest extends FormRequest
             'lines.*.category_id' => ['required', 'exists:categories,id'],
             'lines.*.is_cash' => ['required', 'boolean'],
             'lines.*.denomination_counts' => ['nullable', 'array'],
-            'lines.*.amount' => ['nullable', 'numeric', 'min:0'],
+            'lines.*.amount' => ['nullable', 'integer', 'min:0', 'max:999999999999'],
             'lines.*.reference_number' => ['nullable', 'string', 'max:100'],
             'lines.*.proof_path' => ['nullable', 'string', 'max:255'],
         ];

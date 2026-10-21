@@ -80,7 +80,7 @@ export default function AttributeForm({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={isEdit ? 'Edit Atribut' : 'Tambah Atribut'} />
-            <div className="space-y-6 p-4 max-w-2xl">
+            <div className="space-y-6 p-4 md:p-6">
                 <PageHeader
                     title={isEdit ? 'Edit Atribut' : 'Tambah Atribut'}
                     description={
@@ -100,7 +100,7 @@ export default function AttributeForm({
                     <CardContent>
                         <form onSubmit={submit} className="space-y-4">
                             {!isEdit && (
-                                <div className="space-y-1">
+                                <div className="space-y-2">
                                     <Label htmlFor="entity_type">Entitas Tujuan *</Label>
                                     <Select
                                         value={data.entity_type}
@@ -121,7 +121,7 @@ export default function AttributeForm({
                                 </div>
                             )}
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="key">Kunci Unik (Key) *</Label>
                                 <Input
                                     id="key"
@@ -137,7 +137,7 @@ export default function AttributeForm({
                                 <InputError message={errors.key} />
                             </div>
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="label">Label Tampilan *</Label>
                                 <Input
                                     id="label"
@@ -149,7 +149,7 @@ export default function AttributeForm({
                                 <InputError message={errors.label} />
                             </div>
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="data_type">Tipe Data *</Label>
                                 <Select
                                     value={data.data_type}
@@ -168,7 +168,7 @@ export default function AttributeForm({
                                     </SelectContent>
                                 </Select>
                                 {isEdit && hasValues && (
-                                    <p className="text-xs text-amber-600">
+                                    <p className="text-xs text-warning">
                                         Tipe data terkunci karena atribut ini sudah memiliki nilai tersimpan.
                                     </p>
                                 )}
@@ -190,7 +190,7 @@ export default function AttributeForm({
                                 </div>
                             )}
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="sort_order">Nomor Urutan</Label>
                                 <Input
                                     id="sort_order"

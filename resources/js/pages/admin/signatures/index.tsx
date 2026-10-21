@@ -1,26 +1,19 @@
+import { ConfirmDialog } from '@/components/app/confirm-dialog';
+import { RowActions } from '@/components/app/row-actions';
 import PageHeader from '@/components/page-header';
 import StatusBadge from '@/components/status-badge';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { ArrowUpDown, Edit, FileSignature, Image as ImageIcon, PlusCircle, Trash2, Upload } from 'lucide-react';
+import { FileSignature, Image as ImageIcon, Pencil, PlusCircle, Power, Trash2, Upload } from 'lucide-react';
 import { useState } from 'react';
 
 interface SignatoryRow {
@@ -62,6 +55,7 @@ export default function SignaturesIndex({
     stamp_url?: string | null;
 }) {
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
+    const [deleteTarget, setDeleteTarget] = useState<SignatoryRow | null>(null);
     const [editingSignatory, setEditingSignatory] = useState<SignatoryRow | null>(null);
 
     const [formTitle, setFormTitle] = useState('Dibuat oleh');
@@ -119,10 +113,10 @@ export default function SignaturesIndex({
         router.patch(route('admin.signatures.toggle', sig.id));
     };
 
-    const handleDelete = (sig: SignatoryRow) => {
-        if (confirm(`Hapus susunan penanda tangan "${sig.position}"?`)) {
-            router.delete(route('admin.signatures.destroy', sig.id));
-        }
+    const confirmDelete = () => {
+        if (!deleteTarget) return;
+        router.delete(route('admin.signatures.destroy', deleteTarget.id));
+        setDeleteTarget(null);
     };
 
     const handleUploadStamp = (e: React.FormEvent) => {
@@ -146,12 +140,12 @@ export default function SignaturesIndex({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Susunan Penanda Tangan & Stempel Gereja" />
 
-            <div className="space-y-6 p-4">
+            <div className="space-y-6 p-4 md:p-6">
                 <PageHeader
                     title="Susunan Penanda Tangan & Stempel"
                     description="Atur urutan penanda tangan laporan keuangan resmi (Bendahara, Pemeriksa, Majelis) dan unggah stempel gereja."
                     actions={
-                        <Button onClick={openCreate} className="bg-blue-600 hover:bg-blue-700">
+                        <Button onClick={openCreate}>
                             <PlusCircle className="mr-2 h-4 w-4" />
                             Tambah Penanda Tangan
                         </Button>
@@ -160,10 +154,10 @@ export default function SignaturesIndex({
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Stamp Upload & Preview Card */}
-                    <Card className="bg-white dark:bg-slate-900 shadow-sm md:col-span-1">
+                    <Card className="bg-card shadow-sm md:col-span-1">
                         <CardHeader>
                             <CardTitle className="text-base flex items-center">
-                                <ImageIcon className="mr-2 h-5 w-5 text-blue-600" />
+                                <ImageIcon className="mr-2 h-5 w-5 text-info" />
                                 Stempel Resmi Gereja
                             </CardTitle>
                             <CardDescription className="text-xs">
@@ -171,7 +165,7 @@ export default function SignaturesIndex({
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <div className="flex justify-center p-4 rounded-lg border border-dashed border-slate-300 bg-slate-50 dark:bg-slate-800/40">
+                            <div className="flex justify-center p-4 rounded-lg border border-dashed border-border bg-muted/60">
                                 {stamp_url ? (
                                     <img src={stamp_url} alt="Stempel Gereja" className="max-h-32 object-contain" />
                                 ) : (
@@ -206,10 +200,10 @@ export default function SignaturesIndex({
                     </Card>
 
                     {/* Signatories Table Card */}
-                    <Card className="bg-white dark:bg-slate-900 shadow-sm md:col-span-2">
+                    <Card className="bg-card shadow-sm md:col-span-2">
                         <CardHeader>
                             <CardTitle className="text-base flex items-center">
-                                <FileSignature className="mr-2 h-5 w-5 text-blue-600" />
+                                <FileSignature className="mr-2 h-5 w-5 text-info" />
                                 Urutan Penanda Tangan Laporan Keuangan
                             </CardTitle>
                             <CardDescription className="text-xs">
@@ -225,7 +219,9 @@ export default function SignaturesIndex({
                                             <TableHead>Jabatan / Judul</TableHead>
                                             <TableHead>Peran / Akun</TableHead>
                                             <TableHead>Status</TableHead>
-                                            <TableHead className="text-right">Aksi</TableHead>
+                                            <TableHead className="w-12">
+                                                <span className="sr-only">Aksi</span>
+                                            </TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -259,31 +255,23 @@ export default function SignaturesIndex({
                                                         <StatusBadge active={sig.is_active} />
                                                     </TableCell>
                                                     <TableCell className="text-right">
-                                                        <div className="flex justify-end items-center gap-1">
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="sm"
-                                                                onClick={() => handleToggle(sig)}
-                                                                title={sig.is_active ? 'Nonaktifkan' : 'Aktifkan'}
-                                                            >
-                                                                <Switch checked={sig.is_active} className="pointer-events-none" />
-                                                            </Button>
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="icon"
-                                                                onClick={() => openEdit(sig)}
-                                                            >
-                                                                <Edit className="h-4 w-4" />
-                                                            </Button>
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="icon"
-                                                                onClick={() => handleDelete(sig)}
-                                                                className="text-rose-600 hover:text-rose-700"
-                                                            >
-                                                                <Trash2 className="h-4 w-4" />
-                                                            </Button>
-                                                        </div>
+                                                        <RowActions
+                                                            actions={[
+                                                                { label: 'Ubah', icon: Pencil, onSelect: () => openEdit(sig) },
+                                                                {
+                                                                    label: sig.is_active ? 'Nonaktifkan' : 'Aktifkan',
+                                                                    icon: Power,
+                                                                    onSelect: () => handleToggle(sig),
+                                                                },
+                                                                {
+                                                                    label: 'Hapus',
+                                                                    icon: Trash2,
+                                                                    onSelect: () => setDeleteTarget(sig),
+                                                                    destructive: true,
+                                                                    separated: true,
+                                                                },
+                                                            ]}
+                                                        />
                                                     </TableCell>
                                                 </TableRow>
                                             ))
@@ -391,6 +379,16 @@ export default function SignaturesIndex({
                         </form>
                     </DialogContent>
                 </Dialog>
+
+                <ConfirmDialog
+                    open={deleteTarget !== null}
+                    onOpenChange={(open) => !open && setDeleteTarget(null)}
+                    title="Hapus penanda tangan?"
+                    description={`Susunan "${deleteTarget?.position}" dihapus dari daftar penanda tangan laporan keuangan dan tidak bisa dikembalikan.`}
+                    confirmLabel="Hapus"
+                    destructive
+                    onConfirm={confirmDelete}
+                />
             </div>
         </AppLayout>
     );

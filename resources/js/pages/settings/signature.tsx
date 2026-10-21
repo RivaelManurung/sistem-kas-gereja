@@ -1,14 +1,12 @@
-import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
-import SettingsLayout from '@/layouts/settings/layout';
+import SettingsLayout, { SettingsSection } from '@/layouts/settings/layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { Check, CheckCircle2, Eraser, FileSignature, PenTool, Upload } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -121,137 +119,93 @@ export default function SignatureSettings({
         });
     };
 
+    const footerClass = 'justify-between gap-3 rounded-b-xl border-t bg-muted/30 px-5 py-4 md:px-6';
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Tanda Tangan Digital Akun" />
 
             <SettingsLayout>
-                <div className="space-y-6">
-                    <HeadingSmall
-                        title="Tanda Tangan Digital Akun"
-                        description="Tanda tangan ini digunakan saat Anda menandatangani dan mengesahkan laporan keuangan resmi gereja."
-                    />
-
-                    {/* Current Signature Preview */}
-                    <Card className="bg-white dark:bg-slate-900">
-                        <CardHeader className="pb-3">
-                            <CardTitle className="text-sm font-semibold flex items-center justify-between">
-                                <span>Tanda Tangan Saat Ini</span>
-                                {has_signature && (
-                                    <span className="text-xs text-emerald-600 font-normal flex items-center">
-                                        <CheckCircle2 className="mr-1 h-3.5 w-3.5" /> Terdaftar &amp; Siap Digunakan
-                                    </span>
-                                )}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="flex justify-center items-center h-28 rounded-lg border border-dashed bg-slate-50 dark:bg-slate-800/40 p-4">
-                                {signature_url ? (
-                                    <img src={signature_url} alt="Tanda Tangan" className="max-h-20 object-contain" />
-                                ) : (
-                                    <p className="text-xs text-muted-foreground italic">
-                                        Anda belum memiliki tanda tangan terdaftar. Buat atau unggah di bawah ini.
-                                    </p>
-                                )}
-                            </div>
+                <SettingsSection
+                    title="Tanda tangan saat ini"
+                    description="Dipakai saat Anda menandatangani dan mengesahkan laporan keuangan resmi gereja."
+                >
+                    <Card>
+                        <CardContent className="flex min-h-32 items-center p-5 md:p-6">
+                            {signature_url ? (
+                                <img src={signature_url} alt="Tanda tangan tersimpan" className="max-h-24 object-contain" />
+                            ) : (
+                                <p className="text-sm text-muted-foreground">Belum ada tanda tangan tersimpan</p>
+                            )}
                         </CardContent>
                     </Card>
+                </SettingsSection>
 
-                    {/* Methods: Draw or Upload */}
-                    <Card className="bg-white dark:bg-slate-900">
-                        <CardContent className="pt-6">
-                            <Tabs defaultValue="draw">
-                                <TabsList className="mb-4">
-                                    <TabsTrigger value="draw" className="flex items-center">
-                                        <PenTool className="mr-1.5 h-4 w-4" />
-                                        Gambar di Layar (Canvas)
-                                    </TabsTrigger>
-                                    <TabsTrigger value="upload" className="flex items-center">
-                                        <Upload className="mr-1.5 h-4 w-4" />
-                                        Unggah Berkas Gambar
-                                    </TabsTrigger>
+                <SettingsSection
+                    title={has_signature ? 'Ganti tanda tangan' : 'Buat tanda tangan'}
+                    description="Gambar langsung di layar, atau unggah gambar tanda tangan. Menyimpan akan menggantikan tanda tangan yang ada."
+                >
+                    <Card>
+                        <Tabs defaultValue="draw">
+                            <div className="p-5 pb-0 md:p-6 md:pb-0">
+                                <TabsList>
+                                    <TabsTrigger value="draw">Gambar di layar</TabsTrigger>
+                                    <TabsTrigger value="upload">Unggah gambar</TabsTrigger>
                                 </TabsList>
+                            </div>
 
-                                {/* Canvas Drawing Tab */}
-                                <TabsContent value="draw" className="space-y-4">
-                                    <div className="space-y-2">
-                                        <div className="text-xs text-muted-foreground">
-                                            Gunakan kursor mouse atau sentuhan jari/stylus di area kanvas berikut:
-                                        </div>
-                                        <div className="rounded-lg border-2 border-slate-300 bg-white dark:bg-slate-100 flex justify-center">
-                                            <canvas
-                                                ref={canvasRef}
-                                                width={450}
-                                                height={180}
-                                                className="cursor-crosshair touch-none"
-                                                onMouseDown={startDrawing}
-                                                onMouseMove={draw}
-                                                onMouseUp={stopDrawing}
-                                                onMouseLeave={stopDrawing}
-                                                onTouchStart={startDrawing}
-                                                onTouchMove={draw}
-                                                onTouchEnd={stopDrawing}
-                                            />
-                                        </div>
+                            <TabsContent value="draw" className="mt-0">
+                                <CardContent className="space-y-3 p-5 pt-4 md:p-6 md:pt-4">
+                                    <p className="text-sm text-muted-foreground">Gunakan mouse, jari, atau stylus pada area di bawah.</p>
+                                    {/* Tinta tanda tangan gelap, jadi kanvas selalu berlatar putih di kedua tema. */}
+                                    <div className="overflow-x-auto rounded-lg border bg-white">
+                                        <canvas
+                                            ref={canvasRef}
+                                            width={450}
+                                            height={180}
+                                            className="cursor-crosshair touch-none"
+                                            onMouseDown={startDrawing}
+                                            onMouseMove={draw}
+                                            onMouseUp={stopDrawing}
+                                            onMouseLeave={stopDrawing}
+                                            onTouchStart={startDrawing}
+                                            onTouchMove={draw}
+                                            onTouchEnd={stopDrawing}
+                                        />
                                     </div>
+                                </CardContent>
+                                <CardFooter className={footerClass}>
+                                    <Button type="button" variant="outline" onClick={clearCanvas} disabled={!hasDrawn}>
+                                        Ulangi
+                                    </Button>
+                                    <Button type="button" onClick={saveCanvasSignature} disabled={!hasDrawn || isSaving}>
+                                        {isSaving ? 'Menyimpan...' : 'Simpan tanda tangan'}
+                                    </Button>
+                                </CardFooter>
+                            </TabsContent>
 
-                                    <div className="flex justify-between items-center">
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={clearCanvas}
-                                            disabled={!hasDrawn}
-                                        >
-                                            <Eraser className="mr-1.5 h-4 w-4" />
-                                            Hapus / Ulangi
+                            <TabsContent value="upload" className="mt-0">
+                                <form onSubmit={saveFileSignature}>
+                                    <CardContent className="space-y-2 p-5 pt-4 md:p-6 md:pt-4">
+                                        <Label htmlFor="sig_file">Berkas tanda tangan</Label>
+                                        <Input
+                                            id="sig_file"
+                                            type="file"
+                                            accept="image/png,image/jpeg,image/webp"
+                                            onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
+                                        />
+                                        <p className="text-sm text-muted-foreground">PNG dengan latar transparan disarankan. Maksimal 2 MB.</p>
+                                    </CardContent>
+                                    <CardFooter className={footerClass + ' justify-end'}>
+                                        <Button type="submit" disabled={!uploadFile || isSaving}>
+                                            {isSaving ? 'Mengunggah...' : 'Unggah dan simpan'}
                                         </Button>
-
-                                        <Button
-                                            type="button"
-                                            size="sm"
-                                            onClick={saveCanvasSignature}
-                                            disabled={!hasDrawn || isSaving}
-                                            className="bg-blue-600 hover:bg-blue-700"
-                                        >
-                                            <Check className="mr-1.5 h-4 w-4" />
-                                            {isSaving ? 'Menyimpan...' : 'Simpan Tanda Tangan Ini'}
-                                        </Button>
-                                    </div>
-                                </TabsContent>
-
-                                {/* File Upload Tab */}
-                                <TabsContent value="upload" className="space-y-4">
-                                    <form onSubmit={saveFileSignature} className="space-y-4">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="sig_file" className="text-xs">
-                                                Pilih Foto / Gambar Tanda Tangan (PNG disarankan, transparan, max 2MB)
-                                            </Label>
-                                            <Input
-                                                id="sig_file"
-                                                type="file"
-                                                accept="image/png,image/jpeg,image/webp"
-                                                onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
-                                            />
-                                        </div>
-
-                                        <div className="flex justify-end">
-                                            <Button
-                                                type="submit"
-                                                size="sm"
-                                                disabled={!uploadFile || isSaving}
-                                                className="bg-blue-600 hover:bg-blue-700"
-                                            >
-                                                <Upload className="mr-1.5 h-4 w-4" />
-                                                {isSaving ? 'Mengunggah...' : 'Unggah & Simpan'}
-                                            </Button>
-                                        </div>
-                                    </form>
-                                </TabsContent>
-                            </Tabs>
-                        </CardContent>
+                                    </CardFooter>
+                                </form>
+                            </TabsContent>
+                        </Tabs>
                     </Card>
-                </div>
+                </SettingsSection>
             </SettingsLayout>
         </AppLayout>
     );

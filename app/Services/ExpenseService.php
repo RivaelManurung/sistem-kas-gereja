@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Permission;
 use App\Enums\Direction;
 use App\Enums\ExpenseStatus;
 use App\Enums\Role;
@@ -64,7 +65,7 @@ class ExpenseService
         }
 
         // Check authorized roles
-        if (! $approver->hasAnyRole([Role::Bendahara->value, Role::Majelis->value, Role::Admin->value])) {
+        if (! $approver->canAny([Permission::ExpensesApprove->value, Permission::ExpensesApproveLarge->value])) {
             abort(403, 'Anda tidak memiliki wewenang untuk menyetujui pengeluaran.');
         }
 
@@ -72,7 +73,7 @@ class ExpenseService
         $setting = ChurchSetting::current();
         $threshold = (int) $setting->expense_approval_threshold;
         if ($threshold > 0 && $expense->amount > $threshold) {
-            if (! $approver->hasAnyRole([Role::Majelis->value, Role::Admin->value])) {
+            if (! $approver->can(Permission::ExpensesApproveLarge->value)) {
                 abort(403, 'Pengeluaran di atas ambang batas memerlukan persetujuan Majelis.');
             }
         }
@@ -112,7 +113,7 @@ class ExpenseService
             abort(403, 'Pengaju tidak dapat memproses pengeluarannya sendiri.');
         }
 
-        if (! $user->hasAnyRole([Role::Bendahara->value, Role::Majelis->value, Role::Admin->value])) {
+        if (! $user->canAny([Permission::ExpensesApprove->value, Permission::ExpensesApproveLarge->value])) {
             abort(403, 'Anda tidak memiliki wewenang untuk menolak pengeluaran.');
         }
 
@@ -130,8 +131,8 @@ class ExpenseService
             throw new LogicException('Hanya pengeluaran yang sudah disetujui yang dapat dibayar.');
         }
 
-        if (! $payer->hasAnyRole([Role::Bendahara->value, Role::Admin->value])) {
-            abort(403, 'Hanya Bendahara atau Admin yang berhak melakukan pembayaran pengeluaran.');
+        if (! $payer->can(Permission::ExpensesPay->value)) {
+            abort(403, 'Anda tidak memiliki wewenang untuk membayar pengeluaran.');
         }
 
         if (AccountingPeriod::isDateClosed($expense->date)) {

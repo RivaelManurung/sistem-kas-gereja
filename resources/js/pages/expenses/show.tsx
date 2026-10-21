@@ -6,8 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { formatRupiah } from '@/lib/money';
+import { formatDate, formatDateTime } from '@/lib/date';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import {
     AlertTriangle,
     ArrowLeft,
@@ -96,7 +97,7 @@ export default function ExpensesShow({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Pengeluaran ${expense.expense_number}`} />
-            <div className="space-y-6 p-4 max-w-4xl">
+            <div className="space-y-6 p-4 md:p-6">
                 <div className="flex items-center gap-2">
                     <Button variant="ghost" size="sm" asChild>
                         <Link href={route('expenses.index')}>
@@ -108,7 +109,7 @@ export default function ExpensesShow({
 
                 <PageHeader
                     title={`Pengeluaran: ${expense.expense_number}`}
-                    description={`Diajukan pada ${expense.created_at} oleh ${expense.submitter.name}`}
+                    description={`Diajukan pada ${formatDateTime(expense.created_at)} oleh ${expense.submitter.name}`}
                     actions={
                         <div className="flex items-center gap-2">
                             {canApprove && (
@@ -121,7 +122,7 @@ export default function ExpensesShow({
                                         Tolak
                                     </Button>
                                     <Button
-                                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                                        className="border-income/30 bg-income/10 text-income"
                                         onClick={handleApprove}
                                         disabled={isBalanceInsufficient}
                                     >
@@ -157,8 +158,8 @@ export default function ExpensesShow({
                 )}
 
                 {needsMajelis && expense.status === 'pending' && (
-                    <Alert className="bg-amber-500/10 border-amber-500 text-amber-900 dark:text-amber-200">
-                        <Clock className="h-4 w-4 text-amber-600" />
+                    <Alert className="bg-warning/10 border-warning/30 text-warning">
+                        <Clock className="h-4 w-4 text-warning" />
                         <AlertTitle>Memerlukan Persetujuan Majelis / Ketua</AlertTitle>
                         <AlertDescription>
                             Nominal pengeluaran ({formatRupiah(expense.amount)}) melebihi ambang batas kewenangan Bendahara{' '}
@@ -203,7 +204,7 @@ export default function ExpensesShow({
                             <div className="grid grid-cols-2 gap-4 border-b pb-4">
                                 <div>
                                     <span className="text-xs text-muted-foreground block">Nominal Pengeluaran</span>
-                                    <span className="text-2xl font-bold font-mono text-rose-600">
+                                    <span className="text-2xl font-bold text-expense tabular-nums">
                                         {formatRupiah(expense.amount)}
                                     </span>
                                 </div>
@@ -211,13 +212,13 @@ export default function ExpensesShow({
                                     <span className="text-xs text-muted-foreground block">Status Pengajuan</span>
                                     <div className="mt-1">
                                         {expense.status === 'pending' && (
-                                            <Badge className="bg-amber-500 text-white">Menunggu Persetujuan</Badge>
+                                            <Badge className="border-warning/30 bg-warning/10 text-warning">Menunggu Persetujuan</Badge>
                                         )}
                                         {expense.status === 'approved' && (
-                                            <Badge className="bg-blue-600 text-white">Disetujui (Menunggu Bayar)</Badge>
+                                            <Badge className="border-info/30 bg-info/10 text-info">Disetujui (Menunggu Bayar)</Badge>
                                         )}
                                         {expense.status === 'paid' && (
-                                            <Badge className="bg-emerald-600 text-white">Sudah Dibayar & Dibukukan</Badge>
+                                            <Badge className="border-income/30 bg-income/10 text-income">Sudah Dibayar & Dibukukan</Badge>
                                         )}
                                         {expense.status === 'rejected' && (
                                             <Badge variant="destructive">Ditolak</Badge>
@@ -233,7 +234,7 @@ export default function ExpensesShow({
                                 </div>
                                 <div>
                                     <span className="text-xs text-muted-foreground block">Tanggal Transaksi</span>
-                                    <span className="font-mono">{expense.date}</span>
+                                    <span className="">{formatDate(expense.date)}</span>
                                 </div>
                                 <div>
                                     <span className="text-xs text-muted-foreground block">Kategori</span>
@@ -323,22 +324,22 @@ export default function ExpensesShow({
                             </CardHeader>
                             <CardContent className="space-y-3 text-sm">
                                 <div className="flex items-start gap-2">
-                                    <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5" />
+                                    <CheckCircle2 className="h-4 w-4 text-income mt-0.5" />
                                     <div>
                                         <p className="font-medium">Diajukan</p>
                                         <p className="text-xs text-muted-foreground">
-                                            Oleh {expense.submitter.name} ({expense.date})
+                                            Oleh {expense.submitter.name} ({formatDate(expense.date)})
                                         </p>
                                     </div>
                                 </div>
 
                                 {expense.approved_at && (
                                     <div className="flex items-start gap-2">
-                                        <UserCheck className="h-4 w-4 text-blue-500 mt-0.5" />
+                                        <UserCheck className="h-4 w-4 text-info mt-0.5" />
                                         <div>
                                             <p className="font-medium">Disetujui</p>
                                             <p className="text-xs text-muted-foreground">
-                                                Oleh {expense.approver?.name ?? 'Pejabat'} ({expense.approved_at})
+                                                Oleh {expense.approver?.name ?? 'Pejabat'} ({formatDateTime(expense.approved_at)})
                                             </p>
                                         </div>
                                     </div>
@@ -346,10 +347,10 @@ export default function ExpensesShow({
 
                                 {expense.paid_at && (
                                     <div className="flex items-start gap-2">
-                                        <CreditCard className="h-4 w-4 text-emerald-600 mt-0.5" />
+                                        <CreditCard className="h-4 w-4 text-income mt-0.5" />
                                         <div>
-                                            <p className="font-medium text-emerald-600">Dibayarkan ke Buku Besar</p>
-                                            <p className="text-xs text-muted-foreground">Waktu: {expense.paid_at}</p>
+                                            <p className="font-medium text-income">Dibayarkan ke Buku Besar</p>
+                                            <p className="text-xs text-muted-foreground">Waktu: {formatDateTime(expense.paid_at)}</p>
                                         </div>
                                     </div>
                                 )}

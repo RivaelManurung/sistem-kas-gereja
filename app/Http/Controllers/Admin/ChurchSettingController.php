@@ -28,12 +28,18 @@ class ChurchSettingController extends Controller
         rsort($denominations);
         $validated['denominations'] = array_values($denominations);
 
-        if ($request->hasFile('logo')) {
-            if ($settings->logo_path) {
-                Storage::disk('public')->delete($settings->logo_path);
+        foreach (['logo' => 'logo_path', 'favicon' => 'favicon_path'] as $field => $column) {
+            if ($request->hasFile($field)) {
+                if ($settings->{$column}) {
+                    Storage::disk('public')->delete($settings->{$column});
+                }
+                $validated[$column] = $request->file($field)->store('church', 'public');
+            } elseif ($request->boolean('remove_'.$field) && $settings->{$column}) {
+                Storage::disk('public')->delete($settings->{$column});
+                $validated[$column] = null;
             }
-            $validated['logo_path'] = $request->file('logo')->store('church', 'public');
         }
+        unset($validated['logo'], $validated['favicon'], $validated['remove_logo'], $validated['remove_favicon']);
 
         if ($request->hasFile('stamp')) {
             if ($settings->stamp_path) {

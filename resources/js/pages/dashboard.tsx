@@ -1,26 +1,15 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { formatRupiah } from '@/lib/money';
+import { formatDate } from '@/lib/date';
+import { cn } from '@/lib/utils';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import {
-    AlertCircle,
-    AlertTriangle,
-    ArrowDownRight,
-    ArrowUpRight,
-    Calculator,
-    Calendar,
-    CheckCircle2,
-    Clock,
-    CreditCard,
-    DollarSign,
-    FileCheck,
-    PiggyBank,
-    Receipt,
-    Wallet,
-} from 'lucide-react';
+import { ArrowDownRight, ArrowUpRight, Calculator, Calendar, CheckCircle2, Clock, FileCheck, Receipt, Wallet, type LucideIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -109,6 +98,51 @@ interface DashboardProps {
     };
 }
 
+/** 1.250.000 -> "1,3 jt", dipakai untuk label sumbu grafik. */
+function compactRupiah(n: number) {
+    const abs = Math.abs(n);
+    if (abs >= 1e9) return `${(n / 1e9).toFixed(1).replace('.', ',')} M`;
+    if (abs >= 1e6) return `${(n / 1e6).toFixed(1).replace('.', ',')} jt`;
+    if (abs >= 1e3) return `${Math.round(n / 1e3)} rb`;
+    return String(n);
+}
+
+interface TaskRow {
+    key: string;
+    icon: LucideIcon;
+    tone: 'warning' | 'info' | 'expense' | 'muted';
+    title: string;
+    meta: string;
+    amount?: number;
+    badge?: string;
+    href: string;
+    action: string;
+}
+
+const TONE: Record<TaskRow['tone'], string> = {
+    warning: 'bg-warning/10 text-warning',
+    info: 'bg-info/10 text-info',
+    expense: 'bg-expense/10 text-expense',
+    muted: 'bg-muted text-muted-foreground',
+};
+
+function Stat({ label, value, hint, tone, icon: Icon }: { label: string; value: number; hint: string; tone?: 'income' | 'expense'; icon: LucideIcon }) {
+    return (
+        <div className="flex flex-1 items-start gap-4 p-5 md:p-6">
+            <div className={cn('flex size-10 shrink-0 items-center justify-center rounded-full', tone === 'income' ? 'bg-income/10 text-income' : tone === 'expense' ? 'bg-expense/10 text-expense' : 'bg-primary/10 text-primary')}>
+                <Icon className="size-5" aria-hidden="true" />
+            </div>
+            <div className="min-w-0">
+                <p className="text-muted-foreground text-sm">{label}</p>
+                <p className={cn('mt-1 truncate text-2xl font-semibold tracking-tight tabular-nums', tone === 'income' && 'text-income', tone === 'expense' && 'text-expense')}>
+                    {formatRupiah(value)}
+                </p>
+                <p className="text-muted-foreground mt-1 text-xs">{hint}</p>
+            </div>
+        </div>
+    );
+}
+
 export default function Dashboard({
     fundBalances = [],
     accountBalances = [],
@@ -121,487 +155,316 @@ export default function Dashboard({
         uncountedSessions: [],
     },
 }: DashboardProps) {
-    const totalAlertsCount =
-        alerts.waitingConfirmationCountSheets.length +
-        alerts.waitingVerificationCountSheets.length +
-        alerts.waitingApprovalExpenses.length +
-        alerts.uncountedSessions.length;
+    const [ready, setReady] = useState(false);
+    useEffect(() => {
+        const id = requestAnimationFrame(() => setReady(true));
+        return () => cancelAnimationFrame(id);
+    }, []);
 
-    // Calculate max amount for monthly trend chart normalization
-    const maxMonthlyAmount = Math.max(
-        ...monthlyTrend.map((m) => Math.max(m.income, m.expense)),
-        1
-    );
+    const tasks: TaskRow[] = [
+        ...alerts.waitingConfirmationCountSheets.map((s): TaskRow => ({
+            key: `c${s.id}`,
+            icon: Clock,
+            tone: 'warning',
+            title: s.session_name,
+            meta: `Menunggu saksi, ${s.confirmations_count} dari ${s.required_confirmations} konfirmasi · ${formatDate(s.date)}`,
+            amount: s.total_amount,
+            href: `/counting/${s.id}`,
+            action: 'Konfirmasi',
+        })),
+        ...alerts.waitingVerificationCountSheets.map((s): TaskRow => ({
+            key: `v${s.id}`,
+            icon: FileCheck,
+            tone: 'info',
+            title: s.session_name,
+            meta: `Menunggu verifikasi bendahara · ${formatDate(s.date)}`,
+            amount: s.total_amount,
+            href: `/counting/${s.id}`,
+            action: 'Verifikasi',
+        })),
+        ...alerts.waitingApprovalExpenses.map((e): TaskRow => ({
+            key: `e${e.id}`,
+            icon: Receipt,
+            tone: 'expense',
+            title: `${e.payee} · ${e.expense_number}`,
+            meta: `${[e.fund_name, e.category_name].filter(Boolean).join(' · ')} · ${formatDate(e.date)}`,
+            amount: e.amount,
+            badge: e.is_above_threshold ? 'Butuh Majelis' : undefined,
+            href: `/expenses/${e.id}`,
+            action: 'Periksa',
+        })),
+        ...alerts.uncountedSessions.map((s): TaskRow => ({
+            key: `s${s.id}`,
+            icon: Calendar,
+            tone: 'muted',
+            title: s.name,
+            meta: `Belum ada berita acara · ${formatDate(s.date)}`,
+            href: `/counting/create?session_id=${s.id}`,
+            action: 'Buat hitungan',
+        })),
+    ];
+
+    const hasTrendData = monthlyTrend.some((m) => m.income > 0 || m.expense > 0);
+    const maxMonthly = Math.max(...monthlyTrend.map((m) => Math.max(m.income, m.expense)), 1);
+    const ticks = [1, 0.75, 0.5, 0.25, 0].map((f) => Math.round(maxMonthly * f));
+    const totalFund = fundBalances.reduce((sum, f) => sum + Math.max(f.balance, 0), 0);
+    const totalAccount = accountBalances.reduce((sum, a) => sum + Math.max(a.balance, 0), 0);
+    const monthNet = summary.thisMonthIncome - summary.thisMonthExpense;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dasbor Keuangan" />
 
-            <div className="flex flex-1 flex-col gap-6 p-4 md:p-6">
-                {/* Header Section */}
-                <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-1 flex-col gap-6 p-4 md:p-6 lg:p-8">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                     <div>
-                        <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
-                            Dasbor Keuangan
-                        </h1>
-                        <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                            Ringkasan saldo kas, tren bulanan, dan tugas operasional yang memerlukan tindakan.
-                        </p>
+                        <h1 className="text-2xl font-semibold tracking-tight">Dasbor Keuangan</h1>
+                        <p className="text-muted-foreground mt-1 text-sm">Posisi kas gereja, arus bulanan, dan pekerjaan yang menunggu Anda.</p>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <Link href="/counting/create">
-                            <Button size="sm" className="gap-1.5">
+                    <div className="flex flex-wrap items-center gap-2">
+                        <Button asChild>
+                            <Link href="/counting/create">
                                 <Calculator className="size-4" />
-                                Hitung Kolekte
-                            </Button>
-                        </Link>
-                        <Link href="/expenses/create">
-                            <Button size="sm" variant="outline" className="gap-1.5">
+                                Hitung kolekte
+                            </Link>
+                        </Button>
+                        <Button asChild variant="outline">
+                            <Link href="/expenses/create">
                                 <Receipt className="size-4" />
-                                Ajukan Pengeluaran
-                            </Button>
-                        </Link>
+                                Ajukan pengeluaran
+                            </Link>
+                        </Button>
                     </div>
                 </div>
 
-                {/* Summary Stat Cards */}
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium text-neutral-500 dark:text-neutral-400">
-                                Total Saldo Kas & Bank
-                            </CardTitle>
-                            <div className="rounded-full bg-primary/10 p-2 text-primary">
-                                <Wallet className="size-4" />
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold tracking-tight tabular-nums text-neutral-900 dark:text-neutral-100">
-                                {formatRupiah(summary.totalBalance)}
-                            </div>
-                            <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                                Akumulasi seluruh rekening kas & pos dana aktif
-                            </p>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium text-neutral-500 dark:text-neutral-400">
-                                Pemasukan Bulan Ini
-                            </CardTitle>
-                            <div className="rounded-full bg-emerald-500/10 p-2 text-emerald-600 dark:text-emerald-400">
-                                <ArrowUpRight className="size-4" />
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold tracking-tight tabular-nums text-emerald-600 dark:text-emerald-400">
-                                {formatRupiah(summary.thisMonthIncome)}
-                            </div>
-                            <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                                Total penerimaan kas periode berjalan
-                            </p>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium text-neutral-500 dark:text-neutral-400">
-                                Pengeluaran Bulan Ini
-                            </CardTitle>
-                            <div className="rounded-full bg-rose-500/10 p-2 text-rose-600 dark:text-rose-400">
-                                <ArrowDownRight className="size-4" />
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold tracking-tight tabular-nums text-rose-600 dark:text-rose-400">
-                                {formatRupiah(summary.thisMonthExpense)}
-                            </div>
-                            <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
-                                Total pengeluaran kas yang telah dibayar
-                            </p>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                {/* Actionable Alerts Section */}
-                {totalAlertsCount > 0 ? (
-                    <div className="flex flex-col gap-4">
-                        <div className="flex items-center gap-2">
-                            <AlertCircle className="size-5 text-amber-500" />
-                            <h2 className="text-lg font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
-                                Perhatian & Aksi yang Diperlukan ({totalAlertsCount})
-                            </h2>
-                        </div>
-
-                        <div className="grid gap-4 md:grid-cols-2">
-                            {/* Alert: Waiting Confirmation */}
-                            {alerts.waitingConfirmationCountSheets.length > 0 && (
-                                <Card className="border-amber-200 bg-amber-50/50 dark:border-amber-900/40 dark:bg-amber-950/20">
-                                    <CardHeader className="pb-3">
-                                        <div className="flex items-center justify-between">
-                                            <CardTitle className="flex items-center gap-2 text-sm font-semibold text-amber-900 dark:text-amber-200">
-                                                <Clock className="size-4 text-amber-600 dark:text-amber-400" />
-                                                Menunggu Konfirmasi Penghitung ({alerts.waitingConfirmationCountSheets.length})
-                                            </CardTitle>
-                                            <Badge variant="outline" className="border-amber-300 text-amber-800 dark:text-amber-300">
-                                                Draf
-                                            </Badge>
-                                        </div>
-                                        <CardDescription className="text-xs text-amber-800/80 dark:text-amber-300/80">
-                                            Berita acara memerlukan tanda tangan saksi penghitung sebelum diverifikasi.
-                                        </CardDescription>
-                                    </CardHeader>
-                                    <CardContent className="space-y-2.5">
-                                        {alerts.waitingConfirmationCountSheets.map((sheet) => (
-                                            <div
-                                                key={sheet.id}
-                                                className="flex items-center justify-between rounded-md border border-amber-200/80 bg-white p-2.5 text-xs shadow-xs dark:border-amber-900/50 dark:bg-neutral-900"
-                                            >
-                                                <div>
-                                                    <div className="font-medium text-neutral-900 dark:text-neutral-100">
-                                                        {sheet.session_name}
-                                                    </div>
-                                                    <div className="text-neutral-500">
-                                                        {sheet.date} · {sheet.confirmations_count}/{sheet.required_confirmations} konfirmasi
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-center gap-3">
-                                                    <span className="font-semibold tabular-nums text-neutral-900 dark:text-neutral-100">
-                                                        {formatRupiah(sheet.total_amount)}
-                                                    </span>
-                                                    <Link href={`/counting/${sheet.id}`}>
-                                                        <Button size="sm" variant="outline" className="h-7 text-xs">
-                                                            Konfirmasi
-                                                        </Button>
-                                                    </Link>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </CardContent>
-                                </Card>
-                            )}
-
-                            {/* Alert: Waiting Verification */}
-                            {alerts.waitingVerificationCountSheets.length > 0 && (
-                                <Card className="border-sky-200 bg-sky-50/50 dark:border-sky-900/40 dark:bg-sky-950/20">
-                                    <CardHeader className="pb-3">
-                                        <div className="flex items-center justify-between">
-                                            <CardTitle className="flex items-center gap-2 text-sm font-semibold text-sky-900 dark:text-sky-200">
-                                                <FileCheck className="size-4 text-sky-600 dark:text-sky-400" />
-                                                Menunggu Verifikasi Bendahara ({alerts.waitingVerificationCountSheets.length})
-                                            </CardTitle>
-                                            <Badge variant="outline" className="border-sky-300 text-sky-800 dark:text-sky-300">
-                                                Terkonfirmasi
-                                            </Badge>
-                                        </div>
-                                        <CardDescription className="text-xs text-sky-800/80 dark:text-sky-300/80">
-                                            Telah dikonfirmasi saksi, menunggu pemeriksaan dan penguncian bendahara.
-                                        </CardDescription>
-                                    </CardHeader>
-                                    <CardContent className="space-y-2.5">
-                                        {alerts.waitingVerificationCountSheets.map((sheet) => (
-                                            <div
-                                                key={sheet.id}
-                                                className="flex items-center justify-between rounded-md border border-sky-200/80 bg-white p-2.5 text-xs shadow-xs dark:border-sky-900/50 dark:bg-neutral-900"
-                                            >
-                                                <div>
-                                                    <div className="font-medium text-neutral-900 dark:text-neutral-100">
-                                                        {sheet.session_name}
-                                                    </div>
-                                                    <div className="text-neutral-500">{sheet.date}</div>
-                                                </div>
-                                                <div className="flex items-center gap-3">
-                                                    <span className="font-semibold tabular-nums text-neutral-900 dark:text-neutral-100">
-                                                        {formatRupiah(sheet.total_amount)}
-                                                    </span>
-                                                    <Link href={`/counting/${sheet.id}`}>
-                                                        <Button size="sm" variant="outline" className="h-7 text-xs">
-                                                            Verifikasi
-                                                        </Button>
-                                                    </Link>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </CardContent>
-                                </Card>
-                            )}
-
-                            {/* Alert: Waiting Approval Expenses */}
-                            {alerts.waitingApprovalExpenses.length > 0 && (
-                                <Card className="border-rose-200 bg-rose-50/50 dark:border-rose-900/40 dark:bg-rose-950/20">
-                                    <CardHeader className="pb-3">
-                                        <div className="flex items-center justify-between">
-                                            <CardTitle className="flex items-center gap-2 text-sm font-semibold text-rose-900 dark:text-rose-200">
-                                                <Receipt className="size-4 text-rose-600 dark:text-rose-400" />
-                                                Pengeluaran Menunggu Persetujuan ({alerts.waitingApprovalExpenses.length})
-                                            </CardTitle>
-                                            <Badge variant="outline" className="border-rose-300 text-rose-800 dark:text-rose-300">
-                                                Persetujuan
-                                            </Badge>
-                                        </div>
-                                        <CardDescription className="text-xs text-rose-800/80 dark:text-rose-300/80">
-                                            Pengajuan biaya operasional yang membutuhkan otorisasi pejabat berwenang.
-                                        </CardDescription>
-                                    </CardHeader>
-                                    <CardContent className="space-y-2.5">
-                                        {alerts.waitingApprovalExpenses.map((expense) => (
-                                            <div
-                                                key={expense.id}
-                                                className="flex flex-col gap-2 rounded-md border border-rose-200/80 bg-white p-2.5 text-xs shadow-xs sm:flex-row sm:items-center sm:justify-between dark:border-rose-900/50 dark:bg-neutral-900"
-                                            >
-                                                <div>
-                                                    <div className="flex items-center gap-1.5">
-                                                        <span className="font-medium text-neutral-900 dark:text-neutral-100">
-                                                            {expense.expense_number} · {expense.payee}
-                                                        </span>
-                                                        {expense.is_above_threshold && (
-                                                            <Badge className="bg-rose-600 px-1.5 py-0 text-[10px] text-white hover:bg-rose-700">
-                                                                <AlertTriangle className="mr-0.5 inline size-2.5" />
-                                                                Butuh Majelis
-                                                            </Badge>
-                                                        )}
-                                                    </div>
-                                                    <div className="text-neutral-500">
-                                                        {expense.fund_name} ({expense.category_name}) · {expense.date}
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-center justify-between gap-3 sm:justify-end">
-                                                    <span className="font-semibold tabular-nums text-rose-600 dark:text-rose-400">
-                                                        {formatRupiah(expense.amount)}
-                                                    </span>
-                                                    <Link href={`/expenses/${expense.id}`}>
-                                                        <Button size="sm" variant="outline" className="h-7 text-xs">
-                                                            Periksa
-                                                        </Button>
-                                                    </Link>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </CardContent>
-                                </Card>
-                            )}
-
-                            {/* Alert: Uncounted Service Sessions */}
-                            {alerts.uncountedSessions.length > 0 && (
-                                <Card className="border-neutral-200 bg-neutral-50/50 dark:border-neutral-800 dark:bg-neutral-900/30">
-                                    <CardHeader className="pb-3">
-                                        <div className="flex items-center justify-between">
-                                            <CardTitle className="flex items-center gap-2 text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-                                                <Calendar className="size-4 text-neutral-600 dark:text-neutral-400" />
-                                                Sesi Ibadah Belum Dihitung ({alerts.uncountedSessions.length})
-                                            </CardTitle>
-                                            <Badge variant="outline">Belum Dihitung</Badge>
-                                        </div>
-                                        <CardDescription className="text-xs text-neutral-500 dark:text-neutral-400">
-                                            Ibadah yang sudah selesai atau sedang berjalan belum memiliki berita acara.
-                                        </CardDescription>
-                                    </CardHeader>
-                                    <CardContent className="space-y-2.5">
-                                        {alerts.uncountedSessions.map((session) => (
-                                            <div
-                                                key={session.id}
-                                                className="flex items-center justify-between rounded-md border border-neutral-200 bg-white p-2.5 text-xs shadow-xs dark:border-neutral-800 dark:bg-neutral-900"
-                                            >
-                                                <div>
-                                                    <div className="font-medium text-neutral-900 dark:text-neutral-100">
-                                                        {session.name}
-                                                    </div>
-                                                    <div className="text-neutral-500">{session.date}</div>
-                                                </div>
-                                                <Link href={`/counting/create?session_id=${session.id}`}>
-                                                    <Button size="sm" variant="outline" className="h-7 text-xs">
-                                                        Buat Hitungan
-                                                    </Button>
-                                                </Link>
-                                            </div>
-                                        ))}
-                                    </CardContent>
-                                </Card>
-                            )}
-                        </div>
-                    </div>
-                ) : (
-                    <div className="flex items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50/50 p-4 text-emerald-900 dark:border-emerald-900/50 dark:bg-emerald-950/20 dark:text-emerald-300">
-                        <CheckCircle2 className="size-5 shrink-0 text-emerald-600 dark:text-emerald-400" />
-                        <div className="text-sm">
-                            <span className="font-semibold">Semua tugas operasional terkendali.</span> Tidak ada berita acara atau pengeluaran yang menunggu tindakan saat ini.
-                        </div>
-                    </div>
-                )}
-
-                {/* Balances Section: Funds & Accounts */}
-                <div className="grid gap-6 lg:grid-cols-2">
-                    {/* Pos Dana Balances */}
-                    <Card>
-                        <CardHeader className="pb-3">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <PiggyBank className="size-4 text-primary" />
-                                    <CardTitle className="text-base font-semibold">Saldo per Pos Dana</CardTitle>
-                                </div>
-                                <Link href="/admin/funds" className="text-xs text-primary hover:underline">
-                                    Kelola Dana →
-                                </Link>
-                            </div>
-                            <CardDescription className="text-xs">
-                                Alokasi saldo kas gereja berdasarkan pos tujuan dan program.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            {fundBalances.length > 0 ? (
-                                <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
-                                    {fundBalances.map((fund) => (
-                                        <div key={fund.id} className="flex items-center justify-between py-2.5 text-sm">
-                                            <div>
-                                                <div className="font-medium text-neutral-900 dark:text-neutral-100">
-                                                    {fund.name}
-                                                </div>
-                                                <div className="text-xs text-neutral-500">{fund.code}</div>
-                                            </div>
-                                            <div
-                                                className={`font-semibold tabular-nums ${
-                                                    fund.balance < 0
-                                                        ? 'text-rose-600 dark:text-rose-400'
-                                                        : 'text-neutral-900 dark:text-neutral-100'
-                                                }`}
-                                            >
-                                                {formatRupiah(fund.balance)}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="py-6 text-center text-xs text-neutral-500">Belum ada pos dana aktif.</div>
-                            )}
-                        </CardContent>
-                    </Card>
-
-                    {/* Rekening Kas & Bank Balances */}
-                    <Card>
-                        <CardHeader className="pb-3">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <CreditCard className="size-4 text-primary" />
-                                    <CardTitle className="text-base font-semibold">Saldo per Rekening Kas & Bank</CardTitle>
-                                </div>
-                                <Link href="/admin/accounts" className="text-xs text-primary hover:underline">
-                                    Kelola Rekening →
-                                </Link>
-                            </div>
-                            <CardDescription className="text-xs">
-                                Saldo riil fisik di kas tunai dan rekening bank gereja.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            {accountBalances.length > 0 ? (
-                                <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
-                                    {accountBalances.map((acc) => (
-                                        <div key={acc.id} className="flex items-center justify-between py-2.5 text-sm">
-                                            <div>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="font-medium text-neutral-900 dark:text-neutral-100">
-                                                        {acc.name}
-                                                    </span>
-                                                    <Badge variant="outline" className="text-[10px]">
-                                                        {acc.type === 'bank' ? 'Bank' : 'Tunai'}
-                                                    </Badge>
-                                                </div>
-                                                <div className="text-xs text-neutral-500">
-                                                    {acc.code} {acc.bank_name ? `· ${acc.bank_name}` : ''}
-                                                </div>
-                                            </div>
-                                            <div className="font-semibold tabular-nums text-neutral-900 dark:text-neutral-100">
-                                                {formatRupiah(acc.balance)}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="py-6 text-center text-xs text-neutral-500">Belum ada rekening aktif.</div>
-                            )}
-                        </CardContent>
-                    </Card>
-                </div>
-
-                {/* Monthly Trend Section */}
+                {/* Posisi kas: satu kartu, tiga angka utama */}
                 <Card>
-                    <CardHeader className="pb-3">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <DollarSign className="size-4 text-primary" />
-                                <CardTitle className="text-base font-semibold">Tren Arus Kas Bulanan</CardTitle>
-                            </div>
-                            <div className="flex items-center gap-4 text-xs">
-                                <div className="flex items-center gap-1.5">
-                                    <span className="size-2.5 rounded-full bg-emerald-500" />
-                                    <span className="text-neutral-600 dark:text-neutral-300">Pemasukan</span>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                    <span className="size-2.5 rounded-full bg-rose-500" />
-                                    <span className="text-neutral-600 dark:text-neutral-300">Pengeluaran</span>
-                                </div>
-                            </div>
-                        </div>
-                        <CardDescription className="text-xs">
-                            Perbandingan penerimaan persembahan dan pengeluaran kas dalam 6 bulan terakhir.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        {monthlyTrend.length > 0 ? (
-                            <div className="space-y-4 pt-2">
-                                {monthlyTrend.map((item) => {
-                                    const incomePct = Math.round((item.income / maxMonthlyAmount) * 100);
-                                    const expensePct = Math.round((item.expense / maxMonthlyAmount) * 100);
-
-                                    return (
-                                        <div key={item.month} className="space-y-1.5">
-                                            <div className="flex items-center justify-between text-xs">
-                                                <span className="font-medium text-neutral-900 dark:text-neutral-100">
-                                                    {item.label}
-                                                </span>
-                                                <div className="flex items-center gap-3 tabular-nums">
-                                                    <span className="text-emerald-600 dark:text-emerald-400">
-                                                        +{formatRupiah(item.income)}
-                                                    </span>
-                                                    <span className="text-rose-600 dark:text-rose-400">
-                                                        -{formatRupiah(item.expense)}
-                                                    </span>
-                                                    <span
-                                                        className={`font-semibold ${
-                                                            item.net >= 0
-                                                                ? 'text-neutral-900 dark:text-neutral-100'
-                                                                : 'text-rose-600 dark:text-rose-400'
-                                                        }`}
-                                                    >
-                                                        Net: {formatRupiah(item.net)}
-                                                    </span>
-                                                </div>
-                                            </div>
-
-                                            {/* Visual Progress Comparison Bar */}
-                                            <div className="flex h-3 w-full gap-1 overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
-                                                <div
-                                                    className="h-full rounded-full bg-emerald-500 transition-all duration-300"
-                                                    style={{ width: `${Math.max(incomePct, item.income > 0 ? 2 : 0)}%` }}
-                                                    title={`Pemasukan: ${formatRupiah(item.income)}`}
-                                                />
-                                                <div
-                                                    className="h-full rounded-full bg-rose-500 transition-all duration-300"
-                                                    style={{ width: `${Math.max(expensePct, item.expense > 0 ? 2 : 0)}%` }}
-                                                    title={`Pengeluaran: ${formatRupiah(item.expense)}`}
-                                                />
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        ) : (
-                            <div className="py-6 text-center text-xs text-neutral-500">Belum ada data transaksi buku besar.</div>
-                        )}
-                    </CardContent>
+                    <div className="divide-border flex flex-col divide-y md:flex-row md:divide-x md:divide-y-0">
+                        <Stat label="Total saldo kas dan bank" value={summary.totalBalance} hint="Gabungan seluruh rekening dan pos dana aktif" icon={Wallet} />
+                        <Stat label="Pemasukan bulan ini" value={summary.thisMonthIncome} hint="Penerimaan yang sudah dibukukan" tone="income" icon={ArrowUpRight} />
+                        <Stat label="Pengeluaran bulan ini" value={summary.thisMonthExpense} hint={`Selisih bulan ini ${monthNet >= 0 ? '+' : '-'}${formatRupiah(Math.abs(monthNet))}`} tone="expense" icon={ArrowDownRight} />
+                    </div>
                 </Card>
+
+                <div className="grid items-start gap-6 xl:grid-cols-3">
+                    {/* Grafik arus kas */}
+                    <Card className="xl:col-span-2">
+                        <CardHeader className="flex-row items-start justify-between gap-4 space-y-0">
+                            <div className="space-y-1">
+                                <CardTitle>Arus kas 6 bulan terakhir</CardTitle>
+                                <CardDescription>Pemasukan dibandingkan pengeluaran per bulan.</CardDescription>
+                            </div>
+                            <div className="flex shrink-0 items-center gap-4 text-xs">
+                                <span className="flex items-center gap-1.5">
+                                    <span className="bg-income size-2.5 rounded-sm" />
+                                    Pemasukan
+                                </span>
+                                <span className="flex items-center gap-1.5">
+                                    <span className="bg-expense size-2.5 rounded-sm" />
+                                    Pengeluaran
+                                </span>
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            {hasTrendData ? (
+                                <div role="img" aria-label="Grafik batang pemasukan dan pengeluaran per bulan" className="flex gap-3">
+                                    <div className="text-muted-foreground flex h-56 flex-col justify-between pb-0 text-right text-[11px] tabular-nums">
+                                        {ticks.map((t, i) => (
+                                            <span key={i} className="leading-none">
+                                                {compactRupiah(t)}
+                                            </span>
+                                        ))}
+                                    </div>
+                                    <div className="relative flex-1">
+                                        <div className="pointer-events-none absolute inset-x-0 top-0 flex h-56 flex-col justify-between">
+                                            {ticks.map((_, i) => (
+                                                <div key={i} className="border-border/70 border-t border-dashed first:border-solid" />
+                                            ))}
+                                        </div>
+                                        <div className="relative flex h-56 items-end justify-around gap-2">
+                                            {monthlyTrend.map((m) => (
+                                                <div key={m.month} className="flex h-full flex-1 items-end justify-center gap-1.5" title={`${m.label}: masuk ${formatRupiah(m.income)}, keluar ${formatRupiah(m.expense)}`}>
+                                                    {[
+                                                        { v: m.income, c: 'bg-income' },
+                                                        { v: m.expense, c: 'bg-expense' },
+                                                    ].map((bar, i) => (
+                                                        <div
+                                                            key={i}
+                                                            className={cn('w-full max-w-9 origin-bottom rounded-t-md transition-transform duration-700 ease-out motion-reduce:transition-none', bar.c, ready ? 'scale-y-100' : 'scale-y-0')}
+                                                            style={{ height: `${Math.max((bar.v / maxMonthly) * 100, bar.v > 0 ? 1.5 : 0)}%`, transitionDelay: `${i * 60}ms` }}
+                                                        />
+                                                    ))}
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <div className="text-muted-foreground mt-2 flex justify-around gap-2 text-xs">
+                                            {monthlyTrend.map((m) => (
+                                                <span key={m.month} className="flex-1 text-center">
+                                                    {m.label.split(' ')[0]}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col items-center gap-3 py-12 text-center">
+                                    <p className="text-sm font-medium">Belum ada transaksi yang dibukukan</p>
+                                    <p className="text-muted-foreground max-w-sm text-sm">Grafik muncul setelah berita acara hitung diverifikasi dan dikunci, atau pengeluaran dibayar.</p>
+                                    <Button asChild size="sm" variant="outline">
+                                        <Link href="/counting/create">Mulai hitung kolekte</Link>
+                                    </Button>
+                                </div>
+                            )}
+                        </CardContent>
+                        {hasTrendData && (
+                            <div className="border-t">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Bulan</TableHead>
+                                            <TableHead className="text-right">Pemasukan</TableHead>
+                                            <TableHead className="text-right">Pengeluaran</TableHead>
+                                            <TableHead className="text-right">Selisih</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {monthlyTrend.map((m) => (
+                                            <TableRow key={m.month}>
+                                                <TableCell className="font-medium">{m.label}</TableCell>
+                                                <TableCell className="text-income text-right tabular-nums">{formatRupiah(m.income)}</TableCell>
+                                                <TableCell className="text-expense text-right tabular-nums">{formatRupiah(m.expense)}</TableCell>
+                                                <TableCell className={cn('text-right font-semibold tabular-nums', m.net < 0 && 'text-expense')}>{formatRupiah(m.net)}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                        )}
+                    </Card>
+
+                    {/* Pekerjaan yang menunggu */}
+                    <Card>
+                        <CardHeader className="flex-row items-center justify-between space-y-0">
+                            <CardTitle>Perlu tindakan</CardTitle>
+                            {tasks.length > 0 && <Badge variant="secondary">{tasks.length}</Badge>}
+                        </CardHeader>
+                        <CardContent className="px-0 md:px-0">
+                            {tasks.length > 0 ? (
+                                <ul className="divide-border divide-y">
+                                    {tasks.map((t) => {
+                                        const Icon = t.icon;
+                                        return (
+                                            <li key={t.key} className="flex items-start gap-3 px-5 py-3.5 md:px-6">
+                                                <span className={cn('mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full', TONE[t.tone])}>
+                                                    <Icon className="size-4" aria-hidden="true" />
+                                                </span>
+                                                <div className="min-w-0 flex-1">
+                                                    <p className="flex flex-wrap items-center gap-x-2 text-sm font-medium">
+                                                        <span className="truncate">{t.title}</span>
+                                                        {t.badge && <Badge className="border-expense/30 bg-expense/10 text-expense px-1.5 py-0 text-[10px]">{t.badge}</Badge>}
+                                                    </p>
+                                                    <p className="text-muted-foreground mt-0.5 text-xs">{t.meta}</p>
+                                                    {t.amount !== undefined && <p className="mt-1 text-sm font-semibold tabular-nums">{formatRupiah(t.amount)}</p>}
+                                                </div>
+                                                <Button asChild size="sm" variant="outline" className="shrink-0">
+                                                    <Link href={t.href}>{t.action}</Link>
+                                                </Button>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            ) : (
+                                <div className="flex flex-col items-center gap-2 px-6 py-10 text-center">
+                                    <span className="bg-income/10 text-income flex size-10 items-center justify-center rounded-full">
+                                        <CheckCircle2 className="size-5" aria-hidden="true" />
+                                    </span>
+                                    <p className="text-sm font-medium">Semua pekerjaan sudah beres</p>
+                                    <p className="text-muted-foreground text-xs">Tidak ada berita acara atau pengeluaran yang menunggu tindakan.</p>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                </div>
+
+                <div className="grid items-start gap-6 lg:grid-cols-2">
+                    <BalanceCard
+                        title="Saldo per pos dana"
+                        description="Pembagian saldo kas ke pos tujuan dan program."
+                        manageHref="/admin/funds"
+                        manageLabel="Kelola pos dana"
+                        empty="Belum ada pos dana aktif."
+                        total={totalFund}
+                        rows={fundBalances.map((f) => ({ key: f.id, name: f.name, sub: f.code, balance: f.balance }))}
+                    />
+                    <BalanceCard
+                        title="Saldo per rekening"
+                        description="Uang yang benar-benar ada di kas tunai dan bank."
+                        manageHref="/admin/accounts"
+                        manageLabel="Kelola rekening"
+                        empty="Belum ada rekening aktif."
+                        total={totalAccount}
+                        rows={accountBalances.map((a) => ({
+                            key: a.id,
+                            name: a.name,
+                            sub: [a.code, a.bank_name].filter(Boolean).join(' · '),
+                            tag: a.type === 'bank' ? 'Bank' : 'Tunai',
+                            balance: a.balance,
+                        }))}
+                    />
+                </div>
             </div>
         </AppLayout>
+    );
+}
+
+interface BalanceRow {
+    key: number;
+    name: string;
+    sub?: string;
+    tag?: string;
+    balance: number;
+}
+
+function BalanceCard({ title, description, manageHref, manageLabel, empty, total, rows }: { title: string; description: string; manageHref: string; manageLabel: string; empty: string; total: number; rows: BalanceRow[] }) {
+    return (
+        <Card>
+            <CardHeader className="flex-row items-start justify-between gap-4 space-y-0">
+                <div className="space-y-1">
+                    <CardTitle>{title}</CardTitle>
+                    <CardDescription>{description}</CardDescription>
+                </div>
+                <Link href={manageHref} className="text-primary shrink-0 text-sm font-medium hover:underline">
+                    {manageLabel}
+                </Link>
+            </CardHeader>
+            <CardContent className="px-0 md:px-0">
+                {rows.length > 0 ? (
+                    <ul className="divide-border divide-y">
+                        {rows.map((r) => {
+                            const share = total > 0 ? Math.max(r.balance, 0) / total : 0;
+                            return (
+                                <li key={r.key} className="px-5 py-3 md:px-6">
+                                    <div className="flex items-baseline justify-between gap-4">
+                                        <div className="min-w-0">
+                                            <p className="flex items-center gap-2 text-sm font-medium">
+                                                <span className="truncate">{r.name}</span>
+                                                {r.tag && <Badge variant="outline" className="text-[10px] font-medium">{r.tag}</Badge>}
+                                            </p>
+                                            {r.sub && <p className="text-muted-foreground text-xs">{r.sub}</p>}
+                                        </div>
+                                        <p className={cn('shrink-0 text-sm font-semibold tabular-nums', r.balance < 0 && 'text-expense')}>{formatRupiah(r.balance)}</p>
+                                    </div>
+                                    <div className="bg-muted mt-2 h-1.5 overflow-hidden rounded-full" aria-hidden="true">
+                                        <div className="bg-primary/70 h-full rounded-full" style={{ width: `${Math.round(share * 100)}%` }} />
+                                    </div>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                ) : (
+                    <p className="text-muted-foreground px-6 py-8 text-center text-sm">{empty}</p>
+                )}
+            </CardContent>
+        </Card>
     );
 }

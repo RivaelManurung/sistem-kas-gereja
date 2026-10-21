@@ -82,7 +82,7 @@ export default function ScheduleForm({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={isEdit ? 'Edit Jadwal' : 'Tambah Jadwal'} />
-            <div className="space-y-6 p-4 max-w-2xl">
+            <div className="space-y-6 p-4 md:p-6">
                 <PageHeader
                     title={isEdit ? 'Edit Jadwal' : 'Tambah Jadwal Ibadah'}
                     description={
@@ -97,7 +97,7 @@ export default function ScheduleForm({
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={submit} className="space-y-4">
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="name">Nama Ibadah *</Label>
                                 <Input
                                     id="name"
@@ -110,7 +110,7 @@ export default function ScheduleForm({
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-1">
+                                <div className="space-y-2">
                                     <Label htmlFor="day_of_week">Hari *</Label>
                                     <Select
                                         value={data.day_of_week}
@@ -130,7 +130,7 @@ export default function ScheduleForm({
                                     <InputError message={errors.day_of_week} />
                                 </div>
 
-                                <div className="space-y-1">
+                                <div className="space-y-2">
                                     <Label htmlFor="time">Jam Ibadah *</Label>
                                     <Input
                                         id="time"

@@ -4,10 +4,12 @@ import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
+import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem } from '@/types';
 import { type CustomFieldsProp } from '@/types/attributes';
 import { Head, Link, useForm } from '@inertiajs/react';
@@ -85,7 +87,7 @@ export default function MemberForm({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={isEdit ? 'Edit Jemaat' : 'Tambah Jemaat'} />
-            <div className="space-y-6 p-4 max-w-2xl">
+            <div className="space-y-6 p-4 md:p-6">
                 <PageHeader
                     title={isEdit ? 'Edit Jemaat' : 'Tambah Jemaat'}
                     description={
@@ -101,7 +103,7 @@ export default function MemberForm({
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-1">
+                                <div className="space-y-2">
                                     <Label htmlFor="member_number">Nomor Jemaat</Label>
                                     <Input
                                         id="member_number"
@@ -111,7 +113,7 @@ export default function MemberForm({
                                     />
                                     <InputError message={errors.member_number} />
                                 </div>
-                                <div className="space-y-1">
+                                <div className="space-y-2">
                                     <Label htmlFor="gender">Jenis Kelamin</Label>
                                     <Select
                                         value={data.gender}
@@ -129,7 +131,7 @@ export default function MemberForm({
                                 </div>
                             </div>
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="name">Nama Lengkap *</Label>
                                 <Input
                                     id="name"
@@ -142,17 +144,16 @@ export default function MemberForm({
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-1">
+                                <div className="space-y-2">
                                     <Label htmlFor="birth_date">Tanggal Lahir</Label>
-                                    <Input
+                                    <DatePicker
                                         id="birth_date"
-                                        type="date"
-                                        value={data.birth_date}
-                                        onChange={(e) => setData('birth_date', e.target.value)}
+                                        value={formatDate(data.birth_date)}
+                                        onChange={(v) => setData('birth_date', v)}
                                     />
                                     <InputError message={errors.birth_date} />
                                 </div>
-                                <div className="space-y-1">
+                                <div className="space-y-2">
                                     <Label htmlFor="phone">Nomor Telepon</Label>
                                     <Input
                                         id="phone"
@@ -164,7 +165,7 @@ export default function MemberForm({
                                 </div>
                             </div>
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="email">Email</Label>
                                 <Input
                                     id="email"
@@ -176,7 +177,7 @@ export default function MemberForm({
                                 <InputError message={errors.email} />
                             </div>
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="address">Alamat</Label>
                                 <Textarea
                                     id="address"
@@ -187,7 +188,7 @@ export default function MemberForm({
                                 <InputError message={errors.address} />
                             </div>
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="user_id">Tautkan Akun Pengguna</Label>
                                 <Select
                                     value={data.user_id ? String(data.user_id) : 'none'}

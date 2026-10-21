@@ -25,7 +25,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
         <AuthLayout title="Lupa Kata Sandi" description="Masukkan alamat email Anda untuk menerima tautan atur ulang kata sandi">
             <Head title="Lupa Kata Sandi" />
 
-            {status && <div className="mb-4 text-center text-sm font-medium text-green-600">{status}</div>}
+            {status && <div className="mb-4 text-center text-sm font-medium text-income">{status}</div>}
 
             <div className="space-y-6">
                 <form onSubmit={submit}>

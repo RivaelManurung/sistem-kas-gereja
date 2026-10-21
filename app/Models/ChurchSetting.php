@@ -46,6 +46,21 @@ class ChurchSetting extends Model
         return 'data:image/png;base64,'.base64_encode($data);
     }
 
+    /** Identitas yang tampil di seluruh aplikasi: nama sistem, logo, dan favicon. */
+    public function brand(): array
+    {
+        $url = fn (?string $path) => $path
+            ? \Illuminate\Support\Facades\Storage::disk('public')->url($path).'?v='.($this->updated_at?->timestamp ?? 1)
+            : null;
+
+        return [
+            'name' => $this->system_name ?: 'Kas Gereja',
+            'church_name' => $this->name,
+            'logo_url' => $url($this->logo_path),
+            'favicon_url' => $url($this->favicon_path),
+        ];
+    }
+
     public static function current(): self
     {
         return static::query()->first() ?? static::query()->create([

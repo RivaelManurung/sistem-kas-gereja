@@ -2,19 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatRupiah } from '@/lib/money';
 import { Head, Link } from '@inertiajs/react';
-import {
-    ArrowDownRight,
-    ArrowUpRight,
-    Building2,
-    Calendar,
-    ChevronRight,
-    Lock,
-    PieChart,
-    PiggyBank,
-    ShieldCheck,
-    TrendingUp,
-    Wallet,
-} from 'lucide-react';
+import { ArrowDownRight, ArrowUpRight, Building2, Lock, PiggyBank, ShieldCheck, TrendingUp, Wallet } from 'lucide-react';
 
 interface CategorySum {
     id: number;
@@ -64,21 +52,21 @@ export default function Transparency({
     );
 
     return (
-        <div className="min-h-screen bg-neutral-50 text-neutral-900 selection:bg-primary/20 selection:text-primary dark:bg-neutral-950 dark:text-neutral-100">
+        <div className="min-h-screen bg-muted/60 text-foreground selection:bg-primary/20 selection:text-primary">
             <Head title={`Transparansi Keuangan — ${churchName}`} />
 
             {/* Public Top Navigation */}
-            <header className="sticky top-0 z-30 border-b border-neutral-200/80 bg-white/80 backdrop-blur-md dark:border-neutral-800/80 dark:bg-neutral-900/80">
+            <header className="sticky top-0 z-30 border-b border-border bg-card backdrop-blur-md">
                 <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
                     <div className="flex items-center gap-2.5">
                         <div className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-xs">
                             <Building2 className="size-5" />
                         </div>
                         <div>
-                            <span className="font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
+                            <span className="font-semibold tracking-tight text-foreground">
                                 {churchName}
                             </span>
-                            <span className="ml-2 hidden rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-medium text-emerald-800 sm:inline dark:bg-emerald-950/50 dark:text-emerald-300">
+                            <span className="ml-2 hidden rounded-full bg-income/10 px-2 py-0.5 text-[11px] font-medium text-income sm:inline">
                                 Transparansi Terbuka
                             </span>
                         </div>
@@ -87,7 +75,7 @@ export default function Transparency({
                     <div className="flex items-center gap-3 text-xs">
                         <Link
                             href="/login"
-                            className="font-medium text-neutral-600 transition-colors hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
+                            className="font-medium text-muted-foreground transition-colors hover:text-foreground"
                         >
                             Masuk Pengurus →
                         </Link>
@@ -98,21 +86,21 @@ export default function Transparency({
             {/* Hero / Header Section */}
             <main className="mx-auto max-w-6xl space-y-8 px-4 py-8 sm:px-6 sm:py-12">
                 <div className="space-y-3 text-center sm:text-left">
-                    <div className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-3 py-1 text-xs font-medium text-neutral-600 shadow-xs dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-400">
-                        <ShieldCheck className="size-3.5 text-emerald-600 dark:text-emerald-400" />
+                    <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground shadow-xs">
+                        <ShieldCheck className="size-3.5 text-income" />
                         Laporan Transparansi Keuangan Publik
                     </div>
-                    <h1 className="text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl dark:text-neutral-100">
+                    <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
                         Akuntabilitas & Transparansi Persembahan
                     </h1>
-                    <p className="max-w-3xl text-sm leading-relaxed text-neutral-600 sm:text-base dark:text-neutral-400">
+                    <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground sm:text-base">
                         Sebagai wujud pertanggungjawaban iman dan pengelolaan yang berintegritas, laporan keuangan gereja ini
                         disajikan secara terbuka dan agregat.
                     </p>
 
                     {/* Strict Privacy Guarantee Banner */}
-                    <div className="flex items-center gap-2.5 rounded-lg border border-sky-200/80 bg-sky-50/70 p-3 text-xs text-sky-900 dark:border-sky-900/40 dark:bg-sky-950/20 dark:text-sky-300">
-                        <Lock className="size-4 shrink-0 text-sky-600 dark:text-sky-400" />
+                    <div className="flex items-center gap-2.5 rounded-lg border border-info/30 bg-info/10 p-3 text-xs text-info">
+                        <Lock className="size-4 shrink-0 text-info" />
                         <span>
                             <strong>Komitmen Kerahasiaan:</strong> Demi melindungi privasi jemaat dan pihak ketiga, halaman publik ini
                             <strong> tidak pernah menampilkan identitas, nama donatur, pihak ketiga, maupun nominal transaksi perorangan</strong>. Seluruh data disajikan dalam bentuk akumulasi per kategori resmi.
@@ -122,9 +110,9 @@ export default function Transparency({
 
                 {/* Big Headline Summary Cards */}
                 <div className="grid gap-4 sm:grid-cols-3">
-                    <Card className="border-neutral-200/80 bg-white shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
+                    <Card className="border-border bg-card shadow-xs">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium text-neutral-500 dark:text-neutral-400">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">
                                 Total Saldo Dana Kas Aktif
                             </CardTitle>
                             <div className="rounded-full bg-primary/10 p-2 text-primary">
@@ -132,48 +120,48 @@ export default function Transparency({
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold tracking-tight tabular-nums text-neutral-900 sm:text-3xl dark:text-neutral-100">
+                            <div className="text-2xl font-bold tracking-tight tabular-nums text-foreground sm:text-3xl">
                                 {formatRupiah(summary.totalBalance)}
                             </div>
-                            <p className="mt-1 text-xs text-neutral-500">
+                            <p className="mt-1 text-xs text-muted-foreground">
                                 Akumulasi saldo di seluruh pos pelayanan gereja
                             </p>
                         </CardContent>
                     </Card>
 
-                    <Card className="border-neutral-200/80 bg-white shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
+                    <Card className="border-border bg-card shadow-xs">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium text-neutral-500 dark:text-neutral-400">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">
                                 Akumulasi Penerimaan Publik
                             </CardTitle>
-                            <div className="rounded-full bg-emerald-500/10 p-2 text-emerald-600 dark:text-emerald-400">
+                            <div className="rounded-full bg-income/10 p-2 text-income">
                                 <ArrowUpRight className="size-4" />
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold tracking-tight tabular-nums text-emerald-600 sm:text-3xl dark:text-emerald-400">
+                            <div className="text-2xl font-bold tracking-tight tabular-nums text-income sm:text-3xl">
                                 {formatRupiah(summary.totalIncome)}
                             </div>
-                            <p className="mt-1 text-xs text-neutral-500">
+                            <p className="mt-1 text-xs text-muted-foreground">
                                 Total persembahan terkumpul melalui pos terbuka
                             </p>
                         </CardContent>
                     </Card>
 
-                    <Card className="border-neutral-200/80 bg-white shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
+                    <Card className="border-border bg-card shadow-xs">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium text-neutral-500 dark:text-neutral-400">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">
                                 Akumulasi Pengeluaran Publik
                             </CardTitle>
-                            <div className="rounded-full bg-rose-500/10 p-2 text-rose-600 dark:text-rose-400">
+                            <div className="rounded-full bg-expense/10 p-2 text-expense">
                                 <ArrowDownRight className="size-4" />
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold tracking-tight tabular-nums text-rose-600 sm:text-3xl dark:text-rose-400">
+                            <div className="text-2xl font-bold tracking-tight tabular-nums text-expense sm:text-3xl">
                                 {formatRupiah(summary.totalExpense)}
                             </div>
-                            <p className="mt-1 text-xs text-neutral-500">
+                            <p className="mt-1 text-xs text-muted-foreground">
                                 Total realisasi biaya pelayanan & operasional
                             </p>
                         </CardContent>
@@ -181,7 +169,7 @@ export default function Transparency({
                 </div>
 
                 {/* Balances Breakdown: Pos Dana Pelayanan */}
-                <Card className="border-neutral-200/80 bg-white shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
+                <Card className="border-border bg-card shadow-xs">
                     <CardHeader className="pb-3">
                         <div className="flex items-center gap-2">
                             <PiggyBank className="size-4 text-primary" />
@@ -197,18 +185,18 @@ export default function Transparency({
                                 {fundBalances.map((fund) => (
                                     <div
                                         key={fund.id}
-                                        className="rounded-lg border border-neutral-200/70 bg-neutral-50/50 p-3 dark:border-neutral-800 dark:bg-neutral-950/40"
+                                        className="rounded-lg border border-border bg-muted/60 p-3"
                                     >
-                                        <div className="text-xs font-medium text-neutral-500">{fund.code}</div>
-                                        <div className="font-semibold text-neutral-900 dark:text-neutral-100">{fund.name}</div>
-                                        <div className="mt-2 text-lg font-bold tabular-nums text-neutral-900 dark:text-neutral-100">
+                                        <div className="text-xs font-medium text-muted-foreground">{fund.code}</div>
+                                        <div className="font-semibold text-foreground">{fund.name}</div>
+                                        <div className="mt-2 text-lg font-bold tabular-nums text-foreground">
                                             {formatRupiah(fund.balance)}
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         ) : (
-                            <div className="py-6 text-center text-xs text-neutral-500">Tidak ada pos dana aktif.</div>
+                            <div className="py-6 text-center text-xs text-muted-foreground">Tidak ada pos dana aktif.</div>
                         )}
                     </CardContent>
                 </Card>
@@ -216,11 +204,11 @@ export default function Transparency({
                 {/* Categories Breakdown: Pemasukan vs Pengeluaran */}
                 <div className="grid gap-6 lg:grid-cols-2">
                     {/* Public Income by Category */}
-                    <Card className="border-neutral-200/80 bg-white shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
+                    <Card className="border-border bg-card shadow-xs">
                         <CardHeader className="pb-3">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <ArrowUpRight className="size-4 text-emerald-600 dark:text-emerald-400" />
+                                    <ArrowUpRight className="size-4 text-income" />
                                     <CardTitle className="text-base font-semibold">Penerimaan per Kategori</CardTitle>
                                 </div>
                                 <Badge variant="outline" className="text-xs font-normal">
@@ -233,28 +221,28 @@ export default function Transparency({
                         </CardHeader>
                         <CardContent>
                             {incomeByCategory.length > 0 ? (
-                                <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
+                                <div className="divide-y divide-border">
                                     {incomeByCategory.map((cat) => (
                                         <div key={cat.id} className="flex items-center justify-between py-2.5 text-sm">
-                                            <span className="font-medium text-neutral-800 dark:text-neutral-200">{cat.name}</span>
-                                            <span className="font-semibold tabular-nums text-emerald-600 dark:text-emerald-400">
+                                            <span className="font-medium text-foreground">{cat.name}</span>
+                                            <span className="font-semibold tabular-nums text-income">
                                                 {formatRupiah(cat.amount)}
                                             </span>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <div className="py-6 text-center text-xs text-neutral-500">Belum ada kategori penerimaan publik.</div>
+                                <div className="py-6 text-center text-xs text-muted-foreground">Belum ada kategori penerimaan publik.</div>
                             )}
                         </CardContent>
                     </Card>
 
                     {/* Public Expense by Category */}
-                    <Card className="border-neutral-200/80 bg-white shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
+                    <Card className="border-border bg-card shadow-xs">
                         <CardHeader className="pb-3">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <ArrowDownRight className="size-4 text-rose-600 dark:text-rose-400" />
+                                    <ArrowDownRight className="size-4 text-expense" />
                                     <CardTitle className="text-base font-semibold">Pengeluaran per Kategori</CardTitle>
                                 </div>
                                 <Badge variant="outline" className="text-xs font-normal">
@@ -267,18 +255,18 @@ export default function Transparency({
                         </CardHeader>
                         <CardContent>
                             {expenseByCategory.length > 0 ? (
-                                <div className="divide-y divide-neutral-100 dark:divide-neutral-800">
+                                <div className="divide-y divide-border">
                                     {expenseByCategory.map((cat) => (
                                         <div key={cat.id} className="flex items-center justify-between py-2.5 text-sm">
-                                            <span className="font-medium text-neutral-800 dark:text-neutral-200">{cat.name}</span>
-                                            <span className="font-semibold tabular-nums text-rose-600 dark:text-rose-400">
+                                            <span className="font-medium text-foreground">{cat.name}</span>
+                                            <span className="font-semibold tabular-nums text-expense">
                                                 {formatRupiah(cat.amount)}
                                             </span>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <div className="py-6 text-center text-xs text-neutral-500">Belum ada kategori pengeluaran publik.</div>
+                                <div className="py-6 text-center text-xs text-muted-foreground">Belum ada kategori pengeluaran publik.</div>
                             )}
                         </CardContent>
                     </Card>
@@ -286,7 +274,7 @@ export default function Transparency({
 
                 {/* Monthly Trend Overview */}
                 {monthlyTrend.length > 0 && (
-                    <Card className="border-neutral-200/80 bg-white shadow-xs dark:border-neutral-800 dark:bg-neutral-900">
+                    <Card className="border-border bg-card shadow-xs">
                         <CardHeader className="pb-3">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
@@ -295,12 +283,12 @@ export default function Transparency({
                                 </div>
                                 <div className="flex items-center gap-4 text-xs">
                                     <div className="flex items-center gap-1.5">
-                                        <span className="size-2.5 rounded-full bg-emerald-500" />
-                                        <span className="text-neutral-600 dark:text-neutral-300">Pemasukan</span>
+                                        <span className="size-2.5 rounded-full bg-income" />
+                                        <span className="text-muted-foreground">Pemasukan</span>
                                     </div>
                                     <div className="flex items-center gap-1.5">
-                                        <span className="size-2.5 rounded-full bg-rose-500" />
-                                        <span className="text-neutral-600 dark:text-neutral-300">Pengeluaran</span>
+                                        <span className="size-2.5 rounded-full bg-expense" />
+                                        <span className="text-muted-foreground">Pengeluaran</span>
                                     </div>
                                 </div>
                             </div>
@@ -317,26 +305,26 @@ export default function Transparency({
                                     return (
                                         <div key={item.month} className="space-y-1.5">
                                             <div className="flex items-center justify-between text-xs">
-                                                <span className="font-medium text-neutral-900 dark:text-neutral-100">
+                                                <span className="font-medium text-foreground">
                                                     {item.label}
                                                 </span>
                                                 <div className="flex items-center gap-3 tabular-nums">
-                                                    <span className="text-emerald-600 dark:text-emerald-400">
+                                                    <span className="text-income">
                                                         +{formatRupiah(item.income)}
                                                     </span>
-                                                    <span className="text-rose-600 dark:text-rose-400">
+                                                    <span className="text-expense">
                                                         -{formatRupiah(item.expense)}
                                                     </span>
                                                 </div>
                                             </div>
 
-                                            <div className="flex h-2.5 w-full gap-1 overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
+                                            <div className="flex h-2.5 w-full gap-1 overflow-hidden rounded-full bg-muted/60">
                                                 <div
-                                                    className="h-full rounded-full bg-emerald-500"
+                                                    className="h-full rounded-full bg-income"
                                                     style={{ width: `${Math.max(incomePct, item.income > 0 ? 2 : 0)}%` }}
                                                 />
                                                 <div
-                                                    className="h-full rounded-full bg-rose-500"
+                                                    className="h-full rounded-full bg-expense"
                                                     style={{ width: `${Math.max(expensePct, item.expense > 0 ? 2 : 0)}%` }}
                                                 />
                                             </div>
@@ -349,7 +337,7 @@ export default function Transparency({
                 )}
 
                 {/* Footer Notice */}
-                <footer className="border-t border-neutral-200 pt-6 text-center text-xs text-neutral-500 dark:border-neutral-800 dark:text-neutral-400">
+                <footer className="border-t border-border pt-6 text-center text-xs text-muted-foreground">
                     <p>
                         © {new Date().getFullYear()} {churchName} · Sistem Pengelolaan Kas & Persembahan Gereja
                     </p>

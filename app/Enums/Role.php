@@ -32,9 +32,21 @@ enum Role: string
     {
         return match ($this) {
             self::Admin => Permission::cases(),
-            self::Bendahara => [Permission::MembersManage, Permission::EventsManage],
-            self::Pemeriksa => [Permission::AuditView],
-            default => [],
+            self::Bendahara => [
+                Permission::CountingManage, Permission::CountingVerify, Permission::DepositsManage,
+                Permission::ExpensesView, Permission::ExpensesApprove, Permission::ExpensesPay,
+                Permission::TransfersView, Permission::TransfersApprove,
+                Permission::EventsView, Permission::EventsManage,
+                Permission::ReportsView, Permission::ReportsManage, Permission::MembersManage,
+            ],
+            self::Penghitung => [Permission::CountingManage],
+            self::Majelis => [
+                Permission::ExpensesView, Permission::ExpensesApprove, Permission::ExpensesApproveLarge,
+                Permission::TransfersView, Permission::TransfersApprove, Permission::EventsView, Permission::ReportsView,
+            ],
+            self::Panitia => [Permission::ExpensesView, Permission::EventsParticipate],
+            self::Pemeriksa => [Permission::AuditView, Permission::EventsView, Permission::ReportsView],
+            self::Jemaat => [],
         };
     }
 

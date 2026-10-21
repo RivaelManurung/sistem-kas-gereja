@@ -1,7 +1,7 @@
 import PageHeader from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { formatRupiah } from '@/lib/money';
 import { type BreadcrumbItem } from '@/types';
@@ -41,7 +41,7 @@ export default function DonationShow({ donation }: { donation: DonationDetail })
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Tanda Terima ${donation.receipt_number}`} />
-            <div className="space-y-6 p-4 max-w-2xl mx-auto">
+            <div className="space-y-6 p-4 md:p-6">
                 <div className="flex items-center justify-between no-print">
                     <Button variant="outline" size="sm" asChild>
                         <Link href={route('donations.index')}>
@@ -59,7 +59,7 @@ export default function DonationShow({ donation }: { donation: DonationDetail })
                 <Card className="border-2 shadow-sm p-6 space-y-6 print:border-none print:shadow-none">
                     <div className="border-b pb-4 text-center">
                         <div className="flex items-center justify-center gap-2 mb-1">
-                            <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                            <CheckCircle2 className="h-5 w-5 text-income" />
                             <h2 className="text-xl font-bold tracking-tight">TANDA TERIMA PERSEMBAHAN</h2>
                         </div>
                         <p className="text-xs text-muted-foreground">Sistem Administrasi Kas & Keuangan Gereja</p>
@@ -112,7 +112,7 @@ export default function DonationShow({ donation }: { donation: DonationDetail })
                         <span className="text-xs uppercase text-muted-foreground font-semibold block">
                             Jumlah Persembahan
                         </span>
-                        <div className="text-3xl font-extrabold font-mono text-primary my-1">
+                        <div className="text-3xl font-extrabold text-primary my-1 tabular-nums">
                             {formatRupiah(donation.amount)}
                         </div>
                     </div>

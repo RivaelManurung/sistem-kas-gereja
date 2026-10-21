@@ -3,12 +3,15 @@ import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { MoneyInput } from '@/components/ui/money-input';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
+
 import AppLayout from '@/layouts/app-layout';
 import { formatRupiah } from '@/lib/money';
+import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Banknote, Calculator, Plus, Trash2 } from 'lucide-react';
@@ -228,7 +231,7 @@ export default function CountingForm({
                     title={isEdit ? `Edit Berita Acara Hitung` : `Penghitungan Kolekte & Penerimaan`}
                     description={
                         session
-                            ? `Sesi Ibadah: ${session.name} (${session.date})`
+                            ? `Sesi Ibadah: ${session.name} (${formatDate(session.date)})`
                             : 'Pencatatan fisik uang persembahan tunai & transfer.'
                     }
                 />
@@ -239,7 +242,7 @@ export default function CountingForm({
                         <CardDescription>Pilih rekening penerima dan tanggal penghitungan fisik.</CardDescription>
                     </CardHeader>
                     <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="space-y-1">
+                        <div className="space-y-2">
                             <Label htmlFor="account_id">Rekening Penampung</Label>
                             <Select
                                 value={String(data.account_id)}
@@ -259,19 +262,18 @@ export default function CountingForm({
                             <InputError message={errors.account_id} />
                         </div>
 
-                        <div className="space-y-1">
+                        <div className="space-y-2">
                             <Label htmlFor="date">Tanggal Hitung</Label>
-                            <Input
+                            <DatePicker
                                 id="date"
-                                type="date"
-                                value={data.date}
-                                onChange={(e) => setData('date', e.target.value)}
+                                value={formatDate(data.date)}
+                                onChange={(v) => setData('date', v)}
                                 required
                             />
                             <InputError message={errors.date} />
                         </div>
 
-                        <div className="space-y-1">
+                        <div className="space-y-2">
                             <Label htmlFor="notes">Catatan (Opsional)</Label>
                             <Input
                                 id="notes"
@@ -343,7 +345,7 @@ export default function CountingForm({
                                                 <div className="text-xs text-muted-foreground uppercase font-semibold">
                                                     Subtotal Pos
                                                 </div>
-                                                <div className="text-lg font-bold font-mono text-primary">
+                                                <div className="text-lg font-bold text-primary tabular-nums">
                                                     {formatRupiah(lineSubtotal)}
                                                 </div>
                                             </div>
@@ -395,7 +397,7 @@ export default function CountingForm({
                                                                     type="number"
                                                                     inputMode="numeric"
                                                                     min={0}
-                                                                    className="w-16 h-11 text-center font-mono font-bold text-base tabular-nums border rounded-md bg-background focus:ring-2 focus:ring-primary"
+                                                                    className="w-16 h-11 text-center font-bold text-base tabular-nums border rounded-md bg-background focus:ring-2 focus:ring-primary"
                                                                     value={count === 0 ? '' : count}
                                                                     placeholder="0"
                                                                     onChange={(e) =>
@@ -441,21 +443,11 @@ export default function CountingForm({
                                         </div>
                                     ) : (
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="space-y-1">
+                                            <div className="space-y-2">
                                                 <Label>Nominal Penerimaan Non-Tunai (Rp)</Label>
-                                                <Input
-                                                    type="number"
-                                                    inputMode="numeric"
-                                                    min={0}
-                                                    value={line.amount || ''}
-                                                    placeholder="0"
-                                                    onChange={(e) =>
-                                                        updateLine(lineIndex, { amount: Number(e.target.value) || 0 })
-                                                    }
-                                                    required
-                                                />
+                                                <MoneyInput value={line.amount} onChange={(v) => updateLine(lineIndex, { amount: v })} required />
                                             </div>
-                                            <div className="space-y-1">
+                                            <div className="space-y-2">
                                                 <Label>No. Referensi / Mutasi Bank / QRIS</Label>
                                                 <Input
                                                     value={line.reference_number}
@@ -484,7 +476,7 @@ export default function CountingForm({
                                 <div className="text-xs text-muted-foreground uppercase font-semibold">
                                     Total Berita Acara
                                 </div>
-                                <div className="text-xl sm:text-2xl font-black font-mono tracking-tight text-primary">
+                                <div className="text-xl sm:text-2xl font-black tracking-tight text-primary tabular-nums">
                                     {formatRupiah(grandTotal)}
                                 </div>
                             </div>

@@ -13,25 +13,15 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
+
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { formatRupiah } from '@/lib/money';
+import { formatDate, formatDateTime } from '@/lib/date';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import {
-    AlertCircle,
-    ArrowLeft,
-    CheckCircle2,
-    Clock,
-    Download,
-    ExternalLink,
-    FileCheck2,
-    FileSignature,
-    FileText,
-    ShieldCheck,
-} from 'lucide-react';
+import { AlertCircle, ArrowLeft, CheckCircle2, Clock, Download, ExternalLink, FileCheck2, FileSignature, ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
 
 interface ApprovalRow {
@@ -126,10 +116,10 @@ export default function ReportsShow({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Laporan: ${report.title}`} />
 
-            <div className="space-y-6 p-4">
+            <div className="space-y-6 p-4 md:p-6">
                 <PageHeader
                     title={report.title}
-                    description={`Periode: ${report.start_date} s/d ${report.end_date} • Kode: ${report.verification_code}`}
+                    description={`Periode: ${formatDate(report.start_date)} s/d ${formatDate(report.end_date)} • Kode: ${report.verification_code}`}
                     actions={
                         <div className="flex flex-wrap items-center gap-2">
                             <Button variant="outline" asChild>
@@ -158,8 +148,8 @@ export default function ReportsShow({
 
                 {/* Status Banners */}
                 {report.is_frozen ? (
-                    <Alert className="border-emerald-300 bg-emerald-50 text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200">
-                        <ShieldCheck className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                    <Alert className="border-income/30 bg-income/10 text-income">
+                        <ShieldCheck className="h-5 w-5 text-income" />
                         <AlertTitle className="font-bold">Laporan Resmi Telah Dibekukan</AlertTitle>
                         <AlertDescription className="text-sm">
                             Dokumen ini telah disetujui oleh seluruh penanda tangan, stempel resmi gereja telah dibubuhkan, dan
@@ -168,8 +158,8 @@ export default function ReportsShow({
                         </AlertDescription>
                     </Alert>
                 ) : (
-                    <Alert className="border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
-                        <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                    <Alert className="border-warning/30 bg-warning/10 text-warning">
+                        <Clock className="h-5 w-5 text-warning" />
                         <AlertTitle className="font-bold">Menunggu Pengesahan Penanda Tangan</AlertTitle>
                         <AlertDescription className="text-sm">
                             Laporan ini sedang dalam alur pengesahan. Stempel resmi gereja akan otomatis diterapkan dan berkas
@@ -180,17 +170,17 @@ export default function ReportsShow({
 
                 {/* Sign Action Banner for current user */}
                 {user_pending_approval_id && (
-                    <Card className="border-blue-300 bg-blue-50/60 dark:border-blue-900 dark:bg-blue-950/30">
+                    <Card className="border-info/30 bg-info/10">
                         <CardContent className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                             <div className="flex items-center space-x-3">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-full border-info/30 bg-info/10 text-info">
                                     <FileSignature className="h-5 w-5" />
                                 </div>
                                 <div>
-                                    <h4 className="font-semibold text-blue-950 dark:text-blue-100">
+                                    <h4 className="font-semibold text-info">
                                         Tanda Tangan Anda Diperlukan
                                     </h4>
-                                    <p className="text-xs text-blue-800 dark:text-blue-300">
+                                    <p className="text-xs text-info">
                                         Akun Anda berwenang menandatangani dokumen ini. Pastikan Anda telah memeriksa kebenaran angka laporan.
                                     </p>
                                 </div>
@@ -206,7 +196,7 @@ export default function ReportsShow({
                             ) : (
                                 <Dialog open={signDialogOpen} onOpenChange={setSignDialogOpen}>
                                     <DialogTrigger asChild>
-                                        <Button className="bg-blue-600 hover:bg-blue-700">
+                                        <Button>
                                             <FileSignature className="mr-2 h-4 w-4" />
                                             Tandatangani Laporan Ini
                                         </Button>
@@ -250,10 +240,10 @@ export default function ReportsShow({
                 )}
 
                 {/* Signatories & Approvals Progress */}
-                <Card className="bg-white dark:bg-slate-900 shadow-sm">
+                <Card className="bg-card shadow-sm">
                     <CardHeader>
                         <CardTitle className="text-base flex items-center">
-                            <FileCheck2 className="mr-2 h-5 w-5 text-blue-600" />
+                            <FileCheck2 className="mr-2 h-5 w-5 text-info" />
                             Status Pengesahan Penanda Tangan
                         </CardTitle>
                         <CardDescription>
@@ -267,8 +257,8 @@ export default function ReportsShow({
                                     key={app.id}
                                     className={`rounded-lg border p-4 transition-colors ${
                                         app.status === 'approved'
-                                            ? 'bg-emerald-50/40 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-900'
-                                            : 'bg-slate-50 border-slate-200 dark:bg-slate-800/40 dark:border-slate-800'
+                                            ? 'bg-income/10 border-income/30'
+                                            : 'bg-muted/60 border-border'
                                     }`}
                                 >
                                     <div className="flex items-center justify-between mb-2">
@@ -276,7 +266,7 @@ export default function ReportsShow({
                                             {app.title}
                                         </span>
                                         {app.status === 'approved' ? (
-                                            <Badge className="bg-emerald-600 text-white text-[10px]">
+                                            <Badge className="border-income/30 bg-income/10 text-income text-[10px]">
                                                 <CheckCircle2 className="mr-1 h-3 w-3" />
                                                 Disetujui
                                             </Badge>
@@ -286,20 +276,20 @@ export default function ReportsShow({
                                             </Badge>
                                         )}
                                     </div>
-                                    <div className="font-bold text-sm text-slate-900 dark:text-slate-100">
+                                    <div className="font-bold text-sm text-foreground">
                                         {app.position}
                                     </div>
                                     <div className="text-xs text-muted-foreground mt-1">
-                                        Nama: <span className="font-medium text-slate-800 dark:text-slate-200">{app.signer_name ?? '—'}</span>
+                                        Nama: <span className="font-medium text-foreground">{app.signer_name ?? '—'}</span>
                                     </div>
                                     {app.approved_at && (
-                                        <div className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-2 flex items-center">
+                                        <div className="text-[11px] text-income mt-2 flex items-center">
                                             <Clock className="mr-1 h-3 w-3" />
-                                            {app.approved_at}
+                                            {formatDateTime(app.approved_at)}
                                         </div>
                                     )}
                                     {app.notes && (
-                                        <div className="text-xs italic text-slate-600 dark:text-slate-400 mt-2 bg-white/60 p-1.5 rounded dark:bg-slate-900/60">
+                                        <div className="text-xs italic text-muted-foreground mt-2 bg-card p-1.5 rounded">
                                             &ldquo;{app.notes}&rdquo;
                                         </div>
                                     )}
@@ -311,7 +301,7 @@ export default function ReportsShow({
 
                 {/* Financial Summary */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <Card className="bg-white dark:bg-slate-900">
+                    <Card className="bg-card">
                         <CardHeader className="pb-2">
                             <CardDescription className="text-xs">Saldo Awal</CardDescription>
                             <CardTitle className="text-base font-bold tabular-nums">
@@ -319,28 +309,28 @@ export default function ReportsShow({
                             </CardTitle>
                         </CardHeader>
                     </Card>
-                    <Card className="bg-white dark:bg-slate-900">
+                    <Card className="bg-card">
                         <CardHeader className="pb-2">
-                            <CardDescription className="text-xs text-emerald-600 font-medium">Total Pemasukan</CardDescription>
-                            <CardTitle className="text-base font-bold tabular-nums text-emerald-600">
+                            <CardDescription className="text-xs text-income font-medium">Total Pemasukan</CardDescription>
+                            <CardTitle className="text-base font-bold tabular-nums text-income">
                                 +{formatRupiah(report.data_snapshot.summary.total_income)}
                             </CardTitle>
                         </CardHeader>
                     </Card>
-                    <Card className="bg-white dark:bg-slate-900">
+                    <Card className="bg-card">
                         <CardHeader className="pb-2">
-                            <CardDescription className="text-xs text-rose-600 font-medium">Total Pengeluaran</CardDescription>
-                            <CardTitle className="text-base font-bold tabular-nums text-rose-600">
+                            <CardDescription className="text-xs text-expense font-medium">Total Pengeluaran</CardDescription>
+                            <CardTitle className="text-base font-bold tabular-nums text-expense">
                                 -{formatRupiah(report.data_snapshot.summary.total_expense)}
                             </CardTitle>
                         </CardHeader>
                     </Card>
-                    <Card className="bg-blue-50 border-blue-200 dark:bg-blue-950/40 dark:border-blue-900">
+                    <Card className="bg-info/10 border-info/30">
                         <CardHeader className="pb-2">
-                            <CardDescription className="text-xs font-semibold text-blue-900 dark:text-blue-300">
+                            <CardDescription className="text-xs font-semibold text-info">
                                 Saldo Kas Akhir
                             </CardDescription>
-                            <CardTitle className="text-base font-black tabular-nums text-blue-900 dark:text-blue-100">
+                            <CardTitle className="text-base font-black tabular-nums text-info">
                                 {formatRupiah(report.data_snapshot.summary.total_closing)}
                             </CardTitle>
                         </CardHeader>
@@ -350,7 +340,7 @@ export default function ReportsShow({
                 {/* Detailed Sections Tables */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Incomes */}
-                    <Card className="bg-white dark:bg-slate-900">
+                    <Card className="bg-card">
                         <CardHeader className="pb-3">
                             <CardTitle className="text-sm font-semibold">Rincian Pemasukan Kas</CardTitle>
                         </CardHeader>
@@ -366,14 +356,14 @@ export default function ReportsShow({
                                     {report.data_snapshot.incomes.by_category.map((item, idx) => (
                                         <TableRow key={idx}>
                                             <TableCell>{item.category_name}</TableCell>
-                                            <TableCell className="text-right tabular-nums text-emerald-600 font-medium">
+                                            <TableCell className="text-right tabular-nums text-income font-medium">
                                                 {formatRupiah(item.total)}
                                             </TableCell>
                                         </TableRow>
                                     ))}
-                                    <TableRow className="font-bold bg-slate-50 dark:bg-slate-800">
+                                    <TableRow className="font-bold bg-muted/60">
                                         <TableCell>Total</TableCell>
-                                        <TableCell className="text-right tabular-nums text-emerald-600">
+                                        <TableCell className="text-right tabular-nums text-income">
                                             {formatRupiah(report.data_snapshot.incomes.total)}
                                         </TableCell>
                                     </TableRow>
@@ -383,7 +373,7 @@ export default function ReportsShow({
                     </Card>
 
                     {/* Expenses */}
-                    <Card className="bg-white dark:bg-slate-900">
+                    <Card className="bg-card">
                         <CardHeader className="pb-3">
                             <CardTitle className="text-sm font-semibold">Rincian Pengeluaran Kas</CardTitle>
                         </CardHeader>
@@ -399,14 +389,14 @@ export default function ReportsShow({
                                     {report.data_snapshot.expenses.by_category.map((item, idx) => (
                                         <TableRow key={idx}>
                                             <TableCell>{item.category_name}</TableCell>
-                                            <TableCell className="text-right tabular-nums text-rose-600 font-medium">
+                                            <TableCell className="text-right tabular-nums text-expense font-medium">
                                                 {formatRupiah(item.total)}
                                             </TableCell>
                                         </TableRow>
                                     ))}
-                                    <TableRow className="font-bold bg-slate-50 dark:bg-slate-800">
+                                    <TableRow className="font-bold bg-muted/60">
                                         <TableCell>Total</TableCell>
-                                        <TableCell className="text-right tabular-nums text-rose-600">
+                                        <TableCell className="text-right tabular-nums text-expense">
                                             {formatRupiah(report.data_snapshot.expenses.total)}
                                         </TableCell>
                                     </TableRow>

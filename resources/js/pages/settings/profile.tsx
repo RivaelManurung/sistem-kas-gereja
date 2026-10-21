@@ -4,13 +4,13 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
 import DeleteUser from '@/components/delete-user';
-import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
-import SettingsLayout from '@/layouts/settings/layout';
+import SettingsLayout, { SettingsSection } from '@/layouts/settings/layout';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -38,80 +38,71 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
             <Head title="Pengaturan Profil" />
 
             <SettingsLayout>
-                <div className="space-y-6">
-                    <HeadingSmall title="Informasi Profil" description="Perbarui nama dan alamat email akun Anda" />
+                <SettingsSection title="Informasi profil" description="Nama dan alamat email yang dipakai untuk akun Anda.">
+                    <Card>
+                        <form onSubmit={submit}>
+                            <CardContent className="space-y-5 p-5 md:p-6">
+                                <div className="grid gap-2">
+                                    <Label htmlFor="name">Nama lengkap</Label>
+                                    <Input
+                                        id="name"
+                                        value={data.name}
+                                        onChange={(e) => setData('name', e.target.value)}
+                                        required
+                                        autoComplete="name"
+                                    />
+                                    <InputError message={errors.name} />
+                                </div>
 
-                    <form onSubmit={submit} className="space-y-6">
-                        <div className="grid gap-2">
-                            <Label htmlFor="name">Nama Lengkap</Label>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="email">Alamat email</Label>
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        value={data.email}
+                                        onChange={(e) => setData('email', e.target.value)}
+                                        required
+                                        autoComplete="username"
+                                    />
+                                    <InputError message={errors.email} />
+                                </div>
 
-                            <Input
-                                id="name"
-                                className="mt-1 block w-full"
-                                value={data.name}
-                                onChange={(e) => setData('name', e.target.value)}
-                                required
-                                autoComplete="name"
-                                placeholder="Nama lengkap"
-                            />
+                                {mustVerifyEmail && auth.user.email_verified_at === null && (
+                                    <div className="text-sm">
+                                        <p className="text-foreground">
+                                            Alamat email Anda belum terverifikasi.{' '}
+                                            <Link
+                                                href={route('verification.send')}
+                                                method="post"
+                                                as="button"
+                                                className="rounded-sm text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                                            >
+                                                Kirim ulang email verifikasi
+                                            </Link>
+                                        </p>
 
-                            <InputError className="mt-2" message={errors.name} />
-                        </div>
-
-                        <div className="grid gap-2">
-                            <Label htmlFor="email">Alamat Email</Label>
-
-                            <Input
-                                id="email"
-                                type="email"
-                                className="mt-1 block w-full"
-                                value={data.email}
-                                onChange={(e) => setData('email', e.target.value)}
-                                required
-                                autoComplete="username"
-                                placeholder="Alamat email"
-                            />
-
-                            <InputError className="mt-2" message={errors.email} />
-                        </div>
-
-                        {mustVerifyEmail && auth.user.email_verified_at === null && (
-                            <div>
-                                <p className="mt-2 text-sm text-neutral-800">
-                                    Alamat email Anda belum terverifikasi.
-                                    <Link
-                                        href={route('verification.send')}
-                                        method="post"
-                                        as="button"
-                                        className="rounded-md text-sm text-neutral-600 underline hover:text-neutral-900 focus:ring-2 focus:ring-offset-2 focus:outline-hidden"
-                                    >
-                                        Klik di sini untuk mengirim ulang email verifikasi.
-                                    </Link>
-                                </p>
-
-                                {status === 'verification-link-sent' && (
-                                    <div className="mt-2 text-sm font-medium text-green-600">
-                                        Tautan verifikasi baru telah dikirimkan ke alamat email Anda.
+                                        {status === 'verification-link-sent' && (
+                                            <p className="mt-2 font-medium text-income">Tautan verifikasi baru telah dikirim ke email Anda.</p>
+                                        )}
                                     </div>
                                 )}
-                            </div>
-                        )}
+                            </CardContent>
 
-                        <div className="flex items-center gap-4">
-                            <Button disabled={processing}>Simpan</Button>
-
-                            <Transition
-                                show={recentlySuccessful}
-                                enter="transition ease-in-out"
-                                enterFrom="opacity-0"
-                                leave="transition ease-in-out"
-                                leaveTo="opacity-0"
-                            >
-                                <p className="text-sm text-neutral-600">Tersimpan</p>
-                            </Transition>
-                        </div>
-                    </form>
-                </div>
+                            <CardFooter className="justify-end gap-4 rounded-b-xl border-t bg-muted/30 px-5 py-4 md:px-6">
+                                <Transition
+                                    show={recentlySuccessful}
+                                    enter="transition ease-in-out"
+                                    enterFrom="opacity-0"
+                                    leave="transition ease-in-out"
+                                    leaveTo="opacity-0"
+                                >
+                                    <p className="text-sm text-muted-foreground">Tersimpan</p>
+                                </Transition>
+                                <Button disabled={processing}>Simpan</Button>
+                            </CardFooter>
+                        </form>
+                    </Card>
+                </SettingsSection>
 
                 <DeleteUser />
             </SettingsLayout>

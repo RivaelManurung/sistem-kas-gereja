@@ -3,11 +3,13 @@ import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { MoneyInput } from '@/components/ui/money-input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
-import { formatRupiah } from '@/lib/money';
+
+import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
@@ -51,10 +53,12 @@ export default function DonationForm({
     sheet,
     categories,
     members,
+    paymentMethods,
 }: {
     sheet: SheetOption | null;
     categories: CategoryOption[];
     members: MemberOption[];
+    paymentMethods: Array<{ value: string; label: string }>;
 }) {
     // If sheet provided, filter categories to only those in the sheet
     const availableCategories = sheet
@@ -67,7 +71,7 @@ export default function DonationForm({
         donor_name: '',
         category_id: availableCategories[0] ? String(availableCategories[0].id) : '',
         amount: 0,
-        payment_method: 'cash',
+        payment_method: paymentMethods[0]?.value ?? '',
         notes: '',
     });
 
@@ -93,12 +97,12 @@ export default function DonationForm({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Catat Persembahan Atas Nama" />
-            <div className="space-y-6 p-4 max-w-2xl">
+            <div className="space-y-6 p-4 md:p-6">
                 <PageHeader
                     title="Catat Persembahan Atas Nama"
                     description={
                         sheet
-                            ? `Terhubung dengan Berita Acara BA-${String(sheet.id).padStart(5, '0')} (${sheet.date})`
+                            ? `Terhubung dengan Berita Acara BA-${String(sheet.id).padStart(5, '0')} (${formatDate(sheet.date)})`
                             : 'Pencatatan persembahan perpuluhan, janji iman, atau ucapan syukur berkwitansi.'
                     }
                 />
@@ -112,7 +116,7 @@ export default function DonationForm({
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={submit} className="space-y-4">
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="member">Anggota Jemaat</Label>
                                 <Select
                                     value={data.member_id}
@@ -142,7 +146,7 @@ export default function DonationForm({
                             </div>
 
                             {isGuest && (
-                                <div className="space-y-1">
+                                <div className="space-y-2">
                                     <Label htmlFor="donor_name">Nama Lengkap Donatur / Tamu</Label>
                                     <Input
                                         id="donor_name"
@@ -155,7 +159,7 @@ export default function DonationForm({
                                 </div>
                             )}
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="category">Pos Persembahan</Label>
                                 <Select
                                     value={data.category_id}
@@ -175,27 +179,13 @@ export default function DonationForm({
                                 <InputError message={errors.category_id} />
                             </div>
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="amount">Nominal Persembahan (Rp)</Label>
-                                <Input
-                                    id="amount"
-                                    type="number"
-                                    inputMode="numeric"
-                                    min={1}
-                                    value={data.amount || ''}
-                                    placeholder="0"
-                                    onChange={(e) => setData('amount', Number(e.target.value) || 0)}
-                                    required
-                                />
-                                {data.amount > 0 && (
-                                    <p className="text-xs text-muted-foreground font-mono">
-                                        Terbilang: {formatRupiah(data.amount)}
-                                    </p>
-                                )}
+                                <MoneyInput id="amount" value={data.amount} onChange={(v) => setData('amount', v)} required />
                                 <InputError message={errors.amount} />
                             </div>
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="method">Metode Pembayaran</Label>
                                 <Select
                                     value={data.payment_method}
@@ -205,15 +195,17 @@ export default function DonationForm({
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="cash">Tunai (Amplop)</SelectItem>
-                                        <SelectItem value="transfer">Transfer Rekening</SelectItem>
-                                        <SelectItem value="qris">QRIS Gereja</SelectItem>
+                                        {paymentMethods.map((m) => (
+                                            <SelectItem key={m.value} value={m.value}>
+                                                {m.label}
+                                            </SelectItem>
+                                        ))}
                                     </SelectContent>
                                 </Select>
                                 <InputError message={errors.payment_method} />
                             </div>
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="notes">Catatan / Doa Khusus (Opsional)</Label>
                                 <Textarea
                                     id="notes"

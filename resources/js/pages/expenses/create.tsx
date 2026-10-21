@@ -3,11 +3,14 @@ import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { MoneyInput } from '@/components/ui/money-input';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
-import { formatRupiah } from '@/lib/money';
+
+import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FileUp, Receipt } from 'lucide-react';
@@ -87,7 +90,7 @@ export default function ExpensesCreate({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Ajukan Pengeluaran Kas" />
-            <div className="space-y-6 p-4 max-w-3xl">
+            <div className="space-y-6 p-4 md:p-6">
                 <PageHeader
                     title="Formulir Pengajuan Pengeluaran Kas"
                     description="Setiap pengeluaran kas wajib menyertakan foto nota atau kuitansi fisik asli."
@@ -103,19 +106,18 @@ export default function ExpensesCreate({
                     <CardContent>
                         <form onSubmit={submit} className="space-y-5">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-1">
+                                <div className="space-y-2">
                                     <Label htmlFor="date">Tanggal Pengeluaran</Label>
-                                    <Input
+                                    <DatePicker
                                         id="date"
-                                        type="date"
-                                        value={data.date}
-                                        onChange={(e) => setData('date', e.target.value)}
+                                        value={formatDate(data.date)}
+                                        onChange={(v) => setData('date', v)}
                                         required
                                     />
                                     <InputError message={errors.date} />
                                 </div>
 
-                                <div className="space-y-1">
+                                <div className="space-y-2">
                                     <Label htmlFor="payee">Penerima Uang / Kepada</Label>
                                     <Input
                                         id="payee"
@@ -129,7 +131,7 @@ export default function ExpensesCreate({
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div className="space-y-1">
+                                <div className="space-y-2">
                                     <Label htmlFor="account">Rekening Pengeluaran</Label>
                                     <Select
                                         value={data.account_id}
@@ -149,7 +151,7 @@ export default function ExpensesCreate({
                                     <InputError message={errors.account_id} />
                                 </div>
 
-                                <div className="space-y-1">
+                                <div className="space-y-2">
                                     <Label htmlFor="fund">Beban Pos Dana</Label>
                                     <Select
                                         value={data.fund_id}
@@ -169,7 +171,7 @@ export default function ExpensesCreate({
                                     <InputError message={errors.fund_id} />
                                 </div>
 
-                                <div className="space-y-1">
+                                <div className="space-y-2">
                                     <Label htmlFor="category">Kategori Pengeluaran</Label>
                                     <Select
                                         value={data.category_id}
@@ -190,27 +192,13 @@ export default function ExpensesCreate({
                                 </div>
                             </div>
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="amount">Nominal Pengeluaran (Rp)</Label>
-                                <Input
-                                    id="amount"
-                                    type="number"
-                                    inputMode="numeric"
-                                    min={1}
-                                    value={data.amount || ''}
-                                    placeholder="0"
-                                    onChange={(e) => setData('amount', Number(e.target.value) || 0)}
-                                    required
-                                />
-                                {data.amount > 0 && (
-                                    <p className="text-xs text-muted-foreground font-mono">
-                                        Terbilang: {formatRupiah(data.amount)}
-                                    </p>
-                                )}
+                                <MoneyInput id="amount" value={data.amount} onChange={(v) => setData('amount', v)} required />
                                 <InputError message={errors.amount} />
                             </div>
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="proof" className="flex items-center gap-1 font-semibold">
                                     <FileUp className="h-4 w-4" />
                                     Unggah Bukti Nota / Kuitansi Fisik (Wajib)
@@ -239,7 +227,7 @@ export default function ExpensesCreate({
                                 )}
                             </div>
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="description">Keterangan / Keperluan</Label>
                                 <Textarea
                                     id="description"
@@ -251,7 +239,7 @@ export default function ExpensesCreate({
                                 <InputError message={errors.description} />
                             </div>
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="notes">Catatan Tambahan (Opsional)</Label>
                                 <Textarea
                                     id="notes"

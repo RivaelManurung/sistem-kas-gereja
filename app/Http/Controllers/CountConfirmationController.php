@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Permission;
 use App\Enums\CountSheetStatus;
 use App\Enums\CountSheetType;
 use App\Enums\Role;
@@ -63,7 +64,7 @@ class CountConfirmationController extends Controller
     {
         $user = $request->user();
 
-        if (! $user->hasAnyRole([Role::Bendahara->value, Role::Admin->value])) {
+        if (! $user->can(Permission::CountingVerify->value)) {
             abort(403, 'Hanya Bendahara atau Admin yang berhak memverifikasi berita acara.');
         }
 
@@ -84,7 +85,7 @@ class CountConfirmationController extends Controller
     {
         $user = $request->user();
 
-        if (! $user->hasAnyRole([Role::Bendahara->value, Role::Admin->value])) {
+        if (! $user->can(Permission::CountingVerify->value)) {
             abort(403, 'Hanya Bendahara atau Admin yang berhak mengunci berita acara ke buku besar.');
         }
 

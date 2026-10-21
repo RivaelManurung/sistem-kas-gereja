@@ -1,12 +1,14 @@
+import { RowActions } from '@/components/app/row-actions';
 import PageHeader from '@/components/page-header';
 import Pagination from '@/components/pagination';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem, type Paginated } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { PlusCircle } from 'lucide-react';
+import { Calculator, PlusCircle } from 'lucide-react';
 
 interface ScheduleSummary {
     id: number;
@@ -36,7 +38,7 @@ export default function SessionsIndex({ sessions }: { sessions: Paginated<Sessio
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Sesi Ibadah" />
-            <div className="space-y-6 p-4">
+            <div className="space-y-6 p-4 md:p-6">
                 <PageHeader
                     title="Sesi Ibadah & Kegiatan"
                     description="Daftar ibadah yang berlangsung untuk penghitungan kolekte dan pencatatan kehadiran."
@@ -58,13 +60,13 @@ export default function SessionsIndex({ sessions }: { sessions: Paginated<Sessio
                             <TableHead>Jadwal Induk</TableHead>
                             <TableHead>Berita Acara</TableHead>
                             <TableHead>Status</TableHead>
-                            <TableHead className="text-right">Aksi</TableHead>
+                            <TableHead className="w-12"><span className="sr-only">Aksi</span></TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {sessions.data.map((session) => (
                             <TableRow key={session.id}>
-                                <TableCell className="font-mono text-sm">{session.date}</TableCell>
+                                <TableCell className="text-sm">{formatDate(session.date)}</TableCell>
                                 <TableCell className="font-medium">{session.name}</TableCell>
                                 <TableCell>
                                     {session.schedule ? (
@@ -81,7 +83,7 @@ export default function SessionsIndex({ sessions }: { sessions: Paginated<Sessio
                                             {session.count_sheets.length} Berita Acara
                                         </Badge>
                                     ) : (
-                                        <span className="text-amber-600 text-xs font-medium">Belum dihitung</span>
+                                        <span className="text-warning text-xs font-medium">Belum dihitung</span>
                                     )}
                                 </TableCell>
                                 <TableCell>
@@ -89,18 +91,16 @@ export default function SessionsIndex({ sessions }: { sessions: Paginated<Sessio
                                         {session.is_completed ? 'Selesai' : 'Terbuka'}
                                     </Badge>
                                 </TableCell>
-                                <TableCell className="text-right space-x-2">
-                                    <Button size="sm" asChild>
-                                        <Link href={`/counting/create?session_id=${session.id}`}>
-                                            Hitung Kolekte
-                                        </Link>
-                                    </Button>
+                                <TableCell className="text-right">
+                                    <RowActions
+                                        actions={[{ label: 'Hitung Kolekte', icon: Calculator, href: `/counting/create?session_id=${session.id}` }]}
+                                    />
                                 </TableCell>
                             </TableRow>
                         ))}
                         {sessions.data.length === 0 && (
                             <TableRow>
-                                <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                                <TableCell colSpan={6} className="text-muted-foreground py-8 text-center">
                                     Belum ada sesi ibadah yang dibuka. Klik &quot;Buka Sesi Ibadah&quot; untuk memulai.
                                 </TableCell>
                             </TableRow>

@@ -2,12 +2,15 @@ import PageHeader from '@/components/page-header';
 import Pagination from '@/components/pagination';
 import StatusBadge from '@/components/status-badge';
 import { Badge } from '@/components/ui/badge';
+import { ConfirmDialog } from '@/components/app/confirm-dialog';
+import { RowActions } from '@/components/app/row-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Paginated } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
+import { Pencil, Power } from 'lucide-react';
 import { Search } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 
@@ -45,17 +48,18 @@ export default function MembersIndex({
         router.get(route('admin.members.index'), { search }, { preserveState: true });
     };
 
-    const toggle = (member: MemberRow) => {
-        const verb = member.is_active ? 'menonaktifkan' : 'mengaktifkan';
-        if (confirm(`Yakin ingin ${verb} data jemaat ${member.name}?`)) {
-            router.patch(route('admin.members.toggle', member.id), {}, { preserveScroll: true });
-        }
+    const [target, setTarget] = useState<MemberRow | null>(null);
+
+    const confirmToggle = () => {
+        if (!target) return;
+        router.patch(route('admin.members.toggle', target.id), {}, { preserveScroll: true });
+        setTarget(null);
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Data Jemaat" />
-            <div className="space-y-6 p-4">
+            <div className="space-y-6 p-4 md:p-6">
                 <PageHeader
                     title="Data Jemaat"
                     description="Kelola basis data jemaat gereja untuk pencatatan persembahan dan portal jemaat."
@@ -106,7 +110,9 @@ export default function MembersIndex({
                             <TableHead>Kontak</TableHead>
                             <TableHead>Akun Login</TableHead>
                             <TableHead>Status</TableHead>
-                            <TableHead className="text-right">Aksi</TableHead>
+                            <TableHead className="w-12">
+                                <span className="sr-only">Aksi</span>
+                            </TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -137,13 +143,19 @@ export default function MembersIndex({
                                 <TableCell>
                                     <StatusBadge active={member.is_active} />
                                 </TableCell>
-                                <TableCell className="text-right space-x-2">
-                                    <Button variant="ghost" size="sm" asChild>
-                                        <Link href={route('admin.members.edit', member.id)}>Ubah</Link>
-                                    </Button>
-                                    <Button variant="ghost" size="sm" onClick={() => toggle(member)}>
-                                        {member.is_active ? 'Nonaktifkan' : 'Aktifkan'}
-                                    </Button>
+                                <TableCell className="text-right">
+                                    <RowActions
+                                        actions={[
+                                            { label: 'Ubah', icon: Pencil, href: route('admin.members.edit', member.id) },
+                                            {
+                                                label: member.is_active ? 'Nonaktifkan' : 'Aktifkan',
+                                                icon: Power,
+                                                onSelect: () => setTarget(member),
+                                                destructive: member.is_active,
+                                                separated: true,
+                                            },
+                                        ]}
+                                    />
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -158,6 +170,20 @@ export default function MembersIndex({
                 </Table>
 
                 <Pagination links={members.links} />
+
+                <ConfirmDialog
+                    open={target !== null}
+                    onOpenChange={(open) => !open && setTarget(null)}
+                    title={target?.is_active ? 'Nonaktifkan data jemaat?' : 'Aktifkan data jemaat?'}
+                    description={
+                        target?.is_active
+                            ? `${target?.name} tidak akan muncul lagi sebagai pilihan baru. Data lama tetap tersimpan dan bisa diaktifkan kembali.`
+                            : `${target?.name} akan tersedia kembali sebagai pilihan.`
+                    }
+                    confirmLabel={target?.is_active ? 'Nonaktifkan' : 'Aktifkan'}
+                    destructive={target?.is_active}
+                    onConfirm={confirmToggle}
+                />
             </div>
         </AppLayout>
     );

@@ -1,19 +1,34 @@
-import { AppContent } from '@/components/app-content';
-import { AppShell } from '@/components/app-shell';
-import { AppSidebar } from '@/components/app-sidebar';
+import { SidebarNavProvider } from '@/components/sidebar-nav-context';
+import { AppSidebar, useNavModules } from '@/components/app-sidebar';
 import { AppSidebarHeader } from '@/components/app-sidebar-header';
+import { useSidebarNav } from '@/components/sidebar-nav-context';
 import FlashMessage from '@/components/flash-message';
+import { cn } from '@/lib/utils';
 import { type BreadcrumbItem } from '@/types';
 
-export default function AppSidebarLayout({ children, breadcrumbs = [] }: { children: React.ReactNode; breadcrumbs?: BreadcrumbItem[] }) {
+function Frame({ children, breadcrumbs }: { children: React.ReactNode; breadcrumbs: BreadcrumbItem[] }) {
+    const { panelOpen } = useSidebarNav();
+
     return (
-        <AppShell variant="sidebar">
+        <div className="bg-background min-h-dvh">
             <AppSidebar />
-            <AppContent variant="sidebar">
+            <div className={cn('flex min-h-dvh flex-col transition-[padding] duration-200', panelOpen ? 'md:pl-[340px]' : 'md:pl-[84px]')}>
                 <AppSidebarHeader breadcrumbs={breadcrumbs} />
-                <FlashMessage />
-                {children}
-            </AppContent>
-        </AppShell>
+                <main className="flex flex-1 flex-col">
+                    <FlashMessage />
+                    {children}
+                </main>
+            </div>
+        </div>
+    );
+}
+
+export default function AppSidebarLayout({ children, breadcrumbs = [] }: { children: React.ReactNode; breadcrumbs?: BreadcrumbItem[] }) {
+    const { activeModuleKey } = useNavModules();
+
+    return (
+        <SidebarNavProvider activeModuleKey={activeModuleKey}>
+            <Frame breadcrumbs={breadcrumbs}>{children}</Frame>
+        </SidebarNavProvider>
     );
 }

@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { formatRupiah } from '@/lib/money';
+import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem, type Paginated } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowRight, Building, PlusCircle } from 'lucide-react';
+import { ArrowRight, PlusCircle } from 'lucide-react';
 
 interface DepositRow {
     id: number;
@@ -36,7 +37,7 @@ export default function DepositsIndex({ deposits }: { deposits: Paginated<Deposi
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Setoran Kas Tunai ke Bank" />
-            <div className="space-y-6 p-4">
+            <div className="space-y-6 p-4 md:p-6">
                 <PageHeader
                     title="Setoran Bank"
                     description="Pencatatan perpindahan fisik uang kas tunai ke rekening bank operasional gereja."
@@ -66,7 +67,7 @@ export default function DepositsIndex({ deposits }: { deposits: Paginated<Deposi
                     <TableBody>
                         {deposits.data.map((deposit) => (
                             <TableRow key={deposit.id}>
-                                <TableCell className="font-mono text-sm">{deposit.deposit_date}</TableCell>
+                                <TableCell className="text-sm">{formatDate(deposit.deposit_date)}</TableCell>
                                 <TableCell className="font-medium">{deposit.from_account.name}</TableCell>
                                 <TableCell className="text-muted-foreground">
                                     <ArrowRight className="h-4 w-4" />
@@ -82,20 +83,19 @@ export default function DepositsIndex({ deposits }: { deposits: Paginated<Deposi
                                 <TableCell className="font-mono text-xs">
                                     {deposit.reference_number ?? '-'}
                                 </TableCell>
-                                <TableCell className="text-right font-mono font-bold">
+                                <TableCell className="text-right font-bold tabular-nums">
                                     {formatRupiah(deposit.amount)}
                                 </TableCell>
                                 <TableCell className="text-sm">{deposit.creator?.name ?? '-'}</TableCell>
                                 <TableCell>
-                                    <Badge className="bg-emerald-600 text-white">Tercatat di Buku Besar</Badge>
+                                    <Badge className="border-income/30 bg-income/10 text-income">Tercatat di Buku Besar</Badge>
                                 </TableCell>
                             </TableRow>
                         ))}
                         {deposits.data.length === 0 && (
                             <TableRow>
-                                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                                    <Building className="mx-auto h-8 w-8 mb-2 opacity-50" />
-                                    Belum ada catatan setoran bank.
+                                <TableCell colSpan={8} className="text-muted-foreground py-8 text-center">
+                                                                        Belum ada catatan setoran bank.
                                 </TableCell>
                             </TableRow>
                         )}

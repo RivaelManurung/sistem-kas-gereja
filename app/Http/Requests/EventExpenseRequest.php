@@ -17,7 +17,7 @@ class EventExpenseRequest extends FormRequest
             'entry_date' => ['required', 'date'],
             'account_id' => ['required', 'exists:accounts,id'],
             'category_id' => ['required', 'exists:categories,id'],
-            'amount' => ['required', 'integer', 'min:1'],
+            'amount' => ['required', 'integer', 'min:1', 'max:999999999999'],
             'description' => ['nullable', 'string', 'max:255'],
             'idempotency_key' => ['nullable', 'string', 'max:100'],
         ];

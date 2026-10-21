@@ -41,6 +41,7 @@ class HandleInertiaRequests extends Middleware
         return array_merge(parent::share($request), [
             ...parent::share($request),
             'name' => config('app.name'),
+            'brand' => fn () => \App\Models\ChurchSetting::current()->brand(),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $request->user(),
@@ -49,6 +50,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
+                'error' => fn () => $request->session()->get('error'),
             ],
         ]);
     }

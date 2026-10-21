@@ -1,5 +1,6 @@
 import InputError from '@/components/input-error';
 import { Input } from '@/components/ui/input';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
@@ -97,11 +98,10 @@ export default function DynamicFields({
                                     <Label htmlFor={`attr_${def.key}`}>
                                         {def.label} {def.is_required && <span className="text-destructive">*</span>}
                                     </Label>
-                                    <Input
+                                    <DatePicker
                                         id={`attr_${def.key}`}
-                                        type="date"
                                         value={val ? String(val) : ''}
-                                        onChange={(e) => onChange(def.key, e.target.value)}
+                                        onChange={(v) => onChange(def.key, v)}
                                         required={def.is_required}
                                     />
                                 </div>

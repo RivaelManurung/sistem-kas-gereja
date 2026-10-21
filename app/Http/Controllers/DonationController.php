@@ -60,6 +60,7 @@ class DonationController extends Controller
             'sheet' => $sheet,
             'categories' => $categories,
             'members' => $members,
+            'paymentMethods' => \App\Models\LookupOption::options('payment_method'),
         ]);
     }
 

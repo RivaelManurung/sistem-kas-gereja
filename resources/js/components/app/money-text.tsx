@@ -19,9 +19,9 @@ export function MoneyText({ amount, className, showSign = false, colored = false
 
     const colorClass = colored
         ? isNegative
-            ? 'text-rose-600 dark:text-rose-400'
+            ? 'text-expense'
             : isPositive
-              ? 'text-emerald-600 dark:text-emerald-400'
+              ? 'text-income'
               : 'text-muted-foreground'
         : '';
 

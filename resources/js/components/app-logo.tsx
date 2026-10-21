@@ -7,8 +7,8 @@ export default function AppLogo() {
                 <Building2 className="size-4.5" />
             </div>
             <div className="ml-1.5 grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold text-neutral-900 dark:text-neutral-100">Kas Gereja</span>
-                <span className="truncate text-[10px] text-neutral-500">Sistem Perbendaharaan</span>
+                <span className="truncate font-semibold text-foreground">Kas Gereja</span>
+                <span className="truncate text-[10px] text-muted-foreground">Sistem Perbendaharaan</span>
             </div>
         </>
     );

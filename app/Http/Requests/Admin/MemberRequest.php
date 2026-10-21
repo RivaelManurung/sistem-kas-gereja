@@ -25,7 +25,7 @@ class MemberRequest extends FormRequest
             'birth_date' => ['nullable', 'date_format:Y-m-d'],
             'phone' => ['nullable', 'string', 'max:50'],
             'email' => ['nullable', 'email', 'max:255'],
-            'address' => ['nullable', 'string'],
+            'address' => ['nullable', 'string', 'max:500'],
             'user_id' => ['nullable', 'integer', Rule::exists('users', 'id'), Rule::unique('members', 'user_id')->ignore($memberId)],
             'is_active' => ['boolean'],
             'attributes' => ['nullable', 'array'],

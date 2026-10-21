@@ -2,12 +2,16 @@ import PageHeader from '@/components/page-header';
 import Pagination from '@/components/pagination';
 import StatusBadge from '@/components/status-badge';
 import { Badge } from '@/components/ui/badge';
+import { ConfirmDialog } from '@/components/app/confirm-dialog';
+import { RowActions } from '@/components/app/row-actions';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Paginated } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
+import { Pencil, Power } from 'lucide-react';
+import { useState } from 'react';
 
 interface FundSummary {
     id: number;
@@ -36,11 +40,12 @@ export default function CategoriesIndex({
     categories: Paginated<CategoryRow>;
     currentDirection: 'in' | 'out';
 }) {
-    const toggle = (cat: CategoryRow) => {
-        const verb = cat.is_active ? 'menonaktifkan' : 'mengaktifkan';
-        if (confirm(`Yakin ingin ${verb} kategori ${cat.name}?`)) {
-            router.patch(route('admin.categories.toggle', cat.id), {}, { preserveScroll: true });
-        }
+    const [target, setTarget] = useState<CategoryRow | null>(null);
+
+    const confirmToggle = () => {
+        if (!target) return;
+        router.patch(route('admin.categories.toggle', target.id), {}, { preserveScroll: true });
+        setTarget(null);
     };
 
     const handleTabChange = (val: string) => {
@@ -50,7 +55,7 @@ export default function CategoriesIndex({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Kategori Kas" />
-            <div className="space-y-6 p-4">
+            <div className="space-y-6 p-4 md:p-6">
                 <PageHeader
                     title="Kategori Pemasukan & Pengeluaran"
                     description="Klasifikasi pos transaksi keuangan gereja dan pemetaan dana default-nya."
@@ -77,7 +82,9 @@ export default function CategoriesIndex({
                             {currentDirection === 'in' && <TableHead>Atas Nama</TableHead>}
                             <TableHead>Tampil Publik</TableHead>
                             <TableHead>Status</TableHead>
-                            <TableHead className="text-right">Aksi</TableHead>
+                            <TableHead className="w-12">
+                                <span className="sr-only">Aksi</span>
+                            </TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -105,13 +112,19 @@ export default function CategoriesIndex({
                                 <TableCell>
                                     <StatusBadge active={cat.is_active} />
                                 </TableCell>
-                                <TableCell className="text-right space-x-2">
-                                    <Button variant="ghost" size="sm" asChild>
-                                        <Link href={route('admin.categories.edit', cat.id)}>Ubah</Link>
-                                    </Button>
-                                    <Button variant="ghost" size="sm" onClick={() => toggle(cat)}>
-                                        {cat.is_active ? 'Nonaktifkan' : 'Aktifkan'}
-                                    </Button>
+                                <TableCell className="text-right">
+                                    <RowActions
+                                        actions={[
+                                            { label: 'Ubah', icon: Pencil, href: route('admin.categories.edit', cat.id) },
+                                            {
+                                                label: cat.is_active ? 'Nonaktifkan' : 'Aktifkan',
+                                                icon: Power,
+                                                onSelect: () => setTarget(cat),
+                                                destructive: cat.is_active,
+                                                separated: true,
+                                            },
+                                        ]}
+                                    />
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -126,6 +139,20 @@ export default function CategoriesIndex({
                 </Table>
 
                 <Pagination links={categories.links} />
+
+                <ConfirmDialog
+                    open={target !== null}
+                    onOpenChange={(open) => !open && setTarget(null)}
+                    title={target?.is_active ? 'Nonaktifkan kategori?' : 'Aktifkan kategori?'}
+                    description={
+                        target?.is_active
+                            ? `${target?.name} tidak akan muncul lagi sebagai pilihan baru. Data lama tetap tersimpan dan bisa diaktifkan kembali.`
+                            : `${target?.name} akan tersedia kembali sebagai pilihan.`
+                    }
+                    confirmLabel={target?.is_active ? 'Nonaktifkan' : 'Aktifkan'}
+                    destructive={target?.is_active}
+                    onConfirm={confirmToggle}
+                />
             </div>
         </AppLayout>
     );

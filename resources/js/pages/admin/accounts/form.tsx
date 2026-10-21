@@ -54,7 +54,7 @@ export default function AccountForm({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={isEdit ? 'Edit Rekening' : 'Tambah Rekening'} />
-            <div className="space-y-6 p-4 max-w-2xl">
+            <div className="space-y-6 p-4 md:p-6">
                 <PageHeader
                     title={isEdit ? 'Edit Rekening' : 'Tambah Rekening'}
                     description={
@@ -71,7 +71,7 @@ export default function AccountForm({
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={submit} className="space-y-4">
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="code">Kode Rekening *</Label>
                                 <Input
                                     id="code"
@@ -83,7 +83,7 @@ export default function AccountForm({
                                 <InputError message={errors.code} />
                             </div>
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="name">Nama Rekening *</Label>
                                 <Input
                                     id="name"
@@ -95,7 +95,7 @@ export default function AccountForm({
                                 <InputError message={errors.name} />
                             </div>
 
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label htmlFor="type">Jenis Rekening *</Label>
                                 <Select value={data.type} onValueChange={(val) => setData('type', val)}>
                                     <SelectTrigger id="type">
@@ -114,7 +114,7 @@ export default function AccountForm({
 
                             {data.type === 'bank' && (
                                 <div className="space-y-4 rounded-lg border p-4 bg-muted/30">
-                                    <div className="space-y-1">
+                                    <div className="space-y-2">
                                         <Label htmlFor="bank_name">Nama Bank *</Label>
                                         <Input
                                             id="bank_name"
@@ -125,7 +125,7 @@ export default function AccountForm({
                                         />
                                         <InputError message={errors.bank_name} />
                                     </div>
-                                    <div className="space-y-1">
+                                    <div className="space-y-2">
                                         <Label htmlFor="account_number">Nomor Rekening *</Label>
                                         <Input
                                             id="account_number"

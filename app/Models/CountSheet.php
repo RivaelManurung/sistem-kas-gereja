@@ -30,7 +30,7 @@ class CountSheet extends Model
     protected $casts = [
         'type' => CountSheetType::class,
         'status' => CountSheetStatus::class,
-        'date' => 'date',
+        'date' => 'date:Y-m-d',
         'total_amount' => 'integer',
     ];
 

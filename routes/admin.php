@@ -9,7 +9,9 @@ use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ChurchSettingController;
 use App\Http\Controllers\Admin\FundController;
+use App\Http\Controllers\Admin\LookupOptionController;
 use App\Http\Controllers\Admin\MemberController;
+use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\ReportSignatoryController;
 use App\Http\Controllers\Admin\ServiceScheduleController;
 use App\Http\Controllers\Admin\UserController;
@@ -21,6 +23,11 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
         Route::patch('users/{user}/toggle', [UserController::class, 'toggle'])->name('users.toggle');
     });
 
+    Route::middleware('permission:'.Permission::RolesManage->value)->group(function () {
+        Route::resource('roles', RoleController::class)->except(['show']);
+        Route::get('roles/{role}', [RoleController::class, 'show'])->whereNumber('role')->name('roles.show');
+    });
+
     Route::middleware('permission:'.Permission::SettingsManage->value)->group(function () {
         Route::get('settings', [ChurchSettingController::class, 'edit'])->name('settings.edit');
         Route::put('settings', [ChurchSettingController::class, 'update'])->name('settings.update');
@@ -30,6 +37,11 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     });
 
     Route::middleware('permission:'.Permission::MasterManage->value)->group(function () {
+        Route::get('options', [LookupOptionController::class, 'index'])->name('options.index');
+        Route::post('options', [LookupOptionController::class, 'store'])->name('options.store');
+        Route::put('options/{option}', [LookupOptionController::class, 'update'])->name('options.update');
+        Route::patch('options/{option}/toggle', [LookupOptionController::class, 'toggle'])->name('options.toggle');
+
         Route::resource('accounts', AccountController::class)->except(['show', 'destroy']);
         Route::patch('accounts/{account}/toggle', [AccountController::class, 'toggle'])->name('accounts.toggle');
 
@@ -60,4 +72,8 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('audit', [AuditLogController::class, 'index'])
         ->middleware('permission:'.Permission::AuditView->value)
         ->name('audit.index');
+    Route::get('audit/{log}', [AuditLogController::class, 'show'])
+        ->middleware('permission:'.Permission::AuditView->value)
+        ->whereNumber('log')
+        ->name('audit.show');
 });

@@ -1,3 +1,5 @@
+import { LinkRow } from '@/components/app/link-row';
+import { RowActions } from '@/components/app/row-actions';
 import PageHeader from '@/components/page-header';
 import Pagination from '@/components/pagination';
 import { Badge } from '@/components/ui/badge';
@@ -8,7 +10,7 @@ import AppLayout from '@/layouts/app-layout';
 import { formatRupiah } from '@/lib/money';
 import { type BreadcrumbItem, type Paginated } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { FileText, PlusCircle, Search } from 'lucide-react';
+import { Eye, PlusCircle, Search } from 'lucide-react';
 import { useState } from 'react';
 
 interface CategoryOption {
@@ -56,7 +58,7 @@ export default function DonationsIndex({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Persembahan Atas Nama & Tanda Terima" />
-            <div className="space-y-6 p-4">
+            <div className="space-y-6 p-4 md:p-6">
                 <PageHeader
                     title="Persembahan Atas Nama"
                     description="Pencatatan persembahan perpuluhan, syukur, dan janji iman yang memerlukan tanda terima jemaat."
@@ -90,12 +92,12 @@ export default function DonationsIndex({
                             <TableHead>Pos Persembahan</TableHead>
                             <TableHead>Metode</TableHead>
                             <TableHead className="text-right">Nominal</TableHead>
-                            <TableHead className="text-right">Aksi</TableHead>
+                            <TableHead className="w-12"><span className="sr-only">Aksi</span></TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {donations.data.map((donation) => (
-                            <TableRow key={donation.id}>
+                            <LinkRow key={donation.id} href={route('donations.show', donation.id)}>
                                 <TableCell className="font-mono font-semibold text-primary">
                                     {donation.receipt_number}
                                 </TableCell>
@@ -118,22 +120,17 @@ export default function DonationsIndex({
                                     <Badge variant="outline">{donation.category.name}</Badge>
                                 </TableCell>
                                 <TableCell className="capitalize text-xs">{donation.payment_method}</TableCell>
-                                <TableCell className="text-right font-mono font-bold">
+                                <TableCell className="text-right font-bold tabular-nums">
                                     {formatRupiah(donation.amount)}
                                 </TableCell>
-                                <TableCell className="text-right space-x-2">
-                                    <Button size="sm" variant="outline" asChild>
-                                        <Link href={route('donations.show', donation.id)}>
-                                            <FileText className="mr-1 h-3.5 w-3.5" />
-                                            Kwitansi
-                                        </Link>
-                                    </Button>
+                                <TableCell className="text-right">
+                                    <RowActions actions={[{ label: 'Lihat kwitansi', icon: Eye, href: route('donations.show', donation.id) }]} />
                                 </TableCell>
-                            </TableRow>
+                            </LinkRow>
                         ))}
                         {donations.data.length === 0 && (
                             <TableRow>
-                                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                                <TableCell colSpan={7} className="text-muted-foreground py-8 text-center">
                                     Belum ada catatan persembahan atas nama.
                                 </TableCell>
                             </TableRow>

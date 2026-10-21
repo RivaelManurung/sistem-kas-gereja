@@ -47,7 +47,7 @@ beforeEach(function () {
 });
 
 it('creates a fund transfer request in pending status', function () {
-    $user = actingAsRole(Role::Penghitung);
+    $user = actingAsRole(Role::Bendahara);
 
     $response = $this->post(route('transfers.store'), [
         'from_fund_id' => $this->fromFund->id,

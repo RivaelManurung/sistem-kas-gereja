@@ -39,7 +39,7 @@ class ServiceSessionRequest extends FormRequest
             'service_schedule_id' => ['nullable', 'exists:service_schedules,id'],
             'date' => $dateRules,
             'name' => ['required', 'string', 'max:255'],
-            'notes' => ['nullable', 'string'],
+            'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }
 
