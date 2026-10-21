@@ -46,7 +46,7 @@ export default function ReportVerify({ report, church }: ReportVerificationProps
         <div className="min-h-screen bg-muted/60 py-10 px-4 sm:px-6 lg:px-8">
             <Head title={`Verifikasi: ${report.title}`} />
 
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 {/* Header Card */}
                 <Card className="border-income/30 bg-card shadow-sm">
                     <CardHeader className="text-center pb-4">

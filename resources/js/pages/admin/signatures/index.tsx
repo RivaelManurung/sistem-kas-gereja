@@ -40,7 +40,6 @@ interface RoleOption {
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Pengaturan', href: '/admin/settings' },
     { title: 'Susunan Penanda Tangan & Stempel', href: '/admin/signatures' },
 ];
 
@@ -65,6 +64,15 @@ export default function SignaturesIndex({
     const [formUserId, setFormUserId] = useState<string>('none');
     const [formOrder, setFormOrder] = useState<number>(signatories.length + 1);
 
+    const orderOwner = (order: number) => signatories.find((s) => s.order === order && s.id !== editingSignatory?.id);
+    const firstFreeOrder = () => {
+        let order = 1;
+        while (signatories.some((s) => s.order === order)) order++;
+        return order;
+    };
+    const maxOrder = Math.max(signatories.length + 1, ...signatories.map((s) => s.order));
+    const orderOptions = Array.from({ length: maxOrder }, (_, i) => i + 1);
+
     const [stampFile, setStampFile] = useState<File | null>(null);
     const [isUploadingStamp, setIsUploadingStamp] = useState(false);
 
@@ -74,7 +82,7 @@ export default function SignaturesIndex({
         setFormPosition('');
         setFormRole('bendahara');
         setFormUserId('none');
-        setFormOrder(signatories.length + 1);
+        setFormOrder(firstFreeOrder());
         setCreateDialogOpen(true);
     };
 
@@ -151,7 +159,7 @@ export default function SignaturesIndex({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Susunan Penanda Tangan & Stempel Gereja" />
 
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
                     title="Susunan Penanda Tangan & Stempel"
                     description="Atur urutan penanda tangan laporan keuangan resmi (Bendahara, Pemeriksa, Majelis) dan unggah stempel gereja."
@@ -322,15 +330,22 @@ export default function SignaturesIndex({
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label htmlFor="order">Urutan (1, 2, 3..)</Label>
-                                        <Input
-                                            id="order"
-                                            type="number"
-                                            min="1"
-                                            value={formOrder}
-                                            onChange={(e) => setFormOrder(Number(e.target.value))}
-                                            required
-                                        />
+                                        <Label htmlFor="order">Urutan</Label>
+                                        <Select value={String(formOrder)} onValueChange={(v) => setFormOrder(Number(v))}>
+                                            <SelectTrigger id="order">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {orderOptions.map((n) => {
+                                                    const owner = orderOwner(n);
+                                                    return (
+                                                        <SelectItem key={n} value={String(n)} disabled={!!owner}>
+                                                            {owner ? `${n} · dipakai ${owner.position}` : n}
+                                                        </SelectItem>
+                                                    );
+                                                })}
+                                            </SelectContent>
+                                        </Select>
                                     </div>
                                 </div>
 

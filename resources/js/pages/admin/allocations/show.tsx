@@ -3,6 +3,7 @@ import PageHeader from '@/components/page-header';
 import StatusBadge from '@/components/status-badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { LinkRow } from '@/components/app/link-row';
 import AppLayout from '@/layouts/app-layout';
 import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem } from '@/types';
@@ -29,8 +30,9 @@ export default function AllocationShow({ rule }: Props) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={rule.name} />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
+                    back="/admin/allocations"
                     title={rule.name}
                     description="Aturan pembagian persembahan ke pos dana."
                     actions={
@@ -62,12 +64,12 @@ export default function AllocationShow({ rule }: Props) {
                         </TableHeader>
                         <TableBody>
                             {rule.items.map((i) => (
-                                <TableRow key={i.id}>
+                                <LinkRow key={i.id} href={route('admin.funds.show', i.fund_id)}>
                                     <TableCell>
                                         {i.fund_code} - {i.fund_name}
                                     </TableCell>
                                     <TableCell className="text-right tabular-nums">{i.percentage}%</TableCell>
-                                </TableRow>
+                                </LinkRow>
                             ))}
                             <TableRow className="bg-muted/50">
                                 <TableCell className="font-medium">Total</TableCell>

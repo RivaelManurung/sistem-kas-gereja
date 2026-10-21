@@ -67,8 +67,9 @@ export default function TransfersCreate({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Ajukan Pindah Dana Antar-Pos" />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
+                    back={route('transfers.index')}
                     title="Permohonan Pindah Dana Antar-Pos"
                     description="Pencatatan mutasi alokasi dana antar pos (mis. penutupan defisit Diakonia oleh Kas Umum)."
                 />

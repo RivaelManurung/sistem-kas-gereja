@@ -2,13 +2,11 @@ import { DefinitionList, DetailCard, StatTiles } from '@/components/app/detail';
 import { LedgerEntriesTable, type LedgerEntryRow } from '@/components/app/ledger-entries-table';
 import PageHeader from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { formatDate } from '@/lib/date';
 import { formatRupiah } from '@/lib/money';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft } from 'lucide-react';
+import { Head } from '@inertiajs/react';
 
 interface DepositDetail {
     id: number;
@@ -33,18 +31,11 @@ export default function DepositShow({ deposit, ledgerEntries }: { deposit: Depos
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Setoran ${formatDate(deposit.deposit_date)}`} />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
+                    back={route('deposits.index')}
                     title={`${deposit.from_account.name} ke ${deposit.to_account.name}`}
                     description={`Setoran bank tanggal ${formatDate(deposit.deposit_date)}`}
-                    actions={
-                        <Button variant="outline" asChild>
-                            <Link href={route('deposits.index')}>
-                                <ArrowLeft className="mr-2 h-4 w-4" />
-                                Kembali
-                            </Link>
-                        </Button>
-                    }
                 />
 
                 <StatTiles items={[{ label: 'Nominal setoran', value: formatRupiah(deposit.amount) }]} />

@@ -64,6 +64,7 @@ class CategoryController extends Controller
                 'description' => $e->description,
                 'direction' => $e->direction->value,
                 'amount' => $e->amount,
+                'source_url' => $e->source_url,
                 'fund_name' => $e->fund?->name,
                 'account_name' => $e->account?->name,
             ]);

@@ -51,7 +51,7 @@ export default function CountingIndex({ sheets }: { sheets: Paginated<SheetSumma
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Berita Acara Penghitungan Kolekte" />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
                     title="Berita Acara Penghitungan"
                     description="Pencatatan fisik kolekte ibadah, persembahan amplop, dan penerimaan umum."

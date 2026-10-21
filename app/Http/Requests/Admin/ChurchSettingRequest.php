@@ -22,9 +22,7 @@ class ChurchSettingRequest extends FormRequest
             'timezone' => ['required', 'string', 'timezone'],
             'system_name' => ['nullable', 'string', 'max:60'],
             'logo' => ['nullable', 'image', 'mimes:png,jpg,webp', 'max:2048'],
-            'favicon' => ['nullable', 'file', 'mimes:png,ico,jpg,webp', 'max:512'],
             'remove_logo' => ['boolean'],
-            'remove_favicon' => ['boolean'],
             'stamp' => ['nullable', 'image', 'mimes:png,jpg,webp', 'max:2048'],
             'denominations' => ['required', 'array', 'min:1'],
             'denominations.*' => ['integer', 'min:1', 'distinct'],
@@ -33,7 +31,6 @@ class ChurchSettingRequest extends FormRequest
             'min_confirmations_general' => ['required', 'integer', 'min:1', 'max:10'],
             'expense_approval_threshold' => ['required', 'integer', 'min:0', 'max:999999999999'],
             'allow_negative_balance' => ['boolean'],
-            'public_page_enabled' => ['boolean'],
         ];
     }
 
@@ -48,7 +45,6 @@ class ChurchSettingRequest extends FormRequest
             'timezone' => 'zona waktu',
             'system_name' => 'nama sistem',
             'logo' => 'logo',
-            'favicon' => 'favicon',
             'denominations' => 'pecahan uang',
             'denominations.*' => 'pecahan uang',
             'min_confirmations_service' => 'konfirmasi minimal ibadah',
@@ -56,7 +52,6 @@ class ChurchSettingRequest extends FormRequest
             'min_confirmations_general' => 'konfirmasi minimal penerimaan umum',
             'expense_approval_threshold' => 'ambang persetujuan pengeluaran',
             'allow_negative_balance' => 'izinkan saldo minus',
-            'public_page_enabled' => 'halaman publik aktif',
         ];
     }
 }

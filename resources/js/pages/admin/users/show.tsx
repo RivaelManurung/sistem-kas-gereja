@@ -41,6 +41,7 @@ export default function UserShow({ user, member, roles, groups, permissionsCount
             <Head title={user.name} />
             <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
+                    back="/admin/users"
                     title={user.name}
                     description={user.email}
                     actions={

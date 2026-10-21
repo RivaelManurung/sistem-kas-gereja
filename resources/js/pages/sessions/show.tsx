@@ -9,7 +9,7 @@ import { formatDate } from '@/lib/date';
 import { formatRupiah } from '@/lib/money';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, Calculator } from 'lucide-react';
+import { Calculator } from 'lucide-react';
 
 interface CountSheetRow {
     id: number;
@@ -38,18 +38,13 @@ export default function SessionShow({ session, totalCollected }: { session: Sess
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Sesi ${session.name}`} />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
+                    back={route('sessions.index')}
                     title={session.name}
                     description={`Sesi ibadah tanggal ${formatDate(session.date)}`}
                     actions={
                         <>
-                            <Button variant="outline" asChild>
-                                <Link href={route('sessions.index')}>
-                                    <ArrowLeft className="mr-2 h-4 w-4" />
-                                    Kembali
-                                </Link>
-                            </Button>
                             {sheets.length === 0 && (
                                 <Button asChild>
                                     <Link href={`${route('counting.create')}?session_id=${session.id}`}>

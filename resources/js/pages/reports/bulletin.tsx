@@ -73,7 +73,7 @@ export default function ReportsBulletin({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Warta Keuangan Jemaat Mingguan" />
 
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <div className="print:hidden">
                     <PageHeader
                         title="Warta Jemaat Mingguan"

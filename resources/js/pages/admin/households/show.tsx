@@ -79,6 +79,7 @@ export default function HouseholdShow({ household, members, availableMembers, fa
             <Head title={household.name} />
             <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
+                    back={route('admin.households.index')}
                     title={household.name}
                     description={household.family_number ? `Nomor keluarga ${household.family_number}` : undefined}
                     actions={

@@ -12,8 +12,8 @@ import AppLayout from '@/layouts/app-layout';
 import { formatDate, formatDateTime } from '@/lib/date';
 import { formatRupiah } from '@/lib/money';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, router } from '@inertiajs/react';
-import { ArrowLeft, CheckCircle2, XCircle } from 'lucide-react';
+import { Head, router } from '@inertiajs/react';
+import { CheckCircle2, XCircle } from 'lucide-react';
 import { useState } from 'react';
 
 interface TransferDetail {
@@ -76,18 +76,13 @@ export default function TransferShow({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Detail Pindah Dana" />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
+                    back={route('transfers.index')}
                     title={`${transfer.from_fund.name} ke ${transfer.to_fund.name}`}
                     description={`Permohonan pindah dana tanggal ${formatDate(transfer.transfer_date)}`}
                     actions={
                         <>
-                            <Button variant="outline" asChild>
-                                <Link href={route('transfers.index')}>
-                                    <ArrowLeft className="mr-2 h-4 w-4" />
-                                    Kembali
-                                </Link>
-                            </Button>
                             {canApprove && (
                                 <>
                                     <Button variant="outline" onClick={() => setRejectOpen(true)}>

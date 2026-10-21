@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router, useForm } from '@inertiajs/react';
@@ -59,8 +60,20 @@ export default function OptionsIndex({ groups }: { groups: Group[] }) {
             <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader title="Opsi Dropdown" description="Atur pilihan yang muncul di formulir. Opsi yang dinonaktifkan tidak muncul lagi, tetapi data lama tetap utuh." />
 
+                <Tabs defaultValue={groups[0]?.key} className="space-y-4">
+                    <div className="overflow-x-auto pb-1">
+                        <TabsList className="h-auto flex-wrap justify-start gap-1">
+                            {groups.map((group) => (
+                                <TabsTrigger key={group.key} value={group.key}>
+                                    {group.label}
+                                    <span className="ml-2 text-xs tabular-nums opacity-70">{group.options.length}</span>
+                                </TabsTrigger>
+                            ))}
+                        </TabsList>
+                    </div>
                 {groups.map((group) => (
-                    <Card key={group.key}>
+                    <TabsContent key={group.key} value={group.key} className="mt-0">
+                    <Card>
                         <CardHeader className="flex-row items-start justify-between gap-4 space-y-0">
                             <div className="space-y-1">
                                 <CardTitle>{group.label}</CardTitle>
@@ -85,7 +98,17 @@ export default function OptionsIndex({ groups }: { groups: Group[] }) {
                                 </TableHeader>
                                 <TableBody>
                                     {group.options.map((option) => (
-                                        <TableRow key={option.id}>
+                                        <TableRow
+                                            key={option.id}
+                                            tabIndex={0}
+                                            className="focus-visible:bg-muted/60 cursor-pointer focus-visible:outline-hidden"
+                                            onClick={(e) => {
+                                                if (!(e.target as HTMLElement).closest('a, button, [role="menuitem"]')) openForm(group, option);
+                                            }}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' && e.target === e.currentTarget) openForm(group, option);
+                                            }}
+                                        >
                                             <TableCell className="text-muted-foreground tabular-nums">{option.sort_order}</TableCell>
                                             <TableCell>
                                                 <span className="font-medium">{option.label}</span>
@@ -118,7 +141,9 @@ export default function OptionsIndex({ groups }: { groups: Group[] }) {
                             </Table>
                         </CardContent>
                     </Card>
+                    </TabsContent>
                 ))}
+                </Tabs>
             </div>
 
             <Dialog open={editing !== null} onOpenChange={(open) => !open && setEditing(null)}>

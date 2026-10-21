@@ -62,7 +62,7 @@ export default function ExpensesIndex({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Pengeluaran Kas Gereja" />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
                     title="Pengeluaran Kas"
                     description="Pengajuan, persetujuan bertingkat, dan pembayaran kas operasional serta pelayanan gereja."

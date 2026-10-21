@@ -71,7 +71,7 @@ export default function HouseholdForm({ household, housingStatus, nextNumber }: 
             <Head title={isEdit ? `Ubah ${household.name}` : 'Tambah keluarga'} />
             <form onSubmit={submit} className="flex min-h-full flex-col">
                 <div className="flex-1 space-y-6 p-4 md:p-6 lg:p-8">
-                    <PageHeader title={isEdit ? 'Ubah keluarga' : 'Tambah keluarga'} description="Data keluarga dipakai bersama oleh semua anggotanya." />
+                    <PageHeader back={isEdit ? route('admin.households.show', household.id) : route('admin.households.index')} title={isEdit ? 'Ubah keluarga' : 'Tambah keluarga'} description="Data keluarga dipakai bersama oleh semua anggotanya." />
 
                     <Card>
                         <CardHeader>

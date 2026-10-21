@@ -77,8 +77,9 @@ export default function CategoryForm({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={isEdit ? 'Edit Kategori' : 'Tambah Kategori'} />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
+                    back={route('admin.categories.index')}
                     title={isEdit ? 'Edit Kategori' : 'Tambah Kategori'}
                     description={
                         isEdit ? `Perbarui kategori kas ${category.name}` : 'Tambahkan klasifikasi pos transaksi baru.'

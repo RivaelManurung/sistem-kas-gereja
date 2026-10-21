@@ -34,7 +34,7 @@ export default function FundsIndex({ funds }: { funds: Paginated<FundRow> }) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dana" />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
                     title="Dana Kas"
                     description="Kelola pos dana (alokasi keuangan) gereja seperti Kas Umum, Dana Pembangunan, dan Diakonia."

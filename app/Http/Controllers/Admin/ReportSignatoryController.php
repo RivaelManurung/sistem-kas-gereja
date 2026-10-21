@@ -10,11 +10,14 @@ use App\Models\ReportSignatory;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class ReportSignatoryController extends Controller
 {
+    private const ORDER_MESSAGES = ['order.unique' => 'Urutan ini sudah dipakai penanda tangan lain.'];
+
     public function index(): Response
     {
         $signatories = ReportSignatory::with('user')->orderBy('order')->get();
@@ -57,9 +60,9 @@ class ReportSignatoryController extends Controller
             'position' => ['required', 'string', 'max:100'],
             'role' => ['nullable', 'string', 'max:50'],
             'user_id' => ['nullable', 'exists:users,id'],
-            'order' => ['required', 'integer', 'min:1'],
+            'order' => ['required', 'integer', 'min:1', Rule::unique('report_signatories', 'order')],
             'is_active' => ['boolean'],
-        ]);
+        ], self::ORDER_MESSAGES);
 
         ReportSignatory::create($validated);
 
@@ -74,9 +77,9 @@ class ReportSignatoryController extends Controller
             'position' => ['required', 'string', 'max:100'],
             'role' => ['nullable', 'string', 'max:50'],
             'user_id' => ['nullable', 'exists:users,id'],
-            'order' => ['required', 'integer', 'min:1'],
+            'order' => ['required', 'integer', 'min:1', Rule::unique('report_signatories', 'order')->ignore($signature->id)],
             'is_active' => ['boolean'],
-        ]);
+        ], self::ORDER_MESSAGES);
 
         $signature->update($validated);
 

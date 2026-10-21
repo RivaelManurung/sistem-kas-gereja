@@ -24,7 +24,6 @@ interface PeriodRow {
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Administrasi', href: '/admin/settings' },
     { title: 'Periode Akuntansi', href: '/admin/periods' },
 ];
 
@@ -40,7 +39,7 @@ export default function PeriodsIndex({ periods }: { periods: Paginated<PeriodRow
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Periode Akuntansi & Tutup Buku" />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
                     title="Periode Akuntansi"
                     description="Kelola periode pembukuan kas gereja, pencatatan saldo awal, dan penutupan periode (tutup buku)."

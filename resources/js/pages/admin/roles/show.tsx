@@ -32,6 +32,7 @@ export default function RoleShow({ role, groups, users, canEdit, canDelete }: Pr
             <Head title={role.label} />
             <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
+                    back="/admin/roles"
                     title={role.label}
                     description={role.description ?? (role.is_locked ? 'Memegang seluruh hak akses dan tidak bisa diubah.' : 'Belum ada deskripsi.')}
                     actions={

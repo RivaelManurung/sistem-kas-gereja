@@ -1,6 +1,7 @@
 import InputError from '@/components/input-error';
 import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -49,9 +50,19 @@ export default function UserForm({ user, roleOptions }: { user: EditableUser | n
             ]}
         >
             <Head title={title} />
-            <div className="max-w-2xl space-y-6 p-4">
-                <PageHeader title={title} />
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
+                <PageHeader
+                    back={route('admin.users.index')}
+                    title={title}
+                    description={isEdit ? `Perbarui akun ${user.name} dan perannya.` : 'Buat akun baru lalu tentukan perannya.'}
+                />
 
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Data Akun</CardTitle>
+                        <CardDescription>Peran menentukan menu dan hak akses pengguna.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
                 <form onSubmit={submit} className="space-y-6">
                     <div className="grid gap-2">
                         <Label htmlFor="name">Nama</Label>
@@ -107,13 +118,17 @@ export default function UserForm({ user, roleOptions }: { user: EditableUser | n
                         <InputError message={errors.roles} />
                     </fieldset>
 
-                    <div className="flex gap-2">
-                        <Button disabled={processing}>Simpan</Button>
+                    <div className="flex items-center justify-end gap-3 pt-4">
                         <Button variant="outline" asChild>
                             <Link href={route('admin.users.index')}>Batal</Link>
                         </Button>
+                        <Button type="submit" disabled={processing}>
+                            {isEdit ? 'Simpan Perubahan' : 'Tambah Pengguna'}
+                        </Button>
                     </div>
                 </form>
+                    </CardContent>
+                </Card>
             </div>
         </AppLayout>
     );

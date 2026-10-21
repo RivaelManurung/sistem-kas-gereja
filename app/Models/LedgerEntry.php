@@ -15,6 +15,27 @@ class LedgerEntry extends Model
 
     protected $guarded = ['id'];
 
+    /** Tautan ke dokumen asal transaksi (pengeluaran, berita acara, dst.), hanya bila pengguna boleh melihatnya. */
+    public function getSourceUrlAttribute(): ?string
+    {
+        $user = auth()->user();
+        if (! $user || ! $this->source_id) {
+            return null;
+        }
+
+        $map = [
+            'expense' => ['expenses.show', 'expenses.view'],
+            'count_sheet' => ['counting.show', 'counting.manage'],
+            'fund_transfer' => ['transfers.show', 'transfers.view'],
+            'bank_deposit' => ['deposits.show', 'deposits.manage'],
+            'event' => ['events.show', 'events.view'],
+            'accounting_period' => ['admin.periods.show', 'master.manage'],
+        ];
+        [$route, $permission] = $map[$this->source_type] ?? [null, null];
+
+        return $route && $user->can($permission) && \Illuminate\Support\Facades\Route::has($route) ? route($route, $this->source_id) : null;
+    }
+
     protected function casts(): array
     {
         return [

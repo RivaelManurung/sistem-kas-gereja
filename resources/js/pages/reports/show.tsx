@@ -21,7 +21,7 @@ import { formatRupiah } from '@/lib/money';
 import { formatDate, formatDateTime } from '@/lib/date';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { AlertCircle, ArrowLeft, CheckCircle2, Clock, Download, ExternalLink, FileCheck2, FileSignature, ShieldCheck } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Clock, Download, ExternalLink, FileCheck2, FileSignature, ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
 
 interface ApprovalRow {
@@ -116,18 +116,13 @@ export default function ReportsShow({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Laporan: ${report.title}`} />
 
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
+                    back="/reports"
                     title={report.title}
                     description={`Periode: ${formatDate(report.start_date)} s/d ${formatDate(report.end_date)} • Kode: ${report.verification_code}`}
                     actions={
                         <div className="flex flex-wrap items-center gap-2">
-                            <Button variant="outline" asChild>
-                                <Link href={route('reports.index')}>
-                                    <ArrowLeft className="mr-2 h-4 w-4" />
-                                    Kembali
-                                </Link>
-                            </Button>
                             <Button variant="secondary" asChild>
                                 <a href={route('reports.pdf', report.id)} download>
                                     <Download className="mr-2 h-4 w-4" />

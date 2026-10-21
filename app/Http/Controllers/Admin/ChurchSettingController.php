@@ -28,7 +28,7 @@ class ChurchSettingController extends Controller
         rsort($denominations);
         $validated['denominations'] = array_values($denominations);
 
-        foreach (['logo' => 'logo_path', 'favicon' => 'favicon_path'] as $field => $column) {
+        foreach (['logo' => 'logo_path'] as $field => $column) {
             if ($request->hasFile($field)) {
                 if ($settings->{$column}) {
                     Storage::disk('public')->delete($settings->{$column});
@@ -39,7 +39,7 @@ class ChurchSettingController extends Controller
                 $validated[$column] = null;
             }
         }
-        unset($validated['logo'], $validated['favicon'], $validated['remove_logo'], $validated['remove_favicon']);
+        unset($validated['logo'], $validated['remove_logo']);
 
         if ($request->hasFile('stamp')) {
             if ($settings->stamp_path) {
@@ -49,7 +49,6 @@ class ChurchSettingController extends Controller
         }
 
         $validated['allow_negative_balance'] = $request->boolean('allow_negative_balance');
-        $validated['public_page_enabled'] = $request->boolean('public_page_enabled');
 
         $settings->update($validated);
 

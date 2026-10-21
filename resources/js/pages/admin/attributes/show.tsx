@@ -38,6 +38,7 @@ export default function AttributeShow({ definition: d }: Props) {
             <Head title={d.label} />
             <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
+                    back="/admin/attributes"
                     title={d.label}
                     description={`Kolom tambahan untuk ${d.entity_label}`}
                     actions={

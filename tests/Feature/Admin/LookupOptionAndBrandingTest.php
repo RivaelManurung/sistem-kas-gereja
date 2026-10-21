@@ -48,7 +48,7 @@ it('denies dropdown settings to users without master data permission', function 
     $this->post(route('admin.options.store'), ['group' => 'payment_method', 'label' => 'Gelap'])->assertForbidden();
 });
 
-it('stores a custom system name, logo and favicon and shares them with every page', function () {
+it('stores a custom system name and logo, and reuses the logo as favicon', function () {
     Storage::fake('public');
     actingAsRole(Role::Admin);
     $settings = ChurchSetting::current();
@@ -64,18 +64,16 @@ it('stores a custom system name, logo and favicon and shares them with every pag
         'min_confirmations_general' => 2,
         'expense_approval_threshold' => 1000000,
         'logo' => tinyPng('logo.png'),
-        'favicon' => tinyPng('favicon.png'),
     ])->assertSessionHasNoErrors();
 
     $settings->refresh();
     expect($settings->system_name)->toBe('Kas GKI');
     Storage::disk('public')->assertExists($settings->logo_path);
-    Storage::disk('public')->assertExists($settings->favicon_path);
 
     $this->get(route('dashboard'))->assertInertia(fn ($page) => $page
         ->where('brand.name', 'Kas GKI')
         ->whereNot('brand.logo_url', null)
-        ->whereNot('brand.favicon_url', null));
+        ->where('brand.favicon_url', fn ($url) => $url === $settings->brand()['logo_url']));
 });
 
 it('removes the logo when asked and rejects non-image uploads', function () {
@@ -89,7 +87,7 @@ it('removes the logo when asked and rejects non-image uploads', function () {
         'min_confirmations_service' => 2, 'min_confirmations_event' => 2, 'min_confirmations_general' => 2, 'expense_approval_threshold' => 0,
     ];
 
-    $this->post(route('admin.settings.update'), [...$base, 'favicon' => UploadedFile::fake()->create('x.exe', 10)])->assertSessionHasErrors('favicon');
+    $this->post(route('admin.settings.update'), [...$base, 'logo' => UploadedFile::fake()->create('x.exe', 10)])->assertSessionHasErrors('logo');
     $this->post(route('admin.settings.update'), [...$base, 'remove_logo' => true])->assertSessionHasNoErrors();
 
     expect($settings->fresh()->logo_path)->toBeNull();

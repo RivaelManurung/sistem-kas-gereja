@@ -3,6 +3,7 @@ import PageHeader from '@/components/page-header';
 import StatusBadge from '@/components/status-badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { MaybeLinkRow } from '@/components/app/link-row';
 import AppLayout from '@/layouts/app-layout';
 import { formatDate } from '@/lib/date';
 import { formatRupiah } from '@/lib/money';
@@ -13,7 +14,7 @@ interface Props {
     fund: { id: number; code: string; name: string; description: string | null; is_active: boolean };
     balance: number;
     perAccount: Array<{ id: number; code: string; name: string; balance: number }>;
-    entries: Array<{ id: number; entry_date: string; description: string | null; direction: 'in' | 'out'; amount: number; account_name: string | null }>;
+    entries: Array<{ id: number; entry_date: string; description: string | null; direction: 'in' | 'out'; source_url: string | null; amount: number; account_name: string | null }>;
     rules: Array<{ id: number; rule_id: number; rule_name: string; category_name: string | null; percentage: number; valid_from: string; is_active: boolean }>;
 }
 
@@ -26,8 +27,9 @@ export default function FundShow({ fund, balance, perAccount, entries, rules }: 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={fund.name} />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
+                    back="/admin/funds"
                     title={fund.name}
                     description={`Dana ${fund.code}`}
                     actions={
@@ -61,12 +63,12 @@ export default function FundShow({ fund, balance, perAccount, entries, rules }: 
                         </TableHeader>
                         <TableBody>
                             {perAccount.map((a) => (
-                                <TableRow key={a.id}>
+                                <MaybeLinkRow key={a.id} href={route('admin.accounts.show', a.id)}>
                                     <TableCell>
                                         {a.code} - {a.name}
                                     </TableCell>
                                     <TableCell className="text-right tabular-nums">{formatRupiah(a.balance)}</TableCell>
-                                </TableRow>
+                                </MaybeLinkRow>
                             ))}
                             {perAccount.length === 0 && (
                                 <TableRow>
@@ -92,7 +94,7 @@ export default function FundShow({ fund, balance, perAccount, entries, rules }: 
                         </TableHeader>
                         <TableBody>
                             {rules.map((r) => (
-                                <TableRow key={r.id}>
+                                <MaybeLinkRow key={r.id} href={route('admin.allocations.show', r.id)}>
                                     <TableCell>
                                         <Link href={route('admin.allocations.show', r.rule_id)} className="font-medium underline-offset-4 hover:underline">
                                             {r.rule_name}
@@ -104,7 +106,7 @@ export default function FundShow({ fund, balance, perAccount, entries, rules }: 
                                         <StatusBadge active={r.is_active} />
                                     </TableCell>
                                     <TableCell className="text-right tabular-nums">{r.percentage}%</TableCell>
-                                </TableRow>
+                                </MaybeLinkRow>
                             ))}
                             {rules.length === 0 && (
                                 <TableRow>
@@ -130,13 +132,13 @@ export default function FundShow({ fund, balance, perAccount, entries, rules }: 
                         </TableHeader>
                         <TableBody>
                             {entries.map((e) => (
-                                <TableRow key={e.id}>
+                                <MaybeLinkRow key={e.id} href={e.source_url}>
                                     <TableCell>{formatDate(e.entry_date)}</TableCell>
                                     <TableCell>{e.description ?? '-'}</TableCell>
                                     <TableCell>{e.account_name ?? '-'}</TableCell>
                                     <TableCell className="text-income text-right tabular-nums">{e.direction === 'in' ? formatRupiah(e.amount) : ''}</TableCell>
                                     <TableCell className="text-expense text-right tabular-nums">{e.direction === 'out' ? formatRupiah(e.amount) : ''}</TableCell>
-                                </TableRow>
+                                </MaybeLinkRow>
                             ))}
                             {entries.length === 0 && (
                                 <TableRow>

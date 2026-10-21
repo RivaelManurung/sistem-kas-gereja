@@ -14,7 +14,7 @@ import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem, type EventItem, type EventStatus } from '@/types';
 import { type AttributeDefinition } from '@/types/attributes';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft, Save } from 'lucide-react';
+import { Save } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
 export default function EventForm({
@@ -68,21 +68,14 @@ export default function EventForm({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={isEdit ? `Edit ${event?.name}` : 'Buat Acara Baru'} />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
+                    back={isEdit && event ? route('events.show', event.id) : route('events.index')}
                     title={isEdit ? `Edit Acara: ${event?.name}` : 'Buat Acara Baru'}
                     description={
                         isEdit
                             ? 'Perbarui informasi agenda, status pelaksanaan, atau target anggaran acara.'
                             : 'Tambahkan agenda atau kepanitiaan baru. Sistem akan secara otomatis mengalokasikan Pos Dana khusus untuk acara ini.'
-                    }
-                    actions={
-                        <Button variant="outline" asChild>
-                            <Link href={isEdit && event ? route('events.show', event.id) : route('events.index')}>
-                                <ArrowLeft className="mr-2 h-4 w-4" />
-                                Kembali
-                            </Link>
-                        </Button>
                     }
                 />
 

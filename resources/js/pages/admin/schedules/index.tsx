@@ -36,7 +36,7 @@ export default function SchedulesIndex({ schedules }: { schedules: Paginated<Sch
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Jadwal Ibadah" />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
                     title="Jadwal Ibadah Rutin"
                     description="Template jadwal ibadah berulang yang digunakan untuk membuat sesi penghitungan kolekte."

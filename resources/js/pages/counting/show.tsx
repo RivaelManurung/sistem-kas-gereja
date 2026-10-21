@@ -115,8 +115,9 @@ export default function CountingShow({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Berita Acara BA-${String(sheet.id).padStart(5, '0')}`} />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
+                    back="/counting"
                     title={`Berita Acara Penghitungan #BA-${String(sheet.id).padStart(5, '0')}`}
                     description={
                         sheet.service_session

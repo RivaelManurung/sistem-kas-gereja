@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\FundController;
 use App\Http\Controllers\Admin\LookupOptionController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\ReportSignatoryController;
+use App\Http\Controllers\Admin\TransparencySettingController;
 use App\Http\Controllers\Admin\ServiceScheduleController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
@@ -30,6 +31,8 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::middleware('permission:'.Permission::SettingsManage->value)->group(function () {
         Route::get('settings', [ChurchSettingController::class, 'edit'])->name('settings.edit');
         Route::put('settings', [ChurchSettingController::class, 'update'])->name('settings.update');
+        Route::get('transparansi', [TransparencySettingController::class, 'edit'])->name('transparency.edit');
+        Route::put('transparansi', [TransparencySettingController::class, 'update'])->name('transparency.update');
 
         Route::resource('signatures', ReportSignatoryController::class)->except(['create', 'edit']);
         Route::patch('signatures/{signature}/toggle', [ReportSignatoryController::class, 'toggle'])->name('signatures.toggle');

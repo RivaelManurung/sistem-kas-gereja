@@ -4,6 +4,7 @@ import StatusBadge from '@/components/status-badge';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { MaybeLinkRow } from '@/components/app/link-row';
 import AppLayout from '@/layouts/app-layout';
 import { formatDate } from '@/lib/date';
 import { formatRupiah } from '@/lib/money';
@@ -23,7 +24,7 @@ interface Props {
         sort_order: number;
     };
     totals: { year: number; all_time: number; year_label: string };
-    entries: Array<{ id: number; entry_date: string; description: string | null; direction: 'in' | 'out'; amount: number; fund_name: string | null; account_name: string | null }>;
+    entries: Array<{ id: number; entry_date: string; description: string | null; direction: 'in' | 'out'; source_url: string | null; amount: number; fund_name: string | null; account_name: string | null }>;
     rules: Array<{ id: number; name: string; valid_from: string; is_active: boolean; items: Array<{ id: number; fund_name: string | null; percentage: number }> }>;
     customFields: {
         definitions: Array<{ id: number; key: string; label: string; data_type: string }>;
@@ -49,8 +50,9 @@ export default function CategoryShow({ category, totals, entries, rules, customF
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={category.name} />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
+                    back={`/admin/categories?direction=${category.direction}`}
                     title={category.name}
                     description={`Kategori ${category.direction_label.toLowerCase()}`}
                     actions={
@@ -130,14 +132,14 @@ export default function CategoryShow({ category, totals, entries, rules, customF
                         </TableHeader>
                         <TableBody>
                             {entries.map((e) => (
-                                <TableRow key={e.id}>
+                                <MaybeLinkRow key={e.id} href={e.source_url}>
                                     <TableCell>{formatDate(e.entry_date)}</TableCell>
                                     <TableCell>{e.description ?? '-'}</TableCell>
                                     <TableCell>{e.fund_name ?? '-'}</TableCell>
                                     <TableCell>{e.account_name ?? '-'}</TableCell>
                                     <TableCell className="text-income text-right tabular-nums">{e.direction === 'in' ? formatRupiah(e.amount) : ''}</TableCell>
                                     <TableCell className="text-expense text-right tabular-nums">{e.direction === 'out' ? formatRupiah(e.amount) : ''}</TableCell>
-                                </TableRow>
+                                </MaybeLinkRow>
                             ))}
                             {entries.length === 0 && (
                                 <TableRow>

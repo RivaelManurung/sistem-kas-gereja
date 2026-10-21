@@ -8,7 +8,7 @@ import AppLayout from '@/layouts/app-layout';
 import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, Pencil } from 'lucide-react';
+import { Pencil } from 'lucide-react';
 
 interface ScheduleDetail {
     id: number;
@@ -45,18 +45,13 @@ export default function ScheduleShow({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Jadwal ${schedule.name}`} />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
+                    back={route('admin.schedules.index')}
                     title={schedule.name}
                     description={`Jadwal ibadah rutin setiap hari ${dayName} pukul ${schedule.time}`}
                     actions={
                         <>
-                            <Button variant="outline" asChild>
-                                <Link href={route('admin.schedules.index')}>
-                                    <ArrowLeft className="mr-2 h-4 w-4" />
-                                    Kembali
-                                </Link>
-                            </Button>
                             <Button asChild>
                                 <Link href={route('admin.schedules.edit', schedule.id)}>
                                     <Pencil className="mr-2 h-4 w-4" />

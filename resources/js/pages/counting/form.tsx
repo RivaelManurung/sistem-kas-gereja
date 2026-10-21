@@ -228,6 +228,7 @@ export default function CountingForm({
             <Head title={isEdit ? 'Edit Berita Acara Hitung' : 'Penghitungan Kolekte / Kas Masuk'} />
             <form onSubmit={submit} className="space-y-6 p-4 max-w-4xl pb-24">
                 <PageHeader
+                    back={route('counting.index')}
                     title={isEdit ? `Edit Berita Acara Hitung` : `Penghitungan Kolekte & Penerimaan`}
                     description={
                         session

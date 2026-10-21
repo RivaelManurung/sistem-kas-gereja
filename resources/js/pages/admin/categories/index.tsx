@@ -56,7 +56,7 @@ export default function CategoriesIndex({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Kategori Kas" />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
                     title="Kategori Pemasukan & Pengeluaran"
                     description="Klasifikasi pos transaksi keuangan gereja dan pemetaan dana default-nya."

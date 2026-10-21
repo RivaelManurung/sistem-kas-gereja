@@ -55,6 +55,7 @@ export default function RoleForm({ role, groups, granted, copiedFrom, grantable 
             <Head title={isEdit ? `Ubah ${role.label}` : 'Buat peran'} />
             <form onSubmit={submit} className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
+                    back={isEdit ? route('admin.roles.show', role.id) : route('admin.roles.index')}
                     title={isEdit ? `Ubah peran ${role.label}` : 'Buat peran baru'}
                     description={copiedFrom ? `Hak akses disalin dari ${copiedFrom}. Sesuaikan sebelum menyimpan.` : 'Beri nama peran, lalu pilih hal apa saja yang boleh dilakukan pemegangnya.'}
                 />

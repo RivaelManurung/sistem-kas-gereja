@@ -75,7 +75,7 @@ const MODULES: NavModule[] = [
                 items: [
                     { title: 'Dasbor', url: '/dashboard', icon: LayoutGrid },
                     { title: 'Portal Jemaat', url: '/portal', icon: HeartHandshake },
-                    { title: 'Transparansi Publik', url: '/transparansi', icon: ShieldCheck },
+                    { title: 'Transparansi Publik', url: '/admin/transparansi', icon: ShieldCheck, anyOf: ['settings.manage'] },
                 ],
             },
         ],
@@ -231,7 +231,7 @@ function Brand() {
             href="/dashboard"
             className={cn(
                 'focus-visible:ring-ring flex size-11 items-center justify-center rounded-xl shadow-xs focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden',
-                brand.logo_url ? 'bg-card border' : 'bg-primary text-primary-foreground',
+                brand.logo_url ? 'bg-white' : 'bg-white text-[hsl(232,48%,16%)]',
             )}
             aria-label={brand.name}
         >
@@ -250,7 +250,7 @@ function RailUser() {
                 <button
                     type="button"
                     aria-label={`Akun ${auth.user.name}`}
-                    className="bg-accent text-accent-foreground hover:ring-ring/30 focus-visible:ring-ring flex size-10 items-center justify-center rounded-full text-sm font-semibold ring-2 ring-transparent transition focus-visible:ring-2 focus-visible:outline-hidden"
+                    className="bg-sidebar-accent text-sidebar-accent-foreground hover:ring-sidebar-muted/40 focus-visible:ring-sidebar-primary flex size-10 items-center justify-center rounded-full text-sm font-semibold ring-2 ring-transparent transition focus-visible:ring-2 focus-visible:outline-hidden"
                 >
                     {initials}
                 </button>
@@ -268,7 +268,7 @@ export function SidebarRail({ onNavigate }: { onNavigate?: () => void }) {
     const { selectedKey, setSelectedKey } = useSidebarNav();
 
     return (
-        <nav aria-label="Modul" className="bg-sidebar-background flex h-full w-[84px] shrink-0 flex-col items-center border-r py-4">
+        <nav aria-label="Modul" className="bg-rail border-sidebar-border flex h-full w-[84px] shrink-0 flex-col items-center border-r py-4">
             <Brand />
             <ul className="mt-6 flex w-full flex-1 flex-col gap-1 overflow-y-auto px-2">
                 {modules.map((m) => {
@@ -285,16 +285,16 @@ export function SidebarRail({ onNavigate }: { onNavigate?: () => void }) {
                                 }}
                                 aria-current={selected ? 'true' : undefined}
                                 className={cn(
-                                    'focus-visible:ring-ring group relative flex w-full flex-col items-center gap-1 rounded-lg px-1 py-2.5 text-[11px] leading-tight font-medium transition-colors focus-visible:ring-2 focus-visible:outline-hidden',
+                                    'focus-visible:ring-sidebar-primary group relative flex w-full flex-col items-center gap-1 rounded-lg px-1 py-2.5 text-[11px] leading-tight font-medium transition-colors focus-visible:ring-2 focus-visible:outline-hidden',
                                     selected
                                         ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                                        : 'text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground',
+                                        : 'text-sidebar-muted hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground',
                                 )}
                             >
                                 <span
                                     aria-hidden="true"
                                     className={cn(
-                                        'bg-gold absolute top-2 bottom-2 -left-2 w-1 rounded-r-full transition-all duration-200',
+                                        'bg-sidebar-primary absolute top-2 bottom-2 -left-2 w-1 rounded-r-full transition-all duration-200',
                                         selected ? 'scale-y-100 opacity-100' : 'scale-y-50 opacity-0',
                                     )}
                                 />
@@ -321,9 +321,9 @@ export function SidebarPanel({ onNavigate }: { onNavigate?: () => void }) {
     if (!module) return null;
 
     return (
-        <div className="bg-sidebar-background/60 flex h-full w-64 shrink-0 flex-col border-r">
-            <div className="flex h-14 shrink-0 items-center border-b px-5">
-                <h2 className="text-base font-semibold tracking-tight">{module.title}</h2>
+        <div className="bg-sidebar border-sidebar-border flex h-full w-64 shrink-0 flex-col border-r">
+            <div className="border-sidebar-border flex h-14 shrink-0 items-center border-b px-5">
+                <h2 className="text-sidebar-accent-foreground text-base font-semibold tracking-tight">{module.title}</h2>
             </div>
             {/* key memicu transisi halus setiap pindah modul */}
             <nav
@@ -353,14 +353,14 @@ function NavSectionGroup({ section, activeUrl, onNavigate }: { section: NavSecti
                             onClick={onNavigate}
                             aria-current={active ? 'page' : undefined}
                             className={cn(
-                                'focus-visible:ring-ring relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors focus-visible:ring-2 focus-visible:outline-hidden',
+                                'focus-visible:ring-sidebar-primary relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors focus-visible:ring-2 focus-visible:outline-hidden',
                                 active
                                     ? 'bg-sidebar-accent text-sidebar-accent-foreground font-semibold'
-                                    : 'text-sidebar-foreground hover:bg-sidebar-accent/60 hover:text-foreground',
+                                    : 'text-sidebar-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground',
                             )}
                         >
-                            {active && <span aria-hidden="true" className="bg-gold absolute top-2 bottom-2 left-0 w-[3px] rounded-r-full" />}
-                            <Icon className={cn('size-4 shrink-0', active ? '' : 'text-muted-foreground')} aria-hidden="true" />
+                            {active && <span aria-hidden="true" className="bg-sidebar-primary absolute top-2 bottom-2 left-0 w-[3px] rounded-r-full" />}
+                            <Icon className={cn('size-4 shrink-0', active ? '' : 'text-sidebar-muted')} aria-hidden="true" />
                             <span className="truncate">{leaf.title}</span>
                         </Link>
                     </li>
@@ -373,7 +373,7 @@ function NavSectionGroup({ section, activeUrl, onNavigate }: { section: NavSecti
 
     return (
         <Collapsible defaultOpen className="group/section">
-            <CollapsibleTrigger className="text-muted-foreground hover:text-foreground focus-visible:ring-ring flex w-full items-center justify-between rounded-md px-3 py-1.5 text-xs font-semibold focus-visible:ring-2 focus-visible:outline-hidden">
+            <CollapsibleTrigger className="text-sidebar-muted hover:text-sidebar-accent-foreground focus-visible:ring-sidebar-primary flex w-full items-center justify-between rounded-md px-3 py-1.5 text-xs font-semibold focus-visible:ring-2 focus-visible:outline-hidden">
                 {section.title}
                 <ChevronDown className="size-3.5 transition-transform group-data-[state=closed]/section:-rotate-90" aria-hidden="true" />
             </CollapsibleTrigger>

@@ -59,7 +59,7 @@ export default function EventsIndex({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Acara & Kepanitiaan" />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
                     title="Acara & Kepanitiaan"
                     description="Kelola program kepanitiaan gereja, alokasi dana khusus, pencatatan pemasukan, dan pertanggungjawaban pengeluaran."

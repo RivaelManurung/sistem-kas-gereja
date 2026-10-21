@@ -145,8 +145,9 @@ export default function AllocationForm({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={isEdit ? 'Edit Aturan Alokasi' : 'Tambah Aturan Alokasi'} />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
+                    back={route('admin.allocations.index')}
                     title={isEdit ? 'Edit Aturan Alokasi' : 'Tambah Aturan Alokasi Pos Dana'}
                     description="Tentukan porsi persentase pembagian persembahan ke setiap pos dana."
                 />

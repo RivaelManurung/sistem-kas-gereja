@@ -43,7 +43,7 @@ export default function AccountsIndex({ accounts }: { accounts: Paginated<Accoun
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Rekening" />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
                     title="Rekening / Kas"
                     description="Kelola rekening bank dan kas tunai fisik yang digunakan dalam transaksi gereja."

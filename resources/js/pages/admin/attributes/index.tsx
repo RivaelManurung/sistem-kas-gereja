@@ -62,7 +62,7 @@ export default function AttributesIndex({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Atribut Kustom" />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
                     title="Definisi Kolom Tambahan (EAV)"
                     description="Definisikan kolom formulir kustom bertipe untuk Jemaat, Kategori, Acara, dan entitas lainnya."

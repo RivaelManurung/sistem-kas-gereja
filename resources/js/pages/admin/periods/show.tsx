@@ -8,8 +8,8 @@ import AppLayout from '@/layouts/app-layout';
 import { formatDate, formatDateRange, formatDateTime } from '@/lib/date';
 import { formatRupiah } from '@/lib/money';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, router } from '@inertiajs/react';
-import { ArrowLeft, Lock } from 'lucide-react';
+import { Head, router } from '@inertiajs/react';
+import { Lock } from 'lucide-react';
 import { useState } from 'react';
 
 interface PeriodDetail {
@@ -42,18 +42,13 @@ export default function PeriodShow({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Periode ${period.name}`} />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
+                    back={route('admin.periods.index')}
                     title={period.name}
                     description={formatDateRange(period.start_date, period.end_date)}
                     actions={
                         <>
-                            <Button variant="outline" asChild>
-                                <Link href={route('admin.periods.index')}>
-                                    <ArrowLeft className="mr-2 h-4 w-4" />
-                                    Kembali
-                                </Link>
-                            </Button>
                             {!period.is_closed && (
                                 <Button variant="destructive" onClick={() => setConfirmOpen(true)}>
                                     <Lock className="mr-2 h-4 w-4" />

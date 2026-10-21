@@ -82,8 +82,9 @@ export default function ScheduleForm({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={isEdit ? 'Edit Jadwal' : 'Tambah Jadwal'} />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
+                    back={route('admin.schedules.index')}
                     title={isEdit ? 'Edit Jadwal' : 'Tambah Jadwal Ibadah'}
                     description={
                         isEdit ? `Perbarui jadwal ${schedule.name}` : 'Tambahkan template jadwal ibadah rutin mingguan.'

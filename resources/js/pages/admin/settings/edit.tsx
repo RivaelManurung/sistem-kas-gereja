@@ -32,7 +32,6 @@ interface ChurchSettingData {
     min_confirmations_general: number;
     expense_approval_threshold: number;
     allow_negative_balance: boolean;
-    public_page_enabled: boolean;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Pengaturan Gereja', href: '/admin/settings' }];
@@ -53,16 +52,13 @@ export default function SettingsEdit({ settings }: { settings: ChurchSettingData
         email: settings.email || '',
         timezone: settings.timezone || 'Asia/Jakarta',
         logo: null as File | null,
-        favicon: null as File | null,
         remove_logo: false as boolean,
-        remove_favicon: false as boolean,
         denominations: settings.denominations || [],
         min_confirmations_service: settings.min_confirmations_service ?? 2,
         min_confirmations_event: settings.min_confirmations_event ?? 2,
         min_confirmations_general: settings.min_confirmations_general ?? 2,
         expense_approval_threshold: settings.expense_approval_threshold ?? 0,
         allow_negative_balance: settings.allow_negative_balance ?? false,
-        public_page_enabled: settings.public_page_enabled ?? false,
     });
 
     const handleDenomChange = (val: string) => {
@@ -87,24 +83,23 @@ export default function SettingsEdit({ settings }: { settings: ChurchSettingData
             <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
                     title="Pengaturan Gereja"
-                    description="Kelola informasi gereja, pecahan uang, ambang batas pengeluaran, dan visibilitas laporan."
+                    description="Kelola identitas gereja, pecahan uang, dan ambang batas pengeluaran."
                 />
 
                 <form onSubmit={submit} className="space-y-6">
                     <Tabs defaultValue="identity" className="w-full">
-                        <TabsList className="grid w-full max-w-2xl grid-cols-5">
+                        <TabsList className="grid w-full max-w-xl grid-cols-4">
                             <TabsTrigger value="identity">Identitas</TabsTrigger>
                             <TabsTrigger value="profile">Profil</TabsTrigger>
                             <TabsTrigger value="counting">Penghitungan</TabsTrigger>
                             <TabsTrigger value="finance">Keuangan</TabsTrigger>
-                            <TabsTrigger value="public">Publik</TabsTrigger>
                         </TabsList>
 
                         <TabsContent value="identity" className="mt-6 space-y-4">
                             <Card>
                                 <CardHeader>
                                     <CardTitle>Identitas sistem</CardTitle>
-                                    <CardDescription>Nama, logo, dan favicon tampil di sidebar, halaman masuk, tab peramban, dan kop laporan.</CardDescription>
+                                    <CardDescription>Nama dan logo tampil di sidebar, halaman masuk, kop laporan, dan sebagai ikon di tab peramban.</CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-6">
                                     <div className="max-w-md space-y-1">
@@ -120,45 +115,24 @@ export default function SettingsEdit({ settings }: { settings: ChurchSettingData
                                         <InputError message={errors.system_name} />
                                     </div>
 
-                                    <div className="grid gap-6 md:grid-cols-2">
-                                        <ImageField
-                                            id="logo"
-                                            label="Logo"
-                                            hint="PNG, JPG, atau WebP, maksimal 2 MB. Disarankan persegi dengan latar transparan."
-                                            currentUrl={brand.logo_url}
-                                            file={data.logo}
-                                            removed={data.remove_logo}
-                                            onFile={(f) => {
-                                                setData('logo', f);
-                                                setData('remove_logo', false);
-                                            }}
-                                            onRemove={() => {
-                                                setData('logo', null);
-                                                setData('remove_logo', true);
-                                            }}
-                                            error={errors.logo}
-                                            previewClassName="size-20"
-                                        />
-                                        <ImageField
-                                            id="favicon"
-                                            label="Favicon"
-                                            hint="PNG atau ICO persegi, maksimal 512 KB. Ikon kecil di tab peramban."
-                                            currentUrl={brand.favicon_url}
-                                            file={data.favicon}
-                                            removed={data.remove_favicon}
-                                            onFile={(f) => {
-                                                setData('favicon', f);
-                                                setData('remove_favicon', false);
-                                            }}
-                                            onRemove={() => {
-                                                setData('favicon', null);
-                                                setData('remove_favicon', true);
-                                            }}
-                                            error={errors.favicon}
-                                            accept="image/png,image/x-icon,image/vnd.microsoft.icon,image/jpeg,image/webp"
-                                            previewClassName="size-12"
-                                        />
-                                    </div>
+                                    <ImageField
+                                        id="logo"
+                                        label="Logo"
+                                        hint="PNG, JPG, atau WebP, maksimal 2 MB. Disarankan persegi dengan latar transparan. Logo ini juga dipakai sebagai ikon tab peramban (favicon)."
+                                        currentUrl={brand.logo_url}
+                                        file={data.logo}
+                                        removed={data.remove_logo}
+                                        onFile={(f) => {
+                                            setData('logo', f);
+                                            setData('remove_logo', false);
+                                        }}
+                                        onRemove={() => {
+                                            setData('logo', null);
+                                            setData('remove_logo', true);
+                                        }}
+                                        error={errors.logo}
+                                        previewClassName="size-20"
+                                    />
                                 </CardContent>
                             </Card>
                         </TabsContent>
@@ -343,31 +317,6 @@ export default function SettingsEdit({ settings }: { settings: ChurchSettingData
                             </Card>
                         </TabsContent>
 
-                        <TabsContent value="public" className="mt-6 space-y-4">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Transparansi Publik</CardTitle>
-                                    <CardDescription>
-                                        Akses publik ke ringkasan keuangan gereja tanpa perlu masuk ke akun.
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <div className="flex items-center justify-between rounded-lg border p-4">
-                                        <div className="space-y-0.5">
-                                            <Label htmlFor="public_page_enabled">Aktifkan Halaman Transparansi Publik</Label>
-                                            <p className="text-xs text-muted-foreground">
-                                                Halaman publik hanya menampilkan agregat per kategori dan dana, tidak pernah menampilkan nama atau nominal per individu.
-                                            </p>
-                                        </div>
-                                        <Switch
-                                            id="public_page_enabled"
-                                            checked={data.public_page_enabled}
-                                            onCheckedChange={(checked) => setData('public_page_enabled', checked)}
-                                        />
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </TabsContent>
                     </Tabs>
 
                     <div className="flex items-center justify-end gap-3">

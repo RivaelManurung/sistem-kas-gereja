@@ -1,3 +1,4 @@
+import PageHeader from '@/components/page-header';
 import { cn } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
 import type { ReactNode } from 'react';
@@ -14,12 +15,10 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
 
     return (
         <div className="w-full p-4 md:p-6 lg:p-8">
-            <header className="space-y-1">
-                <h1 className="text-2xl font-semibold tracking-tight">Pengaturan akun</h1>
-                <p className="text-sm text-muted-foreground">Kelola profil, tanda tangan, keamanan, dan tampilan akun Anda.</p>
-            </header>
+            <PageHeader title="Pengaturan akun" description="Kelola profil, tanda tangan, keamanan, dan tampilan akun Anda." />
 
-            <nav aria-label="Pengaturan akun" className="mt-6 flex gap-6 overflow-x-auto border-b">
+            {/* Link tabs styled like components/ui/tabs.tsx so every tab bar matches. */}
+            <nav aria-label="Pengaturan akun" className="bg-muted text-muted-foreground mt-6 inline-flex h-9 max-w-full items-center gap-1 overflow-x-auto rounded-lg p-1">
                 {tabs.map((tab) => {
                     const active = currentPath === tab.url;
                     return (
@@ -29,10 +28,8 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
                             prefetch
                             aria-current={active ? 'page' : undefined}
                             className={cn(
-                                '-mb-px shrink-0 border-b-2 pb-3 text-sm font-medium whitespace-nowrap transition-colors duration-150 focus-visible:outline-none focus-visible:text-foreground motion-reduce:transition-none',
-                                active
-                                    ? 'border-primary text-foreground'
-                                    : 'border-transparent text-muted-foreground hover:border-border hover:text-foreground',
+                                'ring-offset-background focus-visible:ring-ring inline-flex shrink-0 items-center justify-center rounded-md px-3 py-1 text-sm font-medium whitespace-nowrap transition-all focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
+                                active ? 'bg-primary text-primary-foreground shadow' : 'hover:text-foreground',
                             )}
                         >
                             {tab.title}

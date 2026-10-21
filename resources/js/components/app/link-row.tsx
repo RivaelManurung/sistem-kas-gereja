@@ -29,3 +29,8 @@ export function LinkRow({ href, className, children, ...props }: { href: string 
         </TableRow>
     );
 }
+
+/** Baris yang membuka halaman detail bila ada tautannya, baris biasa bila tidak (misalnya karena tidak punya izin). */
+export function MaybeLinkRow({ href, ...props }: { href?: string | null } & Omit<React.ComponentProps<typeof TableRow>, 'onClick'>) {
+    return href ? <LinkRow href={href} {...props} /> : <TableRow {...props} />;
+}

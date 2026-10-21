@@ -24,7 +24,7 @@ export default function AuditLogShow({ log }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Detail Aktivitas" />
             <div className="space-y-6 p-4 md:p-6 lg:p-8">
-                <PageHeader title={log.sentence} description={`${log.entity} · ${formatDateTime(log.created_at)}`} />
+                <PageHeader back="/admin/audit" title={log.sentence} description={`${log.entity} · ${formatDateTime(log.created_at)}`} />
 
                 <div className="grid items-start gap-6 xl:grid-cols-3">
                     <Card className="xl:col-span-2">

@@ -1,12 +1,12 @@
-import PageHeader from '@/components/page-header';
+import { BackButton } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { formatRupiah } from '@/lib/money';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, CheckCircle2, Printer } from 'lucide-react';
+import { Head } from '@inertiajs/react';
+import { CheckCircle2, Printer } from 'lucide-react';
 
 interface DonationDetail {
     id: number;
@@ -41,14 +41,9 @@ export default function DonationShow({ donation }: { donation: DonationDetail })
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Tanda Terima ${donation.receipt_number}`} />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <div className="flex items-center justify-between no-print">
-                    <Button variant="outline" size="sm" asChild>
-                        <Link href={route('donations.index')}>
-                            <ArrowLeft className="mr-2 h-4 w-4" />
-                            Kembali
-                        </Link>
-                    </Button>
+                    <BackButton href={route('donations.index')} />
                     <Button onClick={() => window.print()}>
                         <Printer className="mr-2 h-4 w-4" />
                         Cetak Tanda Terima

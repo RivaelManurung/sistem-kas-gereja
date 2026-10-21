@@ -3,7 +3,7 @@ import { DefinitionList, DetailCard, StatTiles } from '@/components/app/detail';
 import { LinkRow } from '@/components/app/link-row';
 import { RowActions } from '@/components/app/row-actions';
 import InputError from '@/components/input-error';
-import PageHeader from '@/components/page-header';
+import { BackButton } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
@@ -259,6 +259,7 @@ export default function MemberShow({ member, household, milestones, ministries, 
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={member.name} />
             <div className="space-y-6 p-4 md:p-6 lg:p-8">
+                <BackButton href={route('admin.members.index')} />
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
                     <div className="flex min-w-0 items-center gap-4">
                         {member.has_photo ? (

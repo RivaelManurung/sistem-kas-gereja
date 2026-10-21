@@ -46,7 +46,7 @@ class ChurchSetting extends Model
         return 'data:image/png;base64,'.base64_encode($data);
     }
 
-    /** Identitas yang tampil di seluruh aplikasi: nama sistem, logo, dan favicon. */
+    /** Identitas yang tampil di seluruh aplikasi; logo sekaligus dipakai sebagai favicon. */
     public function brand(): array
     {
         $url = fn (?string $path) => $path
@@ -57,7 +57,7 @@ class ChurchSetting extends Model
             'name' => $this->system_name ?: 'Kas Gereja',
             'church_name' => $this->name,
             'logo_url' => $url($this->logo_path),
-            'favicon_url' => $url($this->favicon_path),
+            'favicon_url' => $url($this->logo_path),
         ];
     }
 

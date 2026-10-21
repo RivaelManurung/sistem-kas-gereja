@@ -97,8 +97,9 @@ export default function DonationForm({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Catat Persembahan Atas Nama" />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
+                    back={sheet ? route('counting.show', sheet.id) : route('donations.index')}
                     title="Catat Persembahan Atas Nama"
                     description={
                         sheet

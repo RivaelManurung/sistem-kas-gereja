@@ -8,10 +8,9 @@ import AppLayout from '@/layouts/app-layout';
 import { formatRupiah } from '@/lib/money';
 import { formatDate, formatDateTime } from '@/lib/date';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import {
     AlertTriangle,
-    ArrowLeft,
     CheckCircle2,
     Clock,
     CreditCard,
@@ -97,17 +96,9 @@ export default function ExpensesShow({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Pengeluaran ${expense.expense_number}`} />
-            <div className="space-y-6 p-4 md:p-6">
-                <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="sm" asChild>
-                        <Link href={route('expenses.index')}>
-                            <ArrowLeft className="h-4 w-4 mr-1" />
-                            Kembali ke Daftar
-                        </Link>
-                    </Button>
-                </div>
-
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
+                    back={route('expenses.index')}
                     title={`Pengeluaran: ${expense.expense_number}`}
                     description={`Diajukan pada ${formatDateTime(expense.created_at)} oleh ${expense.submitter.name}`}
                     actions={

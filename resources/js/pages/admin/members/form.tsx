@@ -212,6 +212,7 @@ export default function MemberForm({
             <form onSubmit={submit} noValidate>
                 <div className="space-y-6 p-4 md:p-6 lg:p-8">
                     <PageHeader
+                        back={isEdit ? route('admin.members.show', member.id) : route('admin.members.index')}
                         title={isEdit ? `Ubah data ${member.name}` : 'Tambah jemaat'}
                         description={isEdit ? 'Perbarui data lengkap anggota jemaat ini.' : 'Catat data lengkap anggota jemaat baru.'}
                     />

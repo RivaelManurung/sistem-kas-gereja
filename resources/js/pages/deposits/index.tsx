@@ -39,7 +39,7 @@ export default function DepositsIndex({ deposits }: { deposits: Paginated<Deposi
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Setoran Kas Tunai ke Bank" />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
                     title="Setoran Bank"
                     description="Pencatatan perpindahan fisik uang kas tunai ke rekening bank operasional gereja."

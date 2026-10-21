@@ -74,7 +74,7 @@ export default function ExpensesApprove({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Persetujuan Pengeluaran ${expense.expense_number}`} />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <Button variant="ghost" size="sm" asChild>
                     <Link href={route('expenses.show', expense.id)}>
                         <ArrowLeft className="h-4 w-4 mr-1" />
@@ -83,6 +83,7 @@ export default function ExpensesApprove({
                 </Button>
 
                 <PageHeader
+                    back={route('expenses.show', expense.id)}
                     title={`Persetujuan Pengeluaran #${expense.expense_number}`}
                     description={`Verifikasi dan tinjau keabsahan pengeluaran sebelum disetujui.`}
                 />

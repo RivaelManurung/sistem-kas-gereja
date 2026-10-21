@@ -34,7 +34,6 @@ interface OpeningBalanceLine {
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Administrasi', href: '/admin/settings' },
     { title: 'Periode Akuntansi', href: '/admin/periods' },
     { title: 'Buat Periode', href: '#' },
 ];
@@ -104,8 +103,9 @@ export default function PeriodsForm({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Buat Periode Akuntansi & Saldo Awal" />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
+                    back={route('admin.periods.index')}
                     title="Buat Periode Akuntansi Baru"
                     description="Menentukan rentang periode akuntansi buku kas dan opsional mencatat saldo awal pembuka."
                 />

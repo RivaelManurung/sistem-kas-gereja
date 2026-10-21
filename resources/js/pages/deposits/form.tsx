@@ -71,8 +71,9 @@ export default function DepositForm({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Catat Setoran Bank" />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
+                    back={route('deposits.index')}
                     title="Catat Setoran Kas Tunai ke Bank"
                     description="Pencatatan mutasi penyetoran uang fisik kas gereja ke rekening bank."
                 />

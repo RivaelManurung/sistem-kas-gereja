@@ -68,7 +68,7 @@ export default function TransfersIndex({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Pindah Dana Antar-Pos" />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
                     title="Pindah Dana Antar-Pos"
                     description="Pemindahan alokasi dana antar pos dana gereja (misal: Kas Umum menutup kekurangan Diakonia)."

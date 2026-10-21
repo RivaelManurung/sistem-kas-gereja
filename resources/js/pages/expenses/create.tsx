@@ -90,8 +90,9 @@ export default function ExpensesCreate({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Ajukan Pengeluaran Kas" />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
+                    back={route('expenses.index')}
                     title="Formulir Pengajuan Pengeluaran Kas"
                     description="Setiap pengeluaran kas wajib menyertakan foto nota atau kuitansi fisik asli."
                 />

@@ -86,8 +86,9 @@ export default function SessionCreate({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Buka Sesi Ibadah" />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
+                    back={route('sessions.index')}
                     title="Buka Sesi Ibadah"
                     description="Mulai sesi ibadah baru untuk mencatat kehadiran dan berita acara penghitungan kolekte."
                 />

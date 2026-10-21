@@ -44,8 +44,9 @@ export default function FundForm({ fund }: { fund: FundData | null }) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={isEdit ? 'Edit Dana' : 'Tambah Dana'} />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
+                    back={route('admin.funds.index')}
                     title={isEdit ? 'Edit Dana' : 'Tambah Dana'}
                     description={
                         isEdit ? `Perbarui informasi pos dana ${fund.name}` : 'Tambahkan pos alokasi dana kas baru.'

@@ -39,7 +39,7 @@ export default function SessionsIndex({ sessions }: { sessions: Paginated<Sessio
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Sesi Ibadah" />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
                     title="Sesi Ibadah & Kegiatan"
                     description="Daftar ibadah yang berlangsung untuk penghitungan kolekte dan pencatatan kehadiran."

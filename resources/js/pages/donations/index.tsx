@@ -58,7 +58,7 @@ export default function DonationsIndex({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Persembahan Atas Nama & Tanda Terima" />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
                     title="Persembahan Atas Nama"
                     description="Pencatatan persembahan perpuluhan, syukur, dan janji iman yang memerlukan tanda terima jemaat."

@@ -2,7 +2,7 @@ import { ConfirmDialog } from '@/components/app/confirm-dialog';
 import { LinkRow } from '@/components/app/link-row';
 import { RowActions } from '@/components/app/row-actions';
 import InputError from '@/components/input-error';
-import PageHeader from '@/components/page-header';
+import { BackButton } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,9 +26,10 @@ import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { formatRupiah } from '@/lib/money';
 import { formatDate } from '@/lib/date';
-import { type Account, type BreadcrumbItem, type EventFinancialSummary, type EventItem, type EventRole, type EventStatus, type Fund, type Member, type User } from '@/types';
+import { type Account, type BreadcrumbItem, type EventFinancialSummary, type EventItem, type EventRole, type EventStatus, type Fund, type Member, type SharedData, type User } from '@/types';
 import { type AttributeDefinition } from '@/types/attributes';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { MaybeLinkRow } from '@/components/app/link-row';
 import { ArrowDownLeft, ArrowUpRight, Calendar, DollarSign, Edit, Lock, PieChart, Plus, PlusCircle, Eye, Trash2 } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 
@@ -83,6 +84,8 @@ export default function EventShow({
     attributeDefinitions?: AttributeDefinition[];
     customAttributes?: Record<string, any>;
 }) {
+    const { auth } = usePage<SharedData>().props;
+    const canMembers = (auth.permissions ?? []).includes('members.manage');
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Acara & Kepanitiaan', href: '/events' },
         { title: event.name, href: '#' },
@@ -169,8 +172,9 @@ export default function EventShow({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={event.name} />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 {/* Header Section */}
+                <BackButton href={route('events.index')} />
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-5">
                     <div>
                         <div className="flex items-center gap-3">
@@ -498,7 +502,7 @@ export default function EventShow({
                                         </TableRow>
                                     ) : (
                                         event.members.map((m) => (
-                                            <TableRow key={m.id}>
+                                            <MaybeLinkRow key={m.id} href={canMembers && m.member ? route('admin.members.show', m.member.id) : null}>
                                                 <TableCell className="font-medium">
                                                     {m.user?.name || m.member?.name || 'Panitia Non-Akun'}
                                                     {m.user && (
@@ -526,7 +530,7 @@ export default function EventShow({
                                                         ]}
                                                     />
                                                 </TableCell>
-                                            </TableRow>
+                                            </MaybeLinkRow>
                                         ))
                                     )}
                                 </TableBody>

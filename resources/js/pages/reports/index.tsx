@@ -19,12 +19,13 @@ import { DatePicker } from '@/components/ui/date-picker';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { MaybeLinkRow } from '@/components/app/link-row';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
 import { formatRupiah } from '@/lib/money';
 import { formatDate } from '@/lib/date';
-import { type BreadcrumbItem, type Paginated } from '@/types';
-import { Head, Link, router } from '@inertiajs/react';
+import { type BreadcrumbItem, type Paginated, type SharedData } from '@/types';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ArrowDownRight, ArrowUpRight, CheckCircle2, Clock, Download, Eye, FileSignature, Newspaper, ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
 
@@ -89,6 +90,8 @@ export default function ReportsIndex({
     can_initiate: boolean;
     has_signature: boolean;
 }) {
+    const { auth } = usePage<SharedData>().props;
+    const canMaster = (auth.permissions ?? []).includes('master.manage');
     const [periodType, setPeriodType] = useState(period.period_type || 'bulanan');
     const [fromDate, setFromDate] = useState(period.start_date);
     const [toDate, setToDate] = useState(period.end_date);
@@ -150,7 +153,7 @@ export default function ReportsIndex({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Laporan Keuangan & Pengesahan" />
 
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
                     title="Laporan Keuangan & Pengesahan"
                     description="Perhitungan saldo, penerimaan, pengeluaran kas, mutasi dana berkala, dan pengesahan resmi bertanda tangan."
@@ -345,13 +348,13 @@ export default function ReportsIndex({
                                     </TableHeader>
                                     <TableBody>
                                         {live_data.incomes.by_category.map((item, idx) => (
-                                            <TableRow key={idx}>
+                                            <MaybeLinkRow key={idx} href={canMaster && item.category_id ? route('admin.categories.show', item.category_id) : null}>
                                                 <TableCell>{idx + 1}</TableCell>
                                                 <TableCell className="font-medium">{item.category_name}</TableCell>
                                                 <TableCell className="text-right tabular-nums font-semibold text-income">
                                                     {formatRupiah(item.total)}
                                                 </TableCell>
-                                            </TableRow>
+                                            </MaybeLinkRow>
                                         ))}
                                         <TableRow className="bg-muted/60 font-bold">
                                             <TableCell colSpan={2}>TOTAL PENERIMAAN KAS</TableCell>
@@ -377,13 +380,13 @@ export default function ReportsIndex({
                                     </TableHeader>
                                     <TableBody>
                                         {live_data.expenses.by_category.map((item, idx) => (
-                                            <TableRow key={idx}>
+                                            <MaybeLinkRow key={idx} href={canMaster && item.category_id ? route('admin.categories.show', item.category_id) : null}>
                                                 <TableCell>{idx + 1}</TableCell>
                                                 <TableCell className="font-medium">{item.category_name}</TableCell>
                                                 <TableCell className="text-right tabular-nums font-semibold text-expense">
                                                     {formatRupiah(item.total)}
                                                 </TableCell>
-                                            </TableRow>
+                                            </MaybeLinkRow>
                                         ))}
                                         <TableRow className="bg-muted/60 font-bold">
                                             <TableCell colSpan={2}>TOTAL PENGELUARAN KAS</TableCell>
@@ -413,7 +416,7 @@ export default function ReportsIndex({
                                     </TableHeader>
                                     <TableBody>
                                         {live_data.closing_balances.by_fund.map((fund) => (
-                                            <TableRow key={fund.fund_id}>
+                                            <MaybeLinkRow key={fund.fund_id} href={canMaster ? route('admin.funds.show', fund.fund_id) : null}>
                                                 <TableCell className="font-mono text-xs">{fund.fund_code}</TableCell>
                                                 <TableCell className="font-medium">{fund.fund_name}</TableCell>
                                                 <TableCell className="text-right tabular-nums">{formatRupiah(fund.opening_balance)}</TableCell>
@@ -421,7 +424,7 @@ export default function ReportsIndex({
                                                 <TableCell className="text-right tabular-nums text-expense">-{formatRupiah(fund.expense)}</TableCell>
                                                 <TableCell className="text-right tabular-nums">{formatRupiah(fund.net_transfer)}</TableCell>
                                                 <TableCell className="text-right tabular-nums font-bold">{formatRupiah(fund.closing_balance)}</TableCell>
-                                            </TableRow>
+                                            </MaybeLinkRow>
                                         ))}
                                     </TableBody>
                                 </Table>
@@ -445,7 +448,7 @@ export default function ReportsIndex({
                                     </TableHeader>
                                     <TableBody>
                                         {live_data.closing_balances.by_account.map((acc) => (
-                                            <TableRow key={acc.account_id}>
+                                            <MaybeLinkRow key={acc.account_id} href={canMaster ? route('admin.accounts.show', acc.account_id) : null}>
                                                 <TableCell className="font-mono text-xs">{acc.account_code}</TableCell>
                                                 <TableCell className="font-medium">{acc.account_name}</TableCell>
                                                 <TableCell>
@@ -455,7 +458,7 @@ export default function ReportsIndex({
                                                 <TableCell className="text-right tabular-nums text-income">+{formatRupiah(acc.in_amount)}</TableCell>
                                                 <TableCell className="text-right tabular-nums text-expense">-{formatRupiah(acc.out_amount)}</TableCell>
                                                 <TableCell className="text-right tabular-nums font-bold">{formatRupiah(acc.closing_balance)}</TableCell>
-                                            </TableRow>
+                                            </MaybeLinkRow>
                                         ))}
                                     </TableBody>
                                 </Table>

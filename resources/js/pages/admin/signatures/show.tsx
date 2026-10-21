@@ -32,6 +32,7 @@ export default function SignatureShow({ signatory: s }: Props) {
             <Head title={s.position} />
             <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
+                    back="/admin/signatures"
                     title={s.position}
                     description={s.title}
                     actions={

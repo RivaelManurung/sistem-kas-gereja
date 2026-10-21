@@ -46,7 +46,7 @@ export function StatusBadge({ status, active, className }: StatusBadgeProps) {
         case 'rejected':
             return <Badge variant="destructive" className={className}>Ditolak</Badge>;
         case 'locked':
-            return <Badge className={cn('bg-muted text-white hover:bg-muted/60', className)}>Terkunci</Badge>;
+            return <Badge className={cn('bg-muted text-foreground hover:bg-muted/60', className)}>Terkunci</Badge>;
         case 'closed':
             return <Badge variant="secondary" className={cn('text-muted-foreground', className)}>Ditutup</Badge>;
         case 'active':

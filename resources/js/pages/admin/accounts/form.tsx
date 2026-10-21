@@ -54,8 +54,9 @@ export default function AccountForm({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={isEdit ? 'Edit Rekening' : 'Tambah Rekening'} />
-            <div className="space-y-6 p-4 md:p-6">
+            <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <PageHeader
+                    back={route('admin.accounts.index')}
                     title={isEdit ? 'Edit Rekening' : 'Tambah Rekening'}
                     description={
                         isEdit

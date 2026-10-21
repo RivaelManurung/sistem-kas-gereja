@@ -10,7 +10,6 @@ import { Head, router } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
-    { title: 'Pengaturan', href: '/settings/profile' },
     { title: 'Tanda Tangan Digital', href: '/settings/signature' },
 ];
 
