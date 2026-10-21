@@ -1,8 +1,10 @@
 <?php
 
 use App\Enums\Permission;
+use App\Http\Controllers\Admin\AccountController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\ChurchSettingController;
+use App\Http\Controllers\Admin\FundController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -15,6 +17,14 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::middleware('permission:'.Permission::SettingsManage->value)->group(function () {
         Route::get('settings', [ChurchSettingController::class, 'edit'])->name('settings.edit');
         Route::put('settings', [ChurchSettingController::class, 'update'])->name('settings.update');
+    });
+
+    Route::middleware('permission:'.Permission::MasterManage->value)->group(function () {
+        Route::resource('accounts', AccountController::class)->except(['show', 'destroy']);
+        Route::patch('accounts/{account}/toggle', [AccountController::class, 'toggle'])->name('accounts.toggle');
+
+        Route::resource('funds', FundController::class)->except(['show', 'destroy']);
+        Route::patch('funds/{fund}/toggle', [FundController::class, 'toggle'])->name('funds.toggle');
     });
 
     Route::get('audit', [AuditLogController::class, 'index'])

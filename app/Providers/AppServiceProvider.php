@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\Account;
 use App\Models\ChurchSetting;
+use App\Models\Fund;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
@@ -20,6 +22,8 @@ class AppServiceProvider extends ServiceProvider
         Relation::enforceMorphMap([
             'user' => User::class,
             'church_setting' => ChurchSetting::class,
+            'account' => Account::class,
+            'fund' => Fund::class,
         ]);
     }
 }
