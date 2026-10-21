@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\Direction;
+use App\Models\AccountingPeriod;
 use App\Models\LedgerEntry;
 use Illuminate\Support\Facades\DB;
 
@@ -11,6 +12,14 @@ class LedgerService
     public static function record(array $data): LedgerEntry
     {
         return DB::transaction(function () use ($data) {
+            $entryDate = $data['entry_date'];
+            if (AccountingPeriod::isDateClosed($entryDate)) {
+                $dateStr = $entryDate instanceof \DateTimeInterface
+                    ? $entryDate->format('Y-m-d')
+                    : (string) $entryDate;
+                throw new \DomainException("Tidak dapat mencatat transaksi pada periode akuntansi yang sudah ditutup ({$dateStr}).");
+            }
+
             $direction = $data['direction'] instanceof Direction ? $data['direction'] : Direction::from($data['direction']);
             $data['direction'] = $direction->value;
 

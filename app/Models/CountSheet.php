@@ -33,6 +33,15 @@ class CountSheet extends Model
         'total_amount' => 'integer',
     ];
 
+    protected static function booted(): void
+    {
+        static::creating(function (CountSheet $sheet) {
+            if ($sheet->date && AccountingPeriod::isDateClosed($sheet->date)) {
+                throw new \DomainException('Tidak dapat membuat berita acara pada periode akuntansi yang sudah ditutup.');
+            }
+        });
+    }
+
     public function lines(): HasMany
     {
         return $this->hasMany(CountLine::class);

@@ -30,6 +30,13 @@ class LedgerEntry extends Model
             throw new LogicException('ledger_entries is append-only');
         }
 
+        if (AccountingPeriod::isDateClosed($this->entry_date)) {
+            $dateStr = $this->entry_date instanceof \DateTimeInterface
+                ? $this->entry_date->format('Y-m-d')
+                : (string) $this->entry_date;
+            throw new \DomainException("Tidak dapat mencatat transaksi pada periode akuntansi yang sudah ditutup ({$dateStr}).");
+        }
+
         return parent::save($options);
     }
 

@@ -48,8 +48,8 @@
 ## Tasks
 
 ### Task 1: Model & Migrasi `Expense` + Enums
-- [ ] Buat enum `App\Enums\ExpenseStatus` (`pending`, `approved`, `rejected`, `paid`).
-- [ ] Buat migration `database/migrations/2026_10_21_140000_create_expenses_table.php` dengan kolom:
+- [x] Buat enum `App\Enums\ExpenseStatus` (`pending`, `approved`, `rejected`, `paid`).
+- [x] Buat migration `database/migrations/2026_10_21_140000_create_expenses_table.php` dengan kolom:
   - `id`
   - `expense_number` (string, unique, index)
   - `payee` (string)
@@ -67,11 +67,11 @@
   - `paid_at` (timestamp nullable)
   - `notes` (text, nullable)
   - `timestamps`
-- [ ] Buat model `App\Models\Expense` dengan cast, relasi (`account`, `fund`, `category`, `submitter`, `approver`), trait `Audited`, dan generator nomor nota `generateExpenseNumber()`.
-- [ ] Daftarkan `'expense' => Expense::class` pada `AppServiceProvider::enforceMorphMap`.
+- [x] Buat model `App\Models\Expense` dengan cast, relasi (`account`, `fund`, `category`, `submitter`, `approver`), trait `Audited`, dan generator nomor nota `generateExpenseNumber()`.
+- [x] Daftarkan `'expense' => Expense::class` pada `AppServiceProvider::enforceMorphMap`.
 
 ### Task 2: Service & Logika Persetujuan Pengeluaran & Pembayaran
-- [ ] Buat `App\Services\ExpenseService`:
+- [x] Buat `App\Services\ExpenseService`:
   - `submit(array $data, User $user, UploadedFile $proof)`: validasi nota wajib, simpan file, generate expense_number, set status `pending`.
   - `approve(Expense $expense, User $user, ?string $notes = null)`:
     - Cek anti self-approval: jika `$expense->submitted_by === $user->id`, lempar 403 / exception.
@@ -91,8 +91,8 @@
     - Update `status = paid`, `paid_at = now()`.
 
 ### Task 3: Pindah Dana Manual (`FundTransfer`)
-- [ ] Buat enum `App\Enums\FundTransferStatus` (`pending`, `approved`, `rejected`).
-- [ ] Buat migration `database/migrations/2026_10_21_141000_create_fund_transfers_table.php`:
+- [x] Buat enum `App\Enums\FundTransferStatus` (`pending`, `approved`, `rejected`).
+- [x] Buat migration `database/migrations/2026_10_21_141000_create_fund_transfers_table.php`:
   - `id`
   - `from_fund_id` (foreignId -> funds)
   - `to_fund_id` (foreignId -> funds)
@@ -106,14 +106,14 @@
   - `approved_at` (timestamp nullable)
   - `notes` (text nullable)
   - `timestamps`
-- [ ] Buat model `App\Models\FundTransfer` dan relasi ke `fromFund`, `toFund`, `account`, `requester`, `approver`.
-- [ ] Daftarkan `'fund_transfer' => FundTransfer::class` di `AppServiceProvider`.
-- [ ] Buat `App\Services\FundTransferService`:
+- [x] Buat model `App\Models\FundTransfer` dan relasi ke `fromFund`, `toFund`, `account`, `requester`, `approver`.
+- [x] Daftarkan `'fund_transfer' => FundTransfer::class` di `AppServiceProvider`.
+- [x] Buat `App\Services\FundTransferService`:
   - Validasi pos dana asal != pos dana tujuan.
   - Persetujuan: anti self-approval (`requested_by !== $user->id`), pengecekan saldo negatif pada pos asal, pembukuan 2 entri buku besar (OUT dari `from_fund`, IN ke `to_fund`).
 
 ### Task 4: Periode Akuntansi, Saldo Awal, & Kunci Tutup Periode
-- [ ] Buat migration `database/migrations/2026_10_21_142000_create_accounting_periods_table.php`:
+- [x] Buat migration `database/migrations/2026_10_21_142000_create_accounting_periods_table.php`:
   - `id`
   - `name` (string)
   - `start_date` (date)
@@ -122,55 +122,55 @@
   - `closed_at` (timestamp nullable)
   - `closed_by` (foreignId nullable -> users)
   - `timestamps`
-- [ ] Buat model `App\Models\AccountingPeriod` dengan helper `isDateClosed(string $date): bool`.
-- [ ] Daftarkan `'accounting_period' => AccountingPeriod::class` di `AppServiceProvider`.
-- [ ] Integrasikan pengecekan tutup periode:
+- [x] Buat model `App\Models\AccountingPeriod` dengan helper `isDateClosed(string $date): bool`.
+- [x] Daftarkan `'accounting_period' => AccountingPeriod::class` di `AppServiceProvider`.
+- [x] Integrasikan pengecekan tutup periode:
   - Di `LedgerService::record()`: tolak pencatatan pada tanggal di dalam periode yang sudah ditutup.
   - Di `CountSheetRequest` & `CountSheetController`: tolak pengajuan/edit pada tanggal periode tertutup.
   - Di `ExpenseRequest`: tolak tanggal pengeluaran pada periode tertutup.
   - Di `FundTransferRequest`: tolak tanggal transfer pada periode tertutup.
-- [ ] Saldo awal: fungsi untuk mencatat saldo awal ke buku besar (`Direction::In`, `source_type = 'accounting_period'`).
+- [x] Saldo awal: fungsi untuk mencatat saldo awal ke buku besar (`Direction::In`, `source_type = 'accounting_period'`).
 
 ### Task 5: Controller & Routes
-- [ ] Buat `ExpenseController`: index, create, store, show, approveView, approve, reject, pay.
-- [ ] Buat `FundTransferController`: index, create, store, show, approve, reject.
-- [ ] Buat `Admin\AccountingPeriodController`: index, create, store, close, storeOpeningBalance.
-- [ ] Daftarkan rute di `routes/web.php` dan `routes/admin.php`.
-- [ ] Perbarui `resources/js/components/app-sidebar.tsx` dengan link ke Pengeluaran, Pindah Dana, dan Periode Akuntansi.
+- [x] Buat `ExpenseController`: index, create, store, show, approveView, approve, reject, pay.
+- [x] Buat `FundTransferController`: index, create, store, show, approve, reject.
+- [x] Buat `Admin\AccountingPeriodController`: index, create, store, close, storeOpeningBalance.
+- [x] Daftarkan rute di `routes/web.php` dan `routes/admin.php`.
+- [x] Perbarui `resources/js/components/app-sidebar.tsx` dengan link ke Pengeluaran, Pindah Dana, dan Periode Akuntansi.
 
 ### Task 6: Frontend Inertia React Pages
-- [ ] `resources/js/pages/expenses/index.tsx`: Daftar pengeluaran, filter status, summary nominal, badge, tombol aksi.
-- [ ] `resources/js/pages/expenses/create.tsx`: Form pengajuan pengeluaran dengan upload nota, preview gambar, input penerima, akun kas, pos dana, kategori, nominal, tanggal.
-- [ ] `resources/js/pages/expenses/show.tsx`: Detail lengkap pengeluaran, visual nota/kuitansi, linimasa persetujuan, tombol aksi bayar/setujui/tolak.
-- [ ] `resources/js/pages/expenses/approve.tsx`: Antarmuka persetujuan cepat pengeluaran menunggu persetujuan dengan indikasi ambang batas majelis.
-- [ ] `resources/js/pages/transfers/index.tsx`: Daftar pengajuan pindah dana antar-pos beserta status dan aksi persetujuan.
-- [ ] `resources/js/pages/transfers/create.tsx`: Form permohonan pindah dana antar-pos dana.
-- [ ] `resources/js/pages/admin/periods/index.tsx`: Daftar periode akuntansi, status aktif/tutup, tombol tutup periode.
-- [ ] `resources/js/pages/admin/periods/form.tsx`: Form pembuatan periode dan input saldo awal.
+- [x] `resources/js/pages/expenses/index.tsx`: Daftar pengeluaran, filter status, summary nominal, badge, tombol aksi.
+- [x] `resources/js/pages/expenses/create.tsx`: Form pengajuan pengeluaran dengan upload nota, preview gambar, input penerima, akun kas, pos dana, kategori, nominal, tanggal.
+- [x] `resources/js/pages/expenses/show.tsx`: Detail lengkap pengeluaran, visual nota/kuitansi, linimasa persetujuan, tombol aksi bayar/setujui/tolak.
+- [x] `resources/js/pages/expenses/approve.tsx`: Antarmuka persetujuan cepat pengeluaran menunggu persetujuan dengan indikasi ambang batas majelis.
+- [x] `resources/js/pages/transfers/index.tsx`: Daftar pengajuan pindah dana antar-pos beserta status dan aksi persetujuan.
+- [x] `resources/js/pages/transfers/create.tsx`: Form permohonan pindah dana antar-pos dana.
+- [x] `resources/js/pages/admin/periods/index.tsx`: Daftar periode akuntansi, status aktif/tutup, tombol tutup periode.
+- [x] `resources/js/pages/admin/periods/form.tsx`: Form pembuatan periode dan input saldo awal.
 
 ### Task 7: Pengujian Otomatis & Verifikasi
-- [ ] Tulis `tests/Feature/Expenses/ExpenseApprovalTest.php`:
+- [x] Tulis `tests/Feature/Expenses/ExpenseApprovalTest.php`:
   - Pengajuan pengeluaran dengan upload nota wajib.
   - Penolakan bila nota tidak disertakan.
   - Larangan pengaju menyetujui pengajuannya sendiri (anti self-approval).
   - Ambang batas persetujuan: Bendahara tidak dapat menyetujui pengeluaran di atas ambang tanpa Majelis/Admin.
   - Majelis dapat menyetujui pengeluaran di atas ambang.
   - Pembayaran pengeluaran mencatat `LedgerEntry` keluar dengan parameter akurat.
-- [ ] Tulis `tests/Feature/Expenses/NegativeBalanceTest.php`:
+- [x] Tulis `tests/Feature/Expenses/NegativeBalanceTest.php`:
   - Penolakan persetujuan/pembayaran pengeluaran saat saldo pos dana kurang (default: `allow_negative_balance = false`).
   - Izin transaksi saat `allow_negative_balance = true`.
   - Penolakan pindah dana saat saldo pos dana asal tidak mencukupi.
-- [ ] Tulis `tests/Feature/Expenses/FundTransferTest.php`:
+- [x] Tulis `tests/Feature/Expenses/FundTransferTest.php`:
   - Pengajuan pindah dana manual.
   - Penolakan transfer ke pos dana yang sama.
   - Persetujuan pindah dana mencatat 2 entri buku besar (1 OUT, 1 IN).
-- [ ] Tulis `tests/Feature/Ledger/PeriodCloseTest.php`:
+- [x] Tulis `tests/Feature/Ledger/PeriodCloseTest.php`:
   - Pembuatan periode akuntansi dan pencatatan saldo awal.
   - Penutupan periode akuntansi (`is_closed = true`).
   - Penolakan transaksi buku besar baru pada tanggal di periode tertutup.
   - Penolakan pembuatan pengeluaran baru pada periode tertutup.
   - Penolakan penguncian berita acara hitung pada periode tertutup.
   - Transaksi pada periode terbuka tetap berjalan lancar.
-- [ ] Jalankan `DB_DATABASE=kas_gereja_test_f3 php artisan test` (harus 100% pass).
-- [ ] Jalankan `./node_modules/.bin/tsc --noEmit` (harus 0 errors).
-- [ ] Commit rencana dan implementasi sesuai konvensi.
+- [x] Jalankan `DB_DATABASE=kas_gereja_test_f3 php artisan test` (harus 100% pass).
+- [x] Jalankan `./node_modules/.bin/tsc --noEmit` (harus 0 errors).
+- [x] Commit rencana dan implementasi sesuai konvensi.

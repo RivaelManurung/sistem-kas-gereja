@@ -56,4 +56,13 @@ class CountSheetRequest extends FormRequest
             'lines.min' => 'Minimal harus ada 1 baris persembahan yang dihitung.',
         ];
     }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            if ($this->filled('date') && \App\Models\AccountingPeriod::isDateClosed($this->input('date'))) {
+                $validator->errors()->add('date', 'Tidak dapat membuat atau mengubah berita acara pada periode akuntansi yang sudah ditutup.');
+            }
+        });
+    }
 }

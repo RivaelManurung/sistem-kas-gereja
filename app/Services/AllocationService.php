@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\CountSheetStatus;
 use App\Enums\Direction;
+use App\Models\AccountingPeriod;
 use App\Models\AllocationRule;
 use App\Models\CountSheet;
 use App\Models\LedgerEntry;
@@ -25,6 +26,11 @@ class AllocationService
     {
         if ($sheet->isLocked()) {
             throw new LogicException('Berita acara ini sudah dikunci ke buku besar.');
+        }
+
+        if (AccountingPeriod::isDateClosed($sheet->date)) {
+            $dateStr = $sheet->date->toDateString();
+            throw new \DomainException("Tidak dapat membukukan berita acara pada periode akuntansi yang sudah ditutup ({$dateStr}).");
         }
 
         return DB::transaction(function () use ($sheet) {

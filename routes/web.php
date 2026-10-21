@@ -4,6 +4,8 @@ use App\Http\Controllers\BankDepositController;
 use App\Http\Controllers\CountConfirmationController;
 use App\Http\Controllers\CountSheetController;
 use App\Http\Controllers\DonationController;
+use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\FundTransferController;
 use App\Http\Controllers\ServiceSessionController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -24,6 +26,18 @@ Route::middleware(['auth'])->group(function () {
     Route::post('counting/{counting}/lock', [CountConfirmationController::class, 'lock'])->name('counting.lock');
     Route::resource('donations', DonationController::class);
     Route::resource('deposits', BankDepositController::class)->only(['index', 'create', 'store']);
+
+    // Expenses (Pengeluaran)
+    Route::resource('expenses', ExpenseController::class);
+    Route::get('expenses/{expense}/approve', [ExpenseController::class, 'approveView'])->name('expenses.approve.view');
+    Route::post('expenses/{expense}/approve', [ExpenseController::class, 'approve'])->name('expenses.approve');
+    Route::post('expenses/{expense}/reject', [ExpenseController::class, 'reject'])->name('expenses.reject');
+    Route::post('expenses/{expense}/pay', [ExpenseController::class, 'pay'])->name('expenses.pay');
+
+    // Fund Transfers (Pindah Dana Manual)
+    Route::resource('transfers', FundTransferController::class);
+    Route::post('transfers/{transfer}/approve', [FundTransferController::class, 'approve'])->name('transfers.approve');
+    Route::post('transfers/{transfer}/reject', [FundTransferController::class, 'reject'])->name('transfers.reject');
 });
 
 require __DIR__.'/settings.php';
