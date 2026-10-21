@@ -1,5 +1,7 @@
 # Arah Desain UI — Kas Gereja
 
+Aturan wajib yang tidak boleh dilanggar ada di [rules.md](rules.md).
+
 Tujuan: terasa seperti aplikasi keuangan profesional (rapi, tenang, bisa dipercaya),
 bukan template admin generik. Semua halaman memakai komponen shadcn/ui di
 `resources/js/components/ui`.
@@ -16,7 +18,7 @@ bukan template admin generik. Semua halaman memakai komponen shadcn/ui di
 - Semantik: pemasukan = emerald, pengeluaran = rose, menunggu = amber,
   terkunci/selesai = slate, info = sky. Jangan pakai merah/hijau tanpa ikon/label.
 - Radius `0.5rem`; bayangan halus (`shadow-xs`/`shadow-sm`) saja; border 1px.
-- Skala spasi 4px; padding halaman `p-4 md:p-6`, jarak antar-seksi `gap-6`.
+- Skala spasi 4px; padding halaman `p-4 md:p-6 lg:p-8`, jarak antar-seksi `gap-6`.
 - Ikon: lucide-react, ukuran 16px di tombol/tabel, 20px di header.
 
 ## Pola wajib
@@ -40,7 +42,8 @@ bukan template admin generik. Semua halaman memakai komponen shadcn/ui di
   seksi. Konfirmasi via AlertDialog untuk aksi tak terbalik (kunci, setujui,
   tutup periode, sahkan laporan) — jelaskan akibatnya.
 - **Empty state**: ikon, satu kalimat, tombol aksi pertama.
-- **Loading**: Skeleton, bukan spinner layar penuh. Toast (sonner) untuk sukses/gagal.
+- **Loading**: Skeleton untuk memuat data, bukan spinner layar penuh. Aksi simpan/hapus
+  memakai indikator global (lihat [rules.md](rules.md) §7).
 - **Form hitung kolekte (HP)**: input besar (h-12), keypad numerik
   (`inputMode="numeric"`), baris pecahan dengan subtotal langsung, total besar
   sticky di bawah layar.
