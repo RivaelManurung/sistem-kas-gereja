@@ -12,6 +12,7 @@ import {
     FileSignature,
     FileSpreadsheet,
     FileText,
+    HeartHandshake,
     LayoutGrid,
     Newspaper,
     PartyPopper,
@@ -80,6 +81,16 @@ const mainNavItems: NavItem[] = [
         title: 'Warta Mingguan',
         url: '/reports/bulletin',
         icon: Newspaper,
+    },
+    {
+        title: 'Portal Jemaat',
+        url: '/portal',
+        icon: HeartHandshake,
+    },
+    {
+        title: 'Transparansi Publik',
+        url: '/transparansi',
+        icon: ShieldCheck,
     },
 ];
 

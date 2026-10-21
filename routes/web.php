@@ -3,6 +3,7 @@
 use App\Http\Controllers\BankDepositController;
 use App\Http\Controllers\CountConfirmationController;
 use App\Http\Controllers\CountSheetController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\EventCategoryController;
 use App\Http\Controllers\EventClosingController;
@@ -11,9 +12,11 @@ use App\Http\Controllers\EventExpenseController;
 use App\Http\Controllers\EventMemberController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\FundTransferController;
+use App\Http\Controllers\MemberPortalController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReportVerificationController;
 use App\Http\Controllers\ServiceSessionController;
+use App\Http\Controllers\TransparencyController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -21,14 +24,15 @@ Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
 
+// Public transparency page
+Route::get('transparansi', [TransparencyController::class, 'index'])->name('transparency.index');
+
 // Public verification for frozen reports
 Route::get('verify-report/{code}', [ReportVerificationController::class, 'verify'])->name('reports.verify');
 Route::get('verify-report/{code}/download', [ReportVerificationController::class, 'download'])->name('reports.verify.download');
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Financial Reports & Approvals
     Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
@@ -66,6 +70,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('events/{event}/members', [EventMemberController::class, 'store'])->name('events.members.store');
     Route::delete('events/{event}/members/{member}', [EventMemberController::class, 'destroy'])->name('events.members.destroy');
     Route::post('events/{event}/categories', [EventCategoryController::class, 'store'])->name('events.categories.store');
+
+    // Member Portal (Portal Jemaat)
+    Route::get('portal', [MemberPortalController::class, 'index'])->name('portal.index');
+    Route::get('portal/statement', [MemberPortalController::class, 'statement'])->name('portal.statement');
+    Route::get('portal/receipt/{donation}', [MemberPortalController::class, 'receipt'])->name('portal.receipt');
 });
 
 require __DIR__.'/settings.php';
