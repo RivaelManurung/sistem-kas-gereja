@@ -44,6 +44,11 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    public function member(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Member::class);
+    }
+
     /**
      * Get the attributes that should be cast.
      *
