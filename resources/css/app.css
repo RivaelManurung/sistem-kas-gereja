@@ -246,3 +246,84 @@
         --expense: hsl(350, 72%, 40%);
     }
 }
+
+/* Global feedback for mutating requests; driven by resources/js/lib/pending-actions.ts. */
+@keyframes pending-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+html[data-pending] {
+    cursor: progress;
+}
+
+html[data-pending] button[type='submit'],
+[data-pending='true'] {
+    pointer-events: none;
+}
+
+button[data-pending='true'],
+a[data-pending='true'],
+[role='menuitem'][data-pending='true'] {
+    opacity: 0.85;
+}
+
+button[data-pending='true'] > svg {
+    display: none;
+}
+
+button[data-pending='true']::before,
+a[data-pending='true']::before,
+[role='menuitem'][data-pending='true']::before {
+    content: '';
+    flex-shrink: 0;
+    width: 1em;
+    height: 1em;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 9999px;
+    animation: pending-spin 0.7s linear infinite;
+}
+
+.pending-status {
+    position: fixed;
+    bottom: 1.25rem;
+    left: 50%;
+    z-index: 100;
+    max-width: calc(100vw - 2rem);
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.18);
+    transform: translate(-50%, 0.75rem);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+        opacity 150ms ease,
+        transform 150ms ease;
+}
+
+.pending-status[data-visible='true'] {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+.pending-status[data-tone='busy'] {
+    background: var(--primary);
+    color: var(--primary-foreground);
+}
+
+.pending-status[data-tone='error'] {
+    background: var(--expense);
+    color: hsl(0, 0%, 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    button[data-pending='true']::before,
+    a[data-pending='true']::before,
+    [role='menuitem'][data-pending='true']::before {
+        animation-duration: 2s;
+    }
+}

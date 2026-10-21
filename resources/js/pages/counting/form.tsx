@@ -51,6 +51,7 @@ interface CountingFormData {
     [key: string]: any;
     type: string;
     service_session_id: number | null;
+    event_id: number | null;
     account_id: number;
     date: string;
     notes: string;
@@ -62,6 +63,7 @@ interface SheetData {
     id: number;
     type: string;
     service_session_id: number | null;
+    event_id: number | null;
     account_id: number;
     date: string;
     notes: string | null;
@@ -78,6 +80,7 @@ interface SheetData {
 export default function CountingForm({
     sheet,
     session,
+    event,
     type,
     accounts,
     categories,
@@ -86,6 +89,7 @@ export default function CountingForm({
 }: {
     sheet: SheetData | null;
     session: SessionOption | null;
+    event: { id: number; name: string } | null;
     type: 'service' | 'general' | 'event';
     accounts: AccountOption[];
     categories: CategoryOption[];
@@ -140,6 +144,7 @@ export default function CountingForm({
     const { data, setData, post, put, processing, errors } = useForm<CountingFormData>({
         type: sheet?.type ?? type,
         service_session_id: sheet?.service_session_id ?? session?.id ?? null,
+        event_id: sheet?.event_id ?? event?.id ?? null,
         account_id: sheet?.account_id ?? (defaultAccount ? defaultAccount.id : 0),
         date: sheet?.date ?? session?.date ?? today,
         notes: sheet?.notes ?? '',
@@ -233,7 +238,9 @@ export default function CountingForm({
                     description={
                         session
                             ? `Sesi Ibadah: ${session.name} (${formatDate(session.date)})`
-                            : 'Pencatatan fisik uang persembahan tunai & transfer.'
+                            : event
+                              ? `Acara: ${event.name}`
+                              : 'Pencatatan fisik uang persembahan tunai & transfer.'
                     }
                 />
 
@@ -261,13 +268,14 @@ export default function CountingForm({
                                 </SelectContent>
                             </Select>
                             <InputError message={errors.account_id} />
+                            <InputError message={errors.event_id ?? errors.service_session_id} />
                         </div>
 
                         <div className="space-y-2">
                             <Label htmlFor="date">Tanggal Hitung</Label>
                             <DatePicker
                                 id="date"
-                                value={formatDate(data.date)}
+                                value={data.date}
                                 onChange={(v) => setData('date', v)}
                                 required
                             />

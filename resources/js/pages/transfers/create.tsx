@@ -10,7 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 
-import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeftRight } from 'lucide-react';
@@ -87,7 +86,7 @@ export default function TransfersCreate({
                                 <Label htmlFor="date">Tanggal Pemindahan</Label>
                                 <DatePicker
                                     id="date"
-                                    value={formatDate(data.transfer_date)}
+                                    value={data.transfer_date}
                                     onChange={(v) => setData('transfer_date', v)}
                                     required
                                 />

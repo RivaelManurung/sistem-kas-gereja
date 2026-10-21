@@ -629,7 +629,7 @@ export default function EventShow({
                                                 <Label htmlFor="entry_date">Tanggal Pengeluaran <span className="text-destructive">*</span></Label>
                                                 <DatePicker
                                                     id="entry_date"
-                                                    value={formatDate(expenseForm.data.entry_date)}
+                                                    value={expenseForm.data.entry_date}
                                                     onChange={(v) => expenseForm.setData('entry_date', v)}
                                                 />
                                                 <InputError message={formatDate(expenseForm.errors.entry_date)} />

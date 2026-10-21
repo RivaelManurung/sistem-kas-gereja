@@ -8,7 +8,6 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import AppLayout from '@/layouts/app-layout';
-import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Plus, Trash2 } from 'lucide-react';
@@ -184,7 +183,7 @@ export default function AllocationForm({
                                     <Label htmlFor="valid_from">Berlaku Mulai Tanggal</Label>
                                     <DatePicker
                                         id="valid_from"
-                                        value={formatDate(data.valid_from)}
+                                        value={data.valid_from}
                                         onChange={(v) => setData('valid_from', v)}
                                         required
                                     />

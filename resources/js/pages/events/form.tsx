@@ -10,7 +10,6 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
-import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem, type EventItem, type EventStatus } from '@/types';
 import { type AttributeDefinition } from '@/types/attributes';
 import { Head, Link, useForm } from '@inertiajs/react';
@@ -119,7 +118,7 @@ export default function EventForm({
                                     </Label>
                                     <DatePicker
                                         id="start_date"
-                                        value={formatDate(data.start_date)}
+                                        value={data.start_date}
                                         onChange={(v) => setData('start_date', v)}
                                     />
                                     <InputError message={errors.start_date} />
@@ -129,7 +128,7 @@ export default function EventForm({
                                     <Label htmlFor="end_date">Tanggal Selesai (Opsional)</Label>
                                     <DatePicker
                                         id="end_date"
-                                        value={formatDate(data.end_date)}
+                                        value={data.end_date}
                                         onChange={(v) => setData('end_date', v)}
                                     />
                                     <InputError message={errors.end_date} />

@@ -11,7 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { formatRupiah } from '@/lib/money';
-import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { CalendarDays, Plus, Trash2 } from 'lucide-react';
@@ -136,7 +135,7 @@ export default function PeriodsForm({
                                     <Label htmlFor="start_date">Tanggal Mulai</Label>
                                     <DatePicker
                                         id="start_date"
-                                        value={formatDate(data.start_date)}
+                                        value={data.start_date}
                                         onChange={(v) => setData('start_date', v)}
                                         required
                                     />
@@ -147,7 +146,7 @@ export default function PeriodsForm({
                                     <Label htmlFor="end_date">Tanggal Selesai</Label>
                                     <DatePicker
                                         id="end_date"
-                                        value={formatDate(data.end_date)}
+                                        value={data.end_date}
                                         onChange={(v) => setData('end_date', v)}
                                         required
                                     />

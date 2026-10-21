@@ -10,7 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 
-import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
@@ -91,7 +90,7 @@ export default function DepositForm({
                                 <Label htmlFor="date">Tanggal Setor</Label>
                                 <DatePicker
                                     id="date"
-                                    value={formatDate(data.deposit_date)}
+                                    value={data.deposit_date}
                                     onChange={(v) => setData('deposit_date', v)}
                                     required
                                 />

@@ -8,7 +8,6 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
-import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
@@ -140,7 +139,7 @@ export default function SessionCreate({
                                 <Label htmlFor="date">Tanggal Pelaksanaan</Label>
                                 <DatePicker
                                     id="date"
-                                    value={formatDate(data.date)}
+                                    value={data.date}
                                     onChange={(v) => setData('date', v)}
                                     required
                                 />
