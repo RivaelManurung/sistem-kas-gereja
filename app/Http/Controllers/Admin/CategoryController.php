@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\AttributeEntity;
 use App\Enums\Direction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\CategoryRequest;
+use App\Models\AttributeDefinition;
 use App\Models\Category;
 use App\Models\Fund;
 use Illuminate\Http\RedirectResponse;
@@ -41,6 +43,13 @@ class CategoryController extends Controller
                 fn (Direction $d) => ['value' => $d->value, 'label' => $d->label()],
                 Direction::cases()
             ),
+            'customFields' => [
+                'definitions' => AttributeDefinition::active()
+                    ->forEntity(AttributeEntity::Category)
+                    ->orderBy('sort_order')
+                    ->get(),
+                'values' => (object) [],
+            ],
         ]);
     }
 
@@ -69,6 +78,13 @@ class CategoryController extends Controller
                 fn (Direction $d) => ['value' => $d->value, 'label' => $d->label()],
                 Direction::cases()
             ),
+            'customFields' => [
+                'definitions' => AttributeDefinition::active()
+                    ->forEntity(AttributeEntity::Category)
+                    ->orderBy('sort_order')
+                    ->get(),
+                'values' => $category->customAttributes(),
+            ],
         ]);
     }
 

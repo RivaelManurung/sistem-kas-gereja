@@ -1,3 +1,4 @@
+import DynamicFields from '@/components/dynamic-fields';
 import InputError from '@/components/input-error';
 import PageHeader from '@/components/page-header';
 import { Button } from '@/components/ui/button';
@@ -8,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Option } from '@/types';
+import { type CustomFieldsProp } from '@/types/attributes';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
@@ -32,10 +34,12 @@ export default function CategoryForm({
     category,
     funds,
     directionOptions,
+    customFields,
 }: {
     category: CategoryData | null;
     funds: FundOption[];
     directionOptions: Option[];
+    customFields?: CustomFieldsProp;
 }) {
     const isEdit = category !== null;
     const breadcrumbs: BreadcrumbItem[] = [
@@ -51,7 +55,15 @@ export default function CategoryForm({
         is_public: category?.is_public ?? true,
         is_active: category?.is_active ?? true,
         sort_order: category?.sort_order ?? 0,
+        attributes: customFields?.values ?? {},
     });
+
+    const handleAttributeChange = (key: string, value: any) => {
+        setData('attributes', {
+            ...data.attributes,
+            [key]: value,
+        });
+    };
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -179,6 +191,15 @@ export default function CategoryForm({
                                     onCheckedChange={(checked) => setData('is_public', checked)}
                                 />
                             </div>
+
+                            {customFields && (
+                                <DynamicFields
+                                    definitions={customFields.definitions}
+                                    values={data.attributes}
+                                    errors={errors as Record<string, string>}
+                                    onChange={handleAttributeChange}
+                                />
+                            )}
 
                             <div className="flex items-center justify-end gap-3 pt-4">
                                 <Button variant="outline" asChild>
