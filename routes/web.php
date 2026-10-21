@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CountSheetController;
 use App\Http\Controllers\ServiceSessionController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -14,6 +15,7 @@ Route::middleware(['auth'])->group(function () {
     })->name('dashboard');
 
     Route::resource('sessions', ServiceSessionController::class)->only(['index', 'create', 'store']);
+    Route::resource('counting', CountSheetController::class);
 });
 
 require __DIR__.'/settings.php';

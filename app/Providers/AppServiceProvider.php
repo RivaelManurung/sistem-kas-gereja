@@ -7,6 +7,8 @@ use App\Models\AttributeDefinition;
 use App\Models\AttributeValue;
 use App\Models\Category;
 use App\Models\ChurchSetting;
+use App\Models\CountLine;
+use App\Models\CountSheet;
 use App\Models\Fund;
 use App\Models\LedgerEntry;
 use App\Models\Member;
@@ -38,6 +40,8 @@ class AppServiceProvider extends ServiceProvider
             'ledger_entry' => LedgerEntry::class,
             'service_schedule' => ServiceSchedule::class,
             'service_session' => ServiceSession::class,
+            'count_sheet' => CountSheet::class,
+            'count_line' => CountLine::class,
         ]);
     }
 }
