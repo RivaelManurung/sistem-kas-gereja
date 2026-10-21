@@ -24,6 +24,28 @@ class ChurchSetting extends Model
         ];
     }
 
+    public function getStampBase64(): ?string
+    {
+        if (! $this->stamp_path || ! \Illuminate\Support\Facades\Storage::disk('local')->exists($this->stamp_path)) {
+            return null;
+        }
+        $data = \Illuminate\Support\Facades\Storage::disk('local')->get($this->stamp_path);
+        return 'data:image/png;base64,'.base64_encode($data);
+    }
+
+    public function getLogoBase64(): ?string
+    {
+        if (! $this->logo_path) {
+            return null;
+        }
+        $disk = \Illuminate\Support\Facades\Storage::disk('public')->exists($this->logo_path) ? 'public' : 'local';
+        if (! \Illuminate\Support\Facades\Storage::disk($disk)->exists($this->logo_path)) {
+            return null;
+        }
+        $data = \Illuminate\Support\Facades\Storage::disk($disk)->get($this->logo_path);
+        return 'data:image/png;base64,'.base64_encode($data);
+    }
+
     public static function current(): self
     {
         return static::query()->first() ?? static::query()->create([

@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ChurchSettingController;
 use App\Http\Controllers\Admin\FundController;
 use App\Http\Controllers\Admin\MemberController;
+use App\Http\Controllers\Admin\ReportSignatoryController;
 use App\Http\Controllers\Admin\ServiceScheduleController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
@@ -23,6 +24,9 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::middleware('permission:'.Permission::SettingsManage->value)->group(function () {
         Route::get('settings', [ChurchSettingController::class, 'edit'])->name('settings.edit');
         Route::put('settings', [ChurchSettingController::class, 'update'])->name('settings.update');
+
+        Route::resource('signatures', ReportSignatoryController::class)->except(['create', 'show', 'edit']);
+        Route::patch('signatures/{signature}/toggle', [ReportSignatoryController::class, 'toggle'])->name('signatures.toggle');
     });
 
     Route::middleware('permission:'.Permission::MasterManage->value)->group(function () {

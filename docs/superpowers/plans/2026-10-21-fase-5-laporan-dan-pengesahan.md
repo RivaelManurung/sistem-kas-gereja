@@ -52,49 +52,49 @@
 
 ## Tasks
 
-### Task 1: Model & Migrasi Pendukung Laporan & Pengesahan
-- Tambah kolom `signature_path` pada tabel `users`.
-- Buat tabel `report_signatories` (konfigurasi susunan penanda tangan oleh admin).
-- Buat tabel `frozen_reports` (snapshot laporan, status, PDF path, SHA256, kode verifikasi).
-- Buat tabel `report_approvals` (jejak persetujuan per penanda tangan).
-- Model `ReportSignatory`, `FrozenReport`, `ReportApproval`, serta update pada `User` dan `ChurchSetting`.
+- [x] ### Task 1: Model & Migrasi Pendukung Laporan & Pengesahan
+  - Tambah kolom `signature_path` pada tabel `users`.
+  - Buat tabel `report_signatories` (konfigurasi susunan penanda tangan oleh admin).
+  - Buat tabel `frozen_reports` (snapshot laporan, status, PDF path, SHA256, kode verifikasi).
+  - Buat tabel `report_approvals` (jejak persetujuan per penanda tangan).
+  - Model `ReportSignatory`, `FrozenReport`, `ReportApproval`, serta update pada `User` dan `ChurchSetting`.
 
-### Task 2: Service Laporan Keuangan (`FinancialReportService`)
-- Kalkulasi periode: harian, mingguan, bulanan, triwulan, semester, tahunan, rentang bebas.
-- Kalkulasi seksi: Saldo Awal, Pemasukan per Kategori & Dana, Pengeluaran per Kategori & Dana, Pemindahan Antar-Dana, Saldo Akhir per Dana & Rekening.
-- Invariant arithmetic: Saldo Akhir period T = Saldo Awal period T+1.
-- Unit & Feature test: `tests/Feature/Reports/FinancialReportServiceTest.php`.
+- [x] ### Task 2: Service Laporan Keuangan (`FinancialReportService`)
+  - Kalkulasi periode: harian, mingguan, bulanan, triwulan, semester, tahunan, rentang bebas.
+  - Kalkulasi seksi: Saldo Awal, Pemasukan per Kategori & Dana, Pengeluaran per Kategori & Dana, Pemindahan Antar-Dana, Saldo Akhir per Dana & Rekening.
+  - Invariant arithmetic: Saldo Akhir period T = Saldo Awal period T+1.
+  - Unit & Feature test: `tests/Feature/Reports/FinancialReportServiceTest.php`.
 
-### Task 3: Pengelolaan Stempel & Tanda Tangan
-- Endpoint upload stempel gereja di pengaturan gereja (`ChurchSetting.stamp_path`, private storage).
-- Endpoint upload gambar & gambar di canvas untuk tanda tangan pengguna (`User.signature_path`, private storage).
-- Endpoint admin untuk mengatur susunan penanda tangan (`/admin/signatures`).
+- [x] ### Task 3: Pengelolaan Stempel & Tanda Tangan
+  - Endpoint upload stempel gereja di pengaturan gereja (`ChurchSetting.stamp_path`, private storage).
+  - Endpoint upload gambar & gambar di canvas untuk tanda tangan pengguna (`User.signature_path`, private storage).
+  - Endpoint admin untuk mengatur susunan penanda tangan (`/admin/signatures`).
 
-### Task 4: Alur Persetujuan & Pembekuan Laporan (`ReportApprovalService`)
-- Pembuatan laporan & inisiasi persetujuan (`pending_approval`).
-- Persetujuan mandiri per akun penanda tangan dengan verifikasi TTD.
-- Otomasi pembekuan (`frozen`) saat semua penanda tangan telah setuju: penempelan stempel gereja, penyimpanan snapshot JSON, penyimpanan file PDF permanen, kalkulasi hash SHA-256.
-- Feature test: `tests/Feature/Reports/ReportApprovalAndFreezeTest.php`.
+- [x] ### Task 4: Alur Persetujuan & Pembekuan Laporan (`ReportApprovalService`)
+  - Pembuatan laporan & inisiasi persetujuan (`pending_approval`).
+  - Persetujuan mandiri per akun penanda tangan dengan verifikasi TTD.
+  - Otomasi pembekuan (`frozen`) saat semua penanda tangan telah setuju: penempelan stempel gereja, penyimpanan snapshot JSON, penyimpanan file PDF permanen, kalkulasi hash SHA-256.
+  - Feature test: `tests/Feature/Reports/ReportApprovalAndFreezeTest.php`.
 
-### Task 5: Ekspor PDF & Warta Jemaat Mingguan
-- Template Blade A4 resmi laporan keuangan dengan kop surat, tabel terstruktur, tanda tangan & stempel.
-- Template Blade warta mingguan 1-halaman ringkas siap cetak.
-- Service `PdfReportService` dengan base64 image rendering yang aman.
+- [x] ### Task 5: Ekspor PDF & Warta Jemaat Mingguan
+  - Template Blade A4 resmi laporan keuangan dengan kop surat, tabel terstruktur, tanda tangan & stempel.
+  - Template Blade warta mingguan 1-halaman ringkas siap cetak.
+  - Service `PdfReportService` dengan base64 image rendering yang aman.
 
-### Task 6: Halaman Verifikasi Publik & Endpoint Laporan
-- Endpoint publik `/verify-report/{code}` dan controller verifikasi keaslian dokumen.
-- Endpoint unduh/preview PDF laporan resmi.
-- Feature test: `tests/Feature/Reports/ReportVerificationTest.php`.
+- [x] ### Task 6: Halaman Verifikasi Publik & Endpoint Laporan
+  - Endpoint publik `/verify-report/{code}` dan controller verifikasi keaslian dokumen.
+  - Endpoint unduh/preview PDF laporan resmi.
+  - Feature test: `tests/Feature/Reports/ReportVerificationTest.php`.
 
-### Task 7: Frontend Inertia React
-- `resources/js/pages/reports/index.tsx`: filter periode, ringkasan live, daftar laporan resmi/terverifikasi.
-- `resources/js/pages/reports/show.tsx`: detail seksi laporan, progress pengesahan penanda tangan, aksi TTD.
-- `resources/js/pages/reports/bulletin.tsx`: tata letak 1-halaman warta jemaat mingguan siap cetak.
-- `resources/js/pages/reports/verify.tsx`: tampilan publik bukti keaslian & hash SHA256.
-- `resources/js/pages/admin/signatures/index.tsx`: manajemen susunan penanda tangan & stempel gereja.
-- Navigasi sidebar: menu Laporan Keuangan & Warta Mingguan.
+- [x] ### Task 7: Frontend Inertia React
+  - `resources/js/pages/reports/index.tsx`: filter periode, ringkasan live, daftar laporan resmi/terverifikasi.
+  - `resources/js/pages/reports/show.tsx`: detail seksi laporan, progress pengesahan penanda tangan, aksi TTD.
+  - `resources/js/pages/reports/bulletin.tsx`: tata letak 1-halaman warta jemaat mingguan siap cetak.
+  - `resources/js/pages/reports/verify.tsx`: tampilan publik bukti keaslian & hash SHA256.
+  - `resources/js/pages/admin/signatures/index.tsx`: manajemen susunan penanda tangan & stempel gereja.
+  - Navigasi sidebar: menu Laporan Keuangan & Warta Mingguan.
 
-### Task 8: Verifikasi Menyeluruh
-- `php artisan test` semua lulus.
-- `./node_modules/.bin/tsc --noEmit` 0 error.
-- `npm run build` sukses.
+- [x] ### Task 8: Verifikasi Menyeluruh
+  - `php artisan test` semua lulus (204 tests, 832 assertions).
+  - `./node_modules/.bin/tsc --noEmit` 0 error.
+  - `npm run build` sukses.

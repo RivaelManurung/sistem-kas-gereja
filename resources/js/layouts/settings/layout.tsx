@@ -12,6 +12,11 @@ const sidebarNavItems: NavItem[] = [
         icon: null,
     },
     {
+        title: 'Tanda Tangan',
+        url: '/settings/signature',
+        icon: null,
+    },
+    {
         title: 'Password',
         url: '/settings/password',
         icon: null,

@@ -21,6 +21,7 @@ class ChurchSettingRequest extends FormRequest
             'email' => ['nullable', 'email', 'max:255'],
             'timezone' => ['required', 'string', 'timezone'],
             'logo' => ['nullable', 'image', 'mimes:png,jpg,webp', 'max:2048'],
+            'stamp' => ['nullable', 'image', 'mimes:png,jpg,webp', 'max:2048'],
             'denominations' => ['required', 'array', 'min:1'],
             'denominations.*' => ['integer', 'min:1', 'distinct'],
             'min_confirmations_service' => ['required', 'integer', 'min:1', 'max:10'],

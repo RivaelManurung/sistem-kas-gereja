@@ -35,6 +35,13 @@ class ChurchSettingController extends Controller
             $validated['logo_path'] = $request->file('logo')->store('church', 'public');
         }
 
+        if ($request->hasFile('stamp')) {
+            if ($settings->stamp_path) {
+                Storage::disk('local')->delete($settings->stamp_path);
+            }
+            $validated['stamp_path'] = $request->file('stamp')->store('church', 'local');
+        }
+
         $validated['allow_negative_balance'] = $request->boolean('allow_negative_balance');
         $validated['public_page_enabled'] = $request->boolean('public_page_enabled');
 

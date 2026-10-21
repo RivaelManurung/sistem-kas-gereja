@@ -60,6 +60,9 @@ class AppServiceProvider extends ServiceProvider
             'expense' => Expense::class,
             'fund_transfer' => FundTransfer::class,
             'accounting_period' => AccountingPeriod::class,
+            'report_signatory' => \App\Models\ReportSignatory::class,
+            'frozen_report' => \App\Models\FrozenReport::class,
+            'report_approval' => \App\Models\ReportApproval::class,
         ]);
     }
 }
