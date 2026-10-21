@@ -58,6 +58,11 @@ class CountSheet extends Model
         return $this->hasMany(Donation::class);
     }
 
+    public function confirmations(): HasMany
+    {
+        return $this->hasMany(CountConfirmation::class);
+    }
+
     public function isLocked(): bool
     {
         return $this->status === CountSheetStatus::Locked;

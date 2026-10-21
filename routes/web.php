@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CountConfirmationController;
 use App\Http\Controllers\CountSheetController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\ServiceSessionController;
@@ -17,6 +18,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('sessions', ServiceSessionController::class)->only(['index', 'create', 'store']);
     Route::resource('counting', CountSheetController::class);
+    Route::post('counting/{counting}/confirm', [CountConfirmationController::class, 'confirm'])->name('counting.confirm');
+    Route::post('counting/{counting}/verify', [CountConfirmationController::class, 'verify'])->name('counting.verify');
     Route::resource('donations', DonationController::class);
 });
 

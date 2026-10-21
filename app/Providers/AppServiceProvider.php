@@ -7,6 +7,7 @@ use App\Models\AttributeDefinition;
 use App\Models\AttributeValue;
 use App\Models\Category;
 use App\Models\ChurchSetting;
+use App\Models\CountConfirmation;
 use App\Models\CountLine;
 use App\Models\CountSheet;
 use App\Models\Donation;
@@ -43,6 +44,7 @@ class AppServiceProvider extends ServiceProvider
             'service_session' => ServiceSession::class,
             'count_sheet' => CountSheet::class,
             'count_line' => CountLine::class,
+            'count_confirmation' => CountConfirmation::class,
             'donation' => Donation::class,
         ]);
     }
