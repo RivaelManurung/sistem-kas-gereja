@@ -32,6 +32,7 @@ enum Role: string
     {
         return match ($this) {
             self::Admin => Permission::cases(),
+            self::Bendahara => [Permission::MembersManage],
             self::Pemeriksa => [Permission::AuditView],
             default => [],
         };

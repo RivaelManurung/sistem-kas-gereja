@@ -8,6 +8,7 @@ use App\Models\AttributeValue;
 use App\Models\Category;
 use App\Models\ChurchSetting;
 use App\Models\Fund;
+use App\Models\Member;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
@@ -30,6 +31,7 @@ class AppServiceProvider extends ServiceProvider
             'category' => Category::class,
             'attribute_definition' => AttributeDefinition::class,
             'attribute_value' => AttributeValue::class,
+            'member' => Member::class,
         ]);
     }
 }

@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ChurchSettingController;
 use App\Http\Controllers\Admin\FundController;
+use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -33,6 +34,11 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 
         Route::resource('attributes', AttributeDefinitionController::class)->except(['show', 'destroy']);
         Route::patch('attributes/{attribute}/toggle', [AttributeDefinitionController::class, 'toggle'])->name('attributes.toggle');
+    });
+
+    Route::middleware('permission:'.Permission::MembersManage->value)->group(function () {
+        Route::resource('members', MemberController::class)->except(['show', 'destroy']);
+        Route::patch('members/{member}/toggle', [MemberController::class, 'toggle'])->name('members.toggle');
     });
 
     Route::get('audit', [AuditLogController::class, 'index'])
