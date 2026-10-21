@@ -10,6 +10,7 @@ import {
     CalendarCheck,
     CalendarDays,
     FileText,
+    HeartHandshake,
     LayoutGrid,
     PartyPopper,
     PieChart,
@@ -67,6 +68,16 @@ const mainNavItems: NavItem[] = [
         title: 'Pindah Dana',
         url: '/transfers',
         icon: ArrowRightLeft,
+    },
+    {
+        title: 'Portal Jemaat',
+        url: '/portal',
+        icon: HeartHandshake,
+    },
+    {
+        title: 'Transparansi Publik',
+        url: '/transparansi',
+        icon: ShieldCheck,
     },
 ];
 

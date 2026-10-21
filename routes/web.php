@@ -12,6 +12,7 @@ use App\Http\Controllers\EventExpenseController;
 use App\Http\Controllers\EventMemberController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\FundTransferController;
+use App\Http\Controllers\MemberPortalController;
 use App\Http\Controllers\ServiceSessionController;
 use App\Http\Controllers\TransparencyController;
 use Illuminate\Support\Facades\Route;
@@ -53,6 +54,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('events/{event}/members', [EventMemberController::class, 'store'])->name('events.members.store');
     Route::delete('events/{event}/members/{member}', [EventMemberController::class, 'destroy'])->name('events.members.destroy');
     Route::post('events/{event}/categories', [EventCategoryController::class, 'store'])->name('events.categories.store');
+
+    // Member Portal (Portal Jemaat)
+    Route::get('portal', [MemberPortalController::class, 'index'])->name('portal.index');
+    Route::get('portal/statement', [MemberPortalController::class, 'statement'])->name('portal.statement');
+    Route::get('portal/receipt/{donation}', [MemberPortalController::class, 'receipt'])->name('portal.receipt');
 });
 
 require __DIR__.'/settings.php';
