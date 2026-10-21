@@ -201,3 +201,22 @@ it('strictly sanitizes and never exposes donor names, payees, member details, or
         ->and($content)->not->toContain('RCP-SECRET-001')
         ->and($content)->not->toContain('EXP-SECRET-999');
 });
+
+it('filters the public totals by year and period and rejects invalid filters', function () {
+    $category = Category::create(['name' => 'Kolekte', 'direction' => Direction::In, 'default_fund_id' => $this->fund->id, 'is_public' => true, 'is_active' => true]);
+
+    foreach ([['2026-01-10', 1_000_000], ['2026-05-10', 2_000_000], ['2026-10-10', 4_000_000], ['2025-12-20', 8_000_000]] as [$date, $amount]) {
+        LedgerService::record(['entry_date' => $date, 'account_id' => $this->account->id, 'fund_id' => $this->fund->id, 'category_id' => $category->id, 'amount' => $amount, 'direction' => Direction::In, 'description' => 'Kolekte']);
+    }
+
+    $totalFor = fn (array $query) => $this->get(route('transparency.index', $query))->assertOk()->viewData('page')['props']['summary']['totalIncome'];
+
+    expect($totalFor(['tahun' => 2026]))->toBe(7_000_000)
+        ->and($totalFor(['tahun' => 2026, 'periode' => 's1']))->toBe(3_000_000)
+        ->and($totalFor(['tahun' => 2026, 'periode' => 'q4']))->toBe(4_000_000)
+        ->and($totalFor(['tahun' => 2026, 'periode' => 'm05']))->toBe(2_000_000)
+        ->and($totalFor(['tahun' => 2025]))->toBe(8_000_000);
+
+    $this->get(route('transparency.index', ['periode' => 'm13']))->assertSessionHasErrors('periode');
+    $this->get(route('transparency.index', ['tahun' => 1900]))->assertSessionHasErrors('tahun');
+});

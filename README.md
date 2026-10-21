@@ -69,11 +69,12 @@ Aplikasi ini dibangun menggunakan arsitektur monolit modern dengan pemisahan lap
    php artisan migrate --seed
    ```
 
-4. **Jalankan Aplikasi untuk Pengembangan:**
+4. **Jalankan Aplikasi:**
    ```bash
-   composer run dev
+   npm start
    ```
-   Aplikasi akan berjalan di `http://127.0.0.1:8000` dengan Vite HMR diaktifkan.
+   Perintah ini membangun aset lalu menjalankan server di `http://127.0.0.1:8000`. Untuk menjalankan tanpa membangun ulang aset, pakai `npm run serve`.
+   Untuk pengembangan dengan Vite HMR, pakai `composer run dev`.
 
 ---
 

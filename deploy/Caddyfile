@@ -1,0 +1,25 @@
+# Proxy depan untuk aplikasi: kompresi, cache aset, dan file statis langsung dari disk.
+# PHP (php artisan serve) hanya melayani halaman dinamis di 127.0.0.1:8090.
+{
+	admin off
+	auto_https off
+}
+
+:{$PORT:8080} {
+	encode zstd gzip
+
+	root * /home/ubuntu/project/SistemKasGereja/public
+
+	# Aset Vite bernama hash, aman di-cache selamanya.
+	@build path /build/*
+	header @build Cache-Control "public, max-age=31536000, immutable"
+
+	# File statis lain (favicon, logo, storage) tanpa lewat PHP, kecuali berkas .php.
+	@static {
+		file
+		not path *.php
+	}
+	file_server @static
+
+	reverse_proxy 127.0.0.1:{$APP_PORT:8090}
+}

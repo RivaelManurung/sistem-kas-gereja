@@ -1,0 +1,14 @@
+[Unit]
+Description=Kas Gereja (PHP)
+After=network.target postgresql.service
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/project/SistemKasGereja
+Environment=PHP_CLI_SERVER_WORKERS=4
+ExecStart=/usr/bin/php artisan serve --host=127.0.0.1 --port=8090
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

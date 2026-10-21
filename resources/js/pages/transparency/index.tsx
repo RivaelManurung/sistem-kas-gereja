@@ -1,8 +1,14 @@
-import { Badge } from '@/components/ui/badge';
+import { BrandMark } from '@/components/brand-mark';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatRupiah } from '@/lib/money';
-import { Head, Link } from '@inertiajs/react';
-import { ArrowDownRight, ArrowUpRight, Building2, Lock, PiggyBank, ShieldCheck, TrendingUp, Wallet } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Head, Link, router } from '@inertiajs/react';
+import { Download, LoaderCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface CategorySum {
     id: number;
@@ -12,8 +18,8 @@ interface CategorySum {
 
 interface FundSum {
     id: number;
-    code: string;
     name: string;
+    description: string | null;
     balance: number;
 }
 
@@ -27,325 +33,354 @@ interface MonthlyTrendItem {
 
 interface TransparencyProps {
     churchName: string;
+    church: { address: string | null; city: string | null; phone: string | null; email: string | null };
+    year: number;
+    period: string;
+    periodLabel: string;
+    years: number[];
     fundBalances: FundSum[];
     incomeByCategory: CategorySum[];
     expenseByCategory: CategorySum[];
     monthlyTrend: MonthlyTrendItem[];
-    summary: {
-        totalBalance: number;
-        totalIncome: number;
-        totalExpense: number;
-    };
+    reports: Array<{ title: string; period: string; code: string }>;
+    summary: { totalBalance: number; totalIncome: number; totalExpense: number };
 }
 
-export default function Transparency({
-    churchName,
-    fundBalances = [],
-    incomeByCategory = [],
-    expenseByCategory = [],
-    monthlyTrend = [],
-    summary = { totalBalance: 0, totalIncome: 0, totalExpense: 0 },
-}: TransparencyProps) {
-    const maxMonthlyAmount = Math.max(
-        ...monthlyTrend.map((m) => Math.max(m.income, m.expense)),
-        1
-    );
+function compactRupiah(n: number) {
+    const abs = Math.abs(n);
+    if (abs >= 1e9) return `${(n / 1e9).toFixed(1).replace('.', ',')} M`;
+    if (abs >= 1e6) return `${(n / 1e6).toFixed(0)} jt`;
+    if (abs >= 1e3) return `${Math.round(n / 1e3)} rb`;
+    return String(n);
+}
+
+function Breakdown({ title, description, rows, tone }: { title: string; description: string; rows: CategorySum[]; tone: 'income' | 'expense' }) {
+    const total = rows.reduce((sum, r) => sum + r.amount, 0);
+    const visible = rows.filter((r) => r.amount > 0).sort((a, b) => b.amount - a.amount);
 
     return (
-        <div className="min-h-screen bg-muted/60 text-foreground selection:bg-primary/20 selection:text-primary">
-            <Head title={`Transparansi Keuangan — ${churchName}`} />
+        <Card>
+            <CardHeader className="space-y-1">
+                <CardTitle>{title}</CardTitle>
+                <CardDescription>{description}</CardDescription>
+            </CardHeader>
+            <CardContent>
+                {visible.length > 0 ? (
+                    <ul className="space-y-4">
+                        {visible.map((row) => {
+                            const share = total > 0 ? (row.amount / total) * 100 : 0;
+                            return (
+                                <li key={row.id}>
+                                    <div className="flex items-baseline justify-between gap-4 text-sm">
+                                        <span className="font-medium">{row.name}</span>
+                                        <span className="tabular-nums">{formatRupiah(row.amount)}</span>
+                                    </div>
+                                    <div className="mt-1.5 flex items-center gap-3">
+                                        <div className="bg-muted h-1.5 flex-1 overflow-hidden rounded-full" aria-hidden="true">
+                                            <div className={cn('h-full rounded-full', tone === 'income' ? 'bg-income' : 'bg-expense')} style={{ width: `${share}%` }} />
+                                        </div>
+                                        <span className="text-muted-foreground w-10 text-right text-xs tabular-nums">{share.toFixed(0)}%</span>
+                                    </div>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                ) : (
+                    <p className="text-muted-foreground py-6 text-sm">Belum ada catatan pada periode ini.</p>
+                )}
+            </CardContent>
+        </Card>
+    );
+}
 
-            {/* Public Top Navigation */}
-            <header className="sticky top-0 z-30 border-b border-border bg-card backdrop-blur-md">
-                <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
-                    <div className="flex items-center gap-2.5">
-                        <div className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-xs">
-                            <Building2 className="size-5" />
-                        </div>
-                        <div>
-                            <span className="font-semibold tracking-tight text-foreground">
-                                {churchName}
-                            </span>
-                            <span className="ml-2 hidden rounded-full bg-income/10 px-2 py-0.5 text-[11px] font-medium text-income sm:inline">
-                                Transparansi Terbuka
-                            </span>
-                        </div>
-                    </div>
+const MONTHS = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
-                    <div className="flex items-center gap-3 text-xs">
-                        <Link
-                            href="/login"
-                            className="font-medium text-muted-foreground transition-colors hover:text-foreground"
-                        >
-                            Masuk Pengurus →
-                        </Link>
+export default function Transparency({ churchName, church, year, period, periodLabel, years, fundBalances = [], incomeByCategory = [], expenseByCategory = [], monthlyTrend = [], reports = [], summary }: TransparencyProps) {
+    const [ready, setReady] = useState(false);
+    useEffect(() => {
+        const id = requestAnimationFrame(() => setReady(true));
+        return () => cancelAnimationFrame(id);
+    }, []);
+
+    const [loading, setLoading] = useState(false);
+    const [pending, setPending] = useState<{ year: string; period: string } | null>(null);
+
+    // Hanya data yang bergantung pada filter yang diminta ulang, dan pilihan langsung terlihat tanpa menunggu server.
+    const go = (tahun: string, periode: string) => {
+        setPending({ year: tahun, period: periode });
+        router.get(
+            '/transparansi',
+            { tahun, periode: periode === 'all' ? undefined : periode },
+            {
+                only: ['year', 'period', 'periodLabel', 'summary', 'monthlyTrend', 'incomeByCategory', 'expenseByCategory', 'reports'],
+                preserveScroll: true,
+                preserveState: true,
+                replace: true,
+                onStart: () => setLoading(true),
+                onFinish: () => {
+                    setLoading(false);
+                    setPending(null);
+                },
+            },
+        );
+    };
+    const hasTrend = monthlyTrend.some((m) => m.income > 0 || m.expense > 0);
+    const maxMonthly = Math.max(...monthlyTrend.map((m) => Math.max(m.income, m.expense)), 1);
+    const ticks = [1, 0.5, 0].map((f) => Math.round(maxMonthly * f));
+    const contact = [church.address, church.city].filter(Boolean).join(', ');
+
+    return (
+        <div className="bg-background text-foreground min-h-dvh">
+            <Head title={`Laporan Keuangan Jemaat - ${periodLabel}`} />
+
+            <header className="bg-[hsl(232,46%,18%)] text-white">
+                <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+                    <div className="flex items-center gap-3">
+                        <BrandMark className="size-7" />
+                        <span className="font-semibold tracking-tight">{churchName}</span>
                     </div>
+                    <Link href="/login" className="text-sm text-white/70 transition-colors hover:text-white">
+                        Masuk pengurus
+                    </Link>
                 </div>
+
+                <div className="mx-auto max-w-6xl px-4 pt-4 pb-7 sm:px-6 sm:pt-6 sm:pb-9">
+                    <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Laporan keuangan jemaat</h1>
+                    <p className="mt-2 max-w-3xl text-sm leading-relaxed text-white/70">
+                        Ke mana persembahan kita pergi, dicatat dan dibuka untuk seluruh jemaat. &ldquo;Allah mengasihi orang yang memberi dengan sukacita.&rdquo; (2 Korintus 9:7)
+                    </p>
+                </div>
+                <div className="bg-gold h-0.5" />
             </header>
 
-            {/* Hero / Header Section */}
-            <main className="mx-auto max-w-6xl space-y-8 px-4 py-8 sm:px-6 sm:py-12">
-                <div className="space-y-3 text-center sm:text-left">
-                    <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground shadow-xs">
-                        <ShieldCheck className="size-3.5 text-income" />
-                        Laporan Transparansi Keuangan Publik
+            <div className="bg-card border-b">
+                <form
+                    className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-4 sm:flex-row sm:flex-wrap sm:items-end sm:px-6"
+                    onSubmit={(e) => e.preventDefault()}
+                >
+                    <div className="w-full space-y-1.5 sm:w-32">
+                        <Label htmlFor="filter-year">Tahun</Label>
+                        <Select value={pending?.year ?? String(year)} onValueChange={(v) => go(v, 'all')}>
+                            <SelectTrigger id="filter-year" className="h-10">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {years.map((y) => (
+                                    <SelectItem key={y} value={String(y)} className="tabular-nums">
+                                        {y}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
-                    <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                        Akuntabilitas & Transparansi Persembahan
-                    </h1>
-                    <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-                        Sebagai wujud pertanggungjawaban iman dan pengelolaan yang berintegritas, laporan keuangan gereja ini
-                        disajikan secara terbuka dan agregat.
+                    <div className="w-full space-y-1.5 sm:w-56">
+                        <Label htmlFor="filter-period">Periode</Label>
+                        <Select value={pending?.period ?? period} onValueChange={(v) => go(pending?.year ?? String(year), v)}>
+                            <SelectTrigger id="filter-period" className="h-10">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="max-h-80">
+                                <SelectItem value="all">Setahun penuh</SelectItem>
+                                <SelectGroup>
+                                    <SelectLabel>Semester</SelectLabel>
+                                    <SelectItem value="s1">Semester 1 (Jan - Jun)</SelectItem>
+                                    <SelectItem value="s2">Semester 2 (Jul - Des)</SelectItem>
+                                </SelectGroup>
+                                <SelectGroup>
+                                    <SelectLabel>Triwulan</SelectLabel>
+                                    {[1, 2, 3, 4].map((q) => (
+                                        <SelectItem key={q} value={`q${q}`}>
+                                            Triwulan {q}
+                                        </SelectItem>
+                                    ))}
+                                </SelectGroup>
+                                <SelectGroup>
+                                    <SelectLabel>Per bulan</SelectLabel>
+                                    {MONTHS.map((m, i) => (
+                                        <SelectItem key={m} value={`m${String(i + 1).padStart(2, '0')}`}>
+                                            {m}
+                                        </SelectItem>
+                                    ))}
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    {(period !== 'all' || year !== years[0]) && (
+                        <Button type="button" variant="ghost" onClick={() => go(String(years[0]), 'all')}>
+                            Atur ulang
+                        </Button>
+                    )}
+                    <p className="text-muted-foreground flex items-center gap-2 text-sm sm:ml-auto sm:pb-2.5" role="status" aria-live="polite">
+                        {loading ? (
+                            <>
+                                <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
+                                Memuat data...
+                            </>
+                        ) : (
+                            <>
+                                Menampilkan <span className="text-foreground font-medium">{periodLabel}</span>
+                            </>
+                        )}
                     </p>
+                </form>
+            </div>
 
-                    {/* Strict Privacy Guarantee Banner */}
-                    <div className="flex items-center gap-2.5 rounded-lg border border-info/30 bg-info/10 p-3 text-xs text-info">
-                        <Lock className="size-4 shrink-0 text-info" />
-                        <span>
-                            <strong>Komitmen Kerahasiaan:</strong> Demi melindungi privasi jemaat dan pihak ketiga, halaman publik ini
-                            <strong> tidak pernah menampilkan identitas, nama donatur, pihak ketiga, maupun nominal transaksi perorangan</strong>. Seluruh data disajikan dalam bentuk akumulasi per kategori resmi.
-                        </span>
+            <main aria-busy={loading} className={cn('mx-auto max-w-6xl space-y-6 px-4 py-8 transition-opacity duration-200 sm:px-6 sm:py-10', loading && 'pointer-events-none opacity-50')}>
+                <Card>
+                    <div className="divide-border flex flex-col divide-y md:flex-row md:divide-x md:divide-y-0">
+                        {[
+                            { label: 'Persembahan diterima', value: summary.totalIncome, tone: 'text-income', note: 'Dari seluruh kategori yang dibuka untuk jemaat' },
+                            { label: 'Dipakai untuk pelayanan', value: summary.totalExpense, tone: 'text-expense', note: 'Operasional, pelayanan, dan diakonia' },
+                            { label: 'Saldo kas saat ini', value: summary.totalBalance, tone: '', note: 'Seluruh pos dana, termasuk dana acara' },
+                        ].map((item) => (
+                            <div key={item.label} className="flex-1 p-6">
+                                <p className="text-muted-foreground text-sm">{item.label}</p>
+                                <p className={cn('mt-2 text-3xl font-semibold tracking-tight tabular-nums', item.tone)}>{formatRupiah(item.value)}</p>
+                                <p className="text-muted-foreground mt-2 text-sm">{item.note}</p>
+                            </div>
+                        ))}
                     </div>
-                </div>
+                </Card>
 
-                {/* Big Headline Summary Cards */}
-                <div className="grid gap-4 sm:grid-cols-3">
-                    <Card className="border-border bg-card shadow-xs">
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Total Saldo Dana Kas Aktif
-                            </CardTitle>
-                            <div className="rounded-full bg-primary/10 p-2 text-primary">
-                                <Wallet className="size-4" />
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold tracking-tight tabular-nums text-foreground sm:text-3xl">
-                                {formatRupiah(summary.totalBalance)}
-                            </div>
-                            <p className="mt-1 text-xs text-muted-foreground">
-                                Akumulasi saldo di seluruh pos pelayanan gereja
-                            </p>
-                        </CardContent>
-                    </Card>
-
-                    <Card className="border-border bg-card shadow-xs">
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Akumulasi Penerimaan Publik
-                            </CardTitle>
-                            <div className="rounded-full bg-income/10 p-2 text-income">
-                                <ArrowUpRight className="size-4" />
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold tracking-tight tabular-nums text-income sm:text-3xl">
-                                {formatRupiah(summary.totalIncome)}
-                            </div>
-                            <p className="mt-1 text-xs text-muted-foreground">
-                                Total persembahan terkumpul melalui pos terbuka
-                            </p>
-                        </CardContent>
-                    </Card>
-
-                    <Card className="border-border bg-card shadow-xs">
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium text-muted-foreground">
-                                Akumulasi Pengeluaran Publik
-                            </CardTitle>
-                            <div className="rounded-full bg-expense/10 p-2 text-expense">
-                                <ArrowDownRight className="size-4" />
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold tracking-tight tabular-nums text-expense sm:text-3xl">
-                                {formatRupiah(summary.totalExpense)}
-                            </div>
-                            <p className="mt-1 text-xs text-muted-foreground">
-                                Total realisasi biaya pelayanan & operasional
-                            </p>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                {/* Balances Breakdown: Pos Dana Pelayanan */}
-                <Card className="border-border bg-card shadow-xs">
-                    <CardHeader className="pb-3">
-                        <div className="flex items-center gap-2">
-                            <PiggyBank className="size-4 text-primary" />
-                            <CardTitle className="text-base font-semibold">Alokasi per Pos Dana Pelayanan</CardTitle>
+                <Card>
+                    <CardHeader className="flex-row items-start justify-between gap-4 space-y-0">
+                        <div className="space-y-1">
+                            <CardTitle>Bulan demi bulan</CardTitle>
+                            <CardDescription>Persembahan yang diterima dan dana yang dipakai setiap bulan pada periode ini.</CardDescription>
                         </div>
-                        <CardDescription className="text-xs">
-                            Penyaluran saldo kas gereja yang didistribusikan ke masing-masing bidang pelayanan.
-                        </CardDescription>
+                        <div className="flex shrink-0 items-center gap-4 text-xs">
+                            <span className="flex items-center gap-1.5">
+                                <span className="bg-income size-2.5 rounded-sm" />
+                                Diterima
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                                <span className="bg-expense size-2.5 rounded-sm" />
+                                Dipakai
+                            </span>
+                        </div>
                     </CardHeader>
                     <CardContent>
-                        {fundBalances.length > 0 ? (
-                            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                                {fundBalances.map((fund) => (
-                                    <div
-                                        key={fund.id}
-                                        className="rounded-lg border border-border bg-muted/60 p-3"
-                                    >
-                                        <div className="text-xs font-medium text-muted-foreground">{fund.code}</div>
-                                        <div className="font-semibold text-foreground">{fund.name}</div>
-                                        <div className="mt-2 text-lg font-bold tabular-nums text-foreground">
-                                            {formatRupiah(fund.balance)}
-                                        </div>
+                        {hasTrend ? (
+                            <div role="img" aria-label="Grafik batang persembahan diterima dan dana dipakai per bulan" className="flex gap-3">
+                                <div className="text-muted-foreground flex h-48 flex-col justify-between text-right text-[11px] tabular-nums">
+                                    {ticks.map((t, i) => (
+                                        <span key={i} className="leading-none">
+                                            {compactRupiah(t)}
+                                        </span>
+                                    ))}
+                                </div>
+                                <div className="relative min-w-0 flex-1">
+                                    <div className="pointer-events-none absolute inset-x-0 top-0 flex h-48 flex-col justify-between">
+                                        {ticks.map((_, i) => (
+                                            <div key={i} className="border-border/70 border-t border-dashed first:border-solid" />
+                                        ))}
                                     </div>
-                                ))}
+                                    <div className="relative flex h-48 items-end justify-around gap-1.5 sm:gap-3">
+                                        {monthlyTrend.map((m) => (
+                                            <div key={m.month} className="flex h-full flex-1 items-end justify-center gap-1" title={`${m.label}: diterima ${formatRupiah(m.income)}, dipakai ${formatRupiah(m.expense)}`}>
+                                                {[
+                                                    { v: m.income, c: 'bg-income' },
+                                                    { v: m.expense, c: 'bg-expense' },
+                                                ].map((bar, i) => (
+                                                    <div
+                                                        key={i}
+                                                        className={cn('w-full max-w-7 origin-bottom rounded-t-md transition-transform duration-700 ease-out motion-reduce:transition-none', bar.c, ready ? 'scale-y-100' : 'scale-y-0')}
+                                                        style={{ height: `${Math.max((bar.v / maxMonthly) * 100, bar.v > 0 ? 1.5 : 0)}%`, transitionDelay: `${i * 60}ms` }}
+                                                    />
+                                                ))}
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="text-muted-foreground mt-2 flex justify-around gap-1.5 text-xs sm:gap-3">
+                                        {monthlyTrend.map((m) => (
+                                            <span key={m.month} className="flex-1 text-center">
+                                                {m.label.split(' ')[0]}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
                             </div>
                         ) : (
-                            <div className="py-6 text-center text-xs text-muted-foreground">Tidak ada pos dana aktif.</div>
+                            <p className="text-muted-foreground py-10 text-sm">Belum ada catatan persembahan pada periode ini.</p>
                         )}
                     </CardContent>
                 </Card>
 
-                {/* Categories Breakdown: Pemasukan vs Pengeluaran */}
-                <div className="grid gap-6 lg:grid-cols-2">
-                    {/* Public Income by Category */}
-                    <Card className="border-border bg-card shadow-xs">
-                        <CardHeader className="pb-3">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <ArrowUpRight className="size-4 text-income" />
-                                    <CardTitle className="text-base font-semibold">Penerimaan per Kategori</CardTitle>
-                                </div>
-                                <Badge variant="outline" className="text-xs font-normal">
-                                    Total {formatRupiah(summary.totalIncome)}
-                                </Badge>
-                            </div>
-                            <CardDescription className="text-xs">
-                                Akumulasi persembahan dan donasi pada kategori yang dipublikasikan.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            {incomeByCategory.length > 0 ? (
-                                <div className="divide-y divide-border">
-                                    {incomeByCategory.map((cat) => (
-                                        <div key={cat.id} className="flex items-center justify-between py-2.5 text-sm">
-                                            <span className="font-medium text-foreground">{cat.name}</span>
-                                            <span className="font-semibold tabular-nums text-income">
-                                                {formatRupiah(cat.amount)}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="py-6 text-center text-xs text-muted-foreground">Belum ada kategori penerimaan publik.</div>
-                            )}
-                        </CardContent>
-                    </Card>
-
-                    {/* Public Expense by Category */}
-                    <Card className="border-border bg-card shadow-xs">
-                        <CardHeader className="pb-3">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <ArrowDownRight className="size-4 text-expense" />
-                                    <CardTitle className="text-base font-semibold">Pengeluaran per Kategori</CardTitle>
-                                </div>
-                                <Badge variant="outline" className="text-xs font-normal">
-                                    Total {formatRupiah(summary.totalExpense)}
-                                </Badge>
-                            </div>
-                            <CardDescription className="text-xs">
-                                Realisasi pengeluaran kas yang disetujui pada pos operasional dan pelayanan publik.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            {expenseByCategory.length > 0 ? (
-                                <div className="divide-y divide-border">
-                                    {expenseByCategory.map((cat) => (
-                                        <div key={cat.id} className="flex items-center justify-between py-2.5 text-sm">
-                                            <span className="font-medium text-foreground">{cat.name}</span>
-                                            <span className="font-semibold tabular-nums text-expense">
-                                                {formatRupiah(cat.amount)}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="py-6 text-center text-xs text-muted-foreground">Belum ada kategori pengeluaran publik.</div>
-                            )}
-                        </CardContent>
-                    </Card>
+                <div className="grid items-start gap-6 lg:grid-cols-2">
+                    <Breakdown title="Dari mana persembahan berasal" description="Jumlah per kategori, bukan per orang." rows={incomeByCategory} tone="income" />
+                    <Breakdown title="Untuk apa persembahan dipakai" description="Jumlah per jenis pelayanan dan kebutuhan." rows={expenseByCategory} tone="expense" />
                 </div>
 
-                {/* Monthly Trend Overview */}
-                {monthlyTrend.length > 0 && (
-                    <Card className="border-border bg-card shadow-xs">
-                        <CardHeader className="pb-3">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <TrendingUp className="size-4 text-primary" />
-                                    <CardTitle className="text-base font-semibold">Tren Arus Kas 6 Bulan Terakhir</CardTitle>
-                                </div>
-                                <div className="flex items-center gap-4 text-xs">
-                                    <div className="flex items-center gap-1.5">
-                                        <span className="size-2.5 rounded-full bg-income" />
-                                        <span className="text-muted-foreground">Pemasukan</span>
-                                    </div>
-                                    <div className="flex items-center gap-1.5">
-                                        <span className="size-2.5 rounded-full bg-expense" />
-                                        <span className="text-muted-foreground">Pengeluaran</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <CardDescription className="text-xs">
-                                Riwayat agregat keuangan terbuka per bulan kalender.
-                            </CardDescription>
+                <Card>
+                    <CardHeader className="space-y-1">
+                        <CardTitle>Saldo per pos dana</CardTitle>
+                        <CardDescription>Dana gereja dibagi ke beberapa pos sesuai tujuannya.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-0 md:p-0">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Pos dana</TableHead>
+                                    <TableHead className="hidden md:table-cell">Untuk</TableHead>
+                                    <TableHead className="text-right">Saldo</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {fundBalances.map((fund) => (
+                                    <TableRow key={fund.id}>
+                                        <TableCell className="font-medium">{fund.name}</TableCell>
+                                        <TableCell className="text-muted-foreground hidden md:table-cell">{fund.description ?? '-'}</TableCell>
+                                        <TableCell className="text-right tabular-nums">{formatRupiah(fund.balance)}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
+
+                {reports.length > 0 && (
+                    <Card>
+                        <CardHeader className="space-y-1">
+                            <CardTitle>Laporan resmi yang sudah disahkan</CardTitle>
+                            <CardDescription>Ditandatangani bendahara, pemeriksa, dan majelis. Keasliannya bisa diperiksa dengan kode di setiap laporan.</CardDescription>
                         </CardHeader>
-                        <CardContent>
-                            <div className="space-y-4 pt-2">
-                                {monthlyTrend.map((item) => {
-                                    const incomePct = Math.round((item.income / maxMonthlyAmount) * 100);
-                                    const expensePct = Math.round((item.expense / maxMonthlyAmount) * 100);
-
-                                    return (
-                                        <div key={item.month} className="space-y-1.5">
-                                            <div className="flex items-center justify-between text-xs">
-                                                <span className="font-medium text-foreground">
-                                                    {item.label}
-                                                </span>
-                                                <div className="flex items-center gap-3 tabular-nums">
-                                                    <span className="text-income">
-                                                        +{formatRupiah(item.income)}
-                                                    </span>
-                                                    <span className="text-expense">
-                                                        -{formatRupiah(item.expense)}
-                                                    </span>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex h-2.5 w-full gap-1 overflow-hidden rounded-full bg-muted/60">
-                                                <div
-                                                    className="h-full rounded-full bg-income"
-                                                    style={{ width: `${Math.max(incomePct, item.income > 0 ? 2 : 0)}%` }}
-                                                />
-                                                <div
-                                                    className="h-full rounded-full bg-expense"
-                                                    style={{ width: `${Math.max(expensePct, item.expense > 0 ? 2 : 0)}%` }}
-                                                />
-                                            </div>
+                        <CardContent className="p-0 md:p-0">
+                            <ul className="divide-border divide-y">
+                                {reports.map((r) => (
+                                    <li key={r.code} className="flex flex-col gap-2 px-6 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                                        <div className="min-w-0">
+                                            <p className="text-sm font-medium sm:truncate">{r.title}</p>
+                                            <p className="text-muted-foreground text-xs">{r.period}</p>
                                         </div>
-                                    );
-                                })}
-                            </div>
+                                        <div className="flex shrink-0 items-center gap-4 text-sm">
+                                            <Link href={`/verify-report/${r.code}`} className="text-primary hover:underline">
+                                                Periksa keaslian
+                                            </Link>
+                                            <a href={`/verify-report/${r.code}/download`} className="text-primary inline-flex items-center gap-1.5 hover:underline">
+                                                <Download className="size-4" aria-hidden="true" />
+                                                Unduh PDF
+                                            </a>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
                         </CardContent>
                     </Card>
                 )}
-
-                {/* Footer Notice */}
-                <footer className="border-t border-border pt-6 text-center text-xs text-muted-foreground">
-                    <p>
-                        © {new Date().getFullYear()} {churchName} · Sistem Pengelolaan Kas & Persembahan Gereja
-                    </p>
-                    <p className="mt-1 text-[11px]">
-                        Laporan ini diperbarui secara otomatis dari sistem pembukuan buku besar append-only gereja.
-                    </p>
-                </footer>
             </main>
+
+            <footer className="border-t">
+                <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8 text-sm sm:px-6 md:flex-row md:justify-between">
+                    <p className="text-muted-foreground max-w-xl leading-relaxed">
+                        Halaman ini hanya menampilkan jumlah per kategori. Nama pemberi dan nominal pribadi tidak pernah ditampilkan.
+                    </p>
+                    <div className="text-muted-foreground md:text-right">
+                        <p className="text-foreground font-medium">{churchName}</p>
+                        {contact && <p>{contact}</p>}
+                        {(church.phone || church.email) && <p>{[church.phone, church.email].filter(Boolean).join(' · ')}</p>}
+                    </div>
+                </div>
+            </footer>
         </div>
     );
 }

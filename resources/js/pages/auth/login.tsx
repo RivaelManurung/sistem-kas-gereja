@@ -3,10 +3,10 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { BrandMark } from '@/components/brand-mark';
 import { type SharedData } from '@/types';
-import { ArrowRight, ClipboardCheck, Eye, EyeOff, FileText, LoaderCircle, Lock, Mail, ShieldCheck } from 'lucide-react';
+import { ArrowRight, CircleAlert, ClipboardCheck, Eye, EyeOff, FileText, LoaderCircle, Lock, Mail, ShieldCheck } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 
 interface LoginForm {
@@ -19,6 +19,7 @@ interface LoginForm {
 interface LoginProps {
     status?: string;
     canResetPassword: boolean;
+    demoAccounts?: Array<{ email: string; role: string; name: string }>;
 }
 
 const FEATURES = [
@@ -97,11 +98,11 @@ function ChurchScene() {
     );
 }
 
-export default function Login({ status, canResetPassword }: LoginProps) {
-    const { brand } = usePage<SharedData>().props;
+export default function Login({ status, canResetPassword, demoAccounts = [] }: LoginProps) {
+    const { brand, flash } = usePage<SharedData>().props;
     const [showPassword, setShowPassword] = useState(false);
 
-    const { data, setData, post, processing, errors, reset } = useForm<LoginForm>({
+    const { data, setData, post, processing, errors, reset, setError, clearErrors } = useForm<LoginForm>({
         email: '',
         password: '',
         remember: false,
@@ -109,7 +110,21 @@ export default function Login({ status, canResetPassword }: LoginProps) {
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
+
+        clearErrors();
+        const problems: Partial<Record<'email' | 'password', string>> = {};
+        if (!data.email.trim()) problems.email = 'Email wajib diisi.';
+        else if (!/^\S+@\S+\.\S+$/.test(data.email.trim())) problems.email = 'Format email belum benar, contoh: nama@gereja.org.';
+        if (!data.password) problems.password = 'Kata sandi wajib diisi.';
+        if (Object.keys(problems).length > 0) {
+            setError(problems);
+            document.getElementById(problems.email ? 'email' : 'password')?.focus();
+
+            return;
+        }
+
         post(route('login'), {
+            onError: () => document.getElementById('email')?.focus(),
             onFinish: () => reset('password'),
         });
     };
@@ -160,13 +175,20 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                         <p className="text-muted-foreground mt-2 max-w-xs text-sm text-balance">Silakan masuk untuk melanjutkan ke sistem {brand.name}.</p>
                     </div>
 
+                    {flash?.error && (
+                        <div role="alert" className="border-expense/30 bg-expense/10 text-expense mt-6 flex items-start gap-2 rounded-lg border p-3 text-sm font-medium">
+                            <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                            {flash.error}
+                        </div>
+                    )}
+
                     {status && (
                         <div className="mt-6 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-center text-sm font-medium text-emerald-800 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-300">
                             {status}
                         </div>
                     )}
 
-                    <form onSubmit={submit} className="mt-8 space-y-5">
+                    <form onSubmit={submit} noValidate className="mt-8 space-y-5">
                         <div className="space-y-2">
                             <Label htmlFor="email">Email</Label>
                             <div className="relative">
@@ -243,6 +265,30 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             {!processing && <ArrowRight className="size-4" />}
                         </Button>
                     </form>
+
+
+                    {demoAccounts.length > 0 && (
+                        <section className="mt-8 border-t pt-6" aria-labelledby="demo-title">
+                            <h3 id="demo-title" className="text-sm font-medium">
+                                Coba sebagai
+                            </h3>
+                            <p className="text-muted-foreground mt-1 text-sm">Masuk satu klik ke akun contoh untuk melihat tampilan tiap peran.</p>
+                            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                                {demoAccounts.map((account) => (
+                                    <button
+                                        key={account.email}
+                                        type="button"
+                                        disabled={processing}
+                                        onClick={() => router.post(route('demo.login'), { email: account.email })}
+                                        className="hover:bg-accent focus-visible:ring-ring rounded-lg border px-3 py-2.5 text-left transition-colors focus-visible:ring-2 focus-visible:outline-hidden disabled:opacity-50"
+                                    >
+                                        <span className="block text-sm font-medium">{account.role}</span>
+                                        <span className="text-muted-foreground block truncate text-xs">{account.name}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </section>
+                    )}
 
                     <p className="text-muted-foreground mt-8 text-center text-sm">
                         Ingin melihat laporan kas?{' '}

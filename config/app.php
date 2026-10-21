@@ -16,6 +16,11 @@ return [
     'name' => env('APP_NAME', 'Laravel'),
 
     /*
+    | Masuk satu klik ke akun contoh (hanya untuk demo). Jangan aktifkan di sistem yang dipakai untuk data asli.
+    */
+    'demo_login' => (bool) env('APP_DEMO_LOGIN', false),
+
+    /*
     |--------------------------------------------------------------------------
     | Application Environment
     |--------------------------------------------------------------------------

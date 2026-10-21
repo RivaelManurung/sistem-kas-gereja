@@ -3,6 +3,8 @@
 use App\Http\Middleware\EnsureUserIsActive;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Illuminate\Http\Request;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
@@ -30,5 +32,13 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        // Sesi atau token halaman kedaluwarsa (419): kembali ke halaman asal dengan pesan, bukan layar "Page Expired".
+        $exceptions->respond(function (SymfonyResponse $response, Throwable $e, Request $request) {
+            if ($response->getStatusCode() === 419) {
+                return redirect()->back(fallback: route('login'))
+                    ->with('error', 'Sesi Anda sudah berakhir. Halaman sudah dimuat ulang, silakan coba lagi.');
+            }
+
+            return $response;
+        });
     })->create();

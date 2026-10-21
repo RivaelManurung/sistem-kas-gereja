@@ -3,6 +3,8 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
+        "start": "npm run build && php artisan serve",
+        "serve": "php artisan serve",
         "build:ssr": "vite build && vite build --ssr",
         "dev": "vite",
         "format": "prettier --write resources/",
