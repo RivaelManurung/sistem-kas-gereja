@@ -11,6 +11,8 @@ use App\Http\Controllers\EventExpenseController;
 use App\Http\Controllers\EventMemberController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\FundTransferController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ReportVerificationController;
 use App\Http\Controllers\ServiceSessionController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -19,10 +21,23 @@ Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
 
+// Public verification for frozen reports
+Route::get('verify-report/{code}', [ReportVerificationController::class, 'verify'])->name('reports.verify');
+Route::get('verify-report/{code}/download', [ReportVerificationController::class, 'download'])->name('reports.verify.download');
+
 Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
+
+    // Financial Reports & Approvals
+    Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::post('reports', [ReportController::class, 'store'])->name('reports.store');
+    Route::get('reports/bulletin', [ReportController::class, 'bulletin'])->name('reports.bulletin');
+    Route::get('reports/bulletin/pdf', [ReportController::class, 'bulletinPdf'])->name('reports.bulletin.pdf');
+    Route::get('reports/{report}', [ReportController::class, 'show'])->name('reports.show');
+    Route::get('reports/{report}/pdf', [ReportController::class, 'pdf'])->name('reports.pdf');
+    Route::post('reports/{report}/approvals/{approval}/approve', [ReportController::class, 'approve'])->name('reports.approve');
 
     Route::resource('sessions', ServiceSessionController::class)->only(['index', 'create', 'store']);
     Route::resource('counting', CountSheetController::class);

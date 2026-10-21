@@ -32,6 +32,7 @@ class User extends Authenticatable
         'email',
         'password',
         'is_active',
+        'signature_path',
     ];
 
     /**
@@ -56,5 +57,14 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_active' => 'boolean',
         ];
+    }
+
+    public function getSignatureBase64(): ?string
+    {
+        if (! $this->signature_path || ! \Illuminate\Support\Facades\Storage::disk('local')->exists($this->signature_path)) {
+            return null;
+        }
+        $data = \Illuminate\Support\Facades\Storage::disk('local')->get($this->signature_path);
+        return 'data:image/png;base64,'.base64_encode($data);
     }
 }

@@ -9,8 +9,11 @@ import {
     Calendar,
     CalendarCheck,
     CalendarDays,
+    FileSignature,
+    FileSpreadsheet,
     FileText,
     LayoutGrid,
+    Newspaper,
     PartyPopper,
     PieChart,
     Receipt,
@@ -68,6 +71,16 @@ const mainNavItems: NavItem[] = [
         url: '/transfers',
         icon: ArrowRightLeft,
     },
+    {
+        title: 'Laporan Keuangan',
+        url: '/reports',
+        icon: FileSpreadsheet,
+    },
+    {
+        title: 'Warta Mingguan',
+        url: '/reports/bulletin',
+        icon: Newspaper,
+    },
 ];
 
 const adminNavItems: PermittedNavItem[] = [
@@ -81,6 +94,7 @@ const adminNavItems: PermittedNavItem[] = [
     { title: 'Periode Akuntansi', url: '/admin/periods', icon: CalendarDays, permission: 'master.manage' },
     { title: 'Field Kustom (EAV)', url: '/admin/attributes', icon: Sliders, permission: 'master.manage' },
     { title: 'Pengaturan Gereja', url: '/admin/settings', icon: Settings, permission: 'settings.manage' },
+    { title: 'Susunan Penanda Tangan', url: '/admin/signatures', icon: FileSignature, permission: 'settings.manage' },
     { title: 'Audit Trail', url: '/admin/audit', icon: ShieldCheck, permission: 'audit.view' },
 ];
 
