@@ -10,6 +10,8 @@ use App\Models\ChurchSetting;
 use App\Models\Fund;
 use App\Models\LedgerEntry;
 use App\Models\Member;
+use App\Models\ServiceSchedule;
+use App\Models\ServiceSession;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
@@ -34,6 +36,8 @@ class AppServiceProvider extends ServiceProvider
             'attribute_value' => AttributeValue::class,
             'member' => Member::class,
             'ledger_entry' => LedgerEntry::class,
+            'service_schedule' => ServiceSchedule::class,
+            'service_session' => ServiceSession::class,
         ]);
     }
 }

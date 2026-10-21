@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ChurchSettingController;
 use App\Http\Controllers\Admin\FundController;
 use App\Http\Controllers\Admin\MemberController;
+use App\Http\Controllers\Admin\ServiceScheduleController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -34,6 +35,9 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 
         Route::resource('attributes', AttributeDefinitionController::class)->except(['show', 'destroy']);
         Route::patch('attributes/{attribute}/toggle', [AttributeDefinitionController::class, 'toggle'])->name('attributes.toggle');
+
+        Route::resource('schedules', ServiceScheduleController::class)->except(['show', 'destroy']);
+        Route::patch('schedules/{schedule}/toggle', [ServiceScheduleController::class, 'toggle'])->name('schedules.toggle');
     });
 
     Route::middleware('permission:'.Permission::MembersManage->value)->group(function () {
