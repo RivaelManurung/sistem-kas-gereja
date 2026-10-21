@@ -2,6 +2,26 @@ import { LucideIcon } from 'lucide-react';
 
 export interface Auth {
     user: User;
+    permissions: string[];
+}
+
+export interface PaginationLink {
+    url: string | null;
+    label: string;
+    active: boolean;
+}
+
+export interface Paginated<T> {
+    data: T[];
+    links: PaginationLink[];
+    current_page: number;
+    last_page: number;
+    total: number;
+}
+
+export interface Option {
+    value: string;
+    label: string;
 }
 
 export interface BreadcrumbItem {
@@ -25,6 +45,7 @@ export interface SharedData {
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
+    flash: { success: string | null };
     [key: string]: unknown;
 }
 

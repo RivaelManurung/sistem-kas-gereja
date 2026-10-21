@@ -1,5 +1,10 @@
 <?php
 
+use App\Enums\Role;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -11,9 +16,9 @@
 |
 */
 
-pest()->extend(Tests\TestCase::class)
-    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
-    ->in('Feature');
+pest()->extend(TestCase::class)
+    ->use(RefreshDatabase::class)
+    ->in('Feature', 'Unit');
 
 /*
 |--------------------------------------------------------------------------
@@ -41,7 +46,11 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function actingAsRole(Role $role): User
 {
-    // ..
+    $user = User::factory()->create();
+    $user->assignRole($role->value);
+    test()->actingAs($user);
+
+    return $user;
 }
