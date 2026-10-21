@@ -10,6 +10,7 @@ import {
     CalendarCheck,
     FileText,
     LayoutGrid,
+    PartyPopper,
     PieChart,
     Settings,
     ShieldCheck,
@@ -44,6 +45,11 @@ const mainNavItems: NavItem[] = [
         title: 'Persembahan Atas Nama',
         url: '/donations',
         icon: FileText,
+    },
+    {
+        title: 'Acara & Kepanitiaan',
+        url: '/events',
+        icon: PartyPopper,
     },
     {
         title: 'Setoran Bank',

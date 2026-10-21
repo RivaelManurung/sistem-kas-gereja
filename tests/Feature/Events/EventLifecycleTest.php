@@ -176,3 +176,133 @@ it('supports custom attribute definitions scoped to an event', function () {
     $eventDefs = AttributeDefinition::forEntity(AttributeEntity::CountSheet, $event->id)->get();
     expect($eventDefs->pluck('id'))->toContain($scopedDef->id);
 });
+
+it('lists events with calculated financial summary metrics', function () {
+    $event = Event::create([
+        'name' => 'Konser Paskah 2026',
+        'start_date' => '2026-04-10',
+        'target_budget' => 20000000,
+        'status' => EventStatus::Active,
+    ]);
+
+    $account = \App\Models\Account::create([
+        'code' => 'KAS-ACR',
+        'name' => 'Kas Acara',
+        'type' => 'cash',
+        'is_active' => true,
+    ]);
+
+    $ledgerService = app(\App\Services\LedgerService::class);
+    // Income: 12.000.000
+    $ledgerService->record([
+        'entry_date' => '2026-04-10',
+        'account_id' => $account->id,
+        'fund_id' => $event->fund_id,
+        'amount' => 12000000,
+        'direction' => \App\Enums\Direction::In,
+        'description' => 'Penjualan tiket',
+        'source_type' => 'event',
+        'source_id' => $event->id,
+    ]);
+
+    // Expense: 8.000.000
+    $ledgerService->record([
+        'entry_date' => '2026-04-11',
+        'account_id' => $account->id,
+        'fund_id' => $event->fund_id,
+        'amount' => 8000000,
+        'direction' => \App\Enums\Direction::Out,
+        'description' => 'Sound system',
+        'source_type' => 'event',
+        'source_id' => $event->id,
+    ]);
+
+    actingAsRole(Role::Admin);
+
+    $response = $this->get(route('events.index'));
+    $response->assertOk();
+
+    $pageEvents = $response->viewData('page')['props']['events']['data'];
+    $eventData = collect($pageEvents)->firstWhere('id', $event->id);
+
+    expect($eventData)->not->toBeNull()
+        ->and($eventData['financial_summary']['total_income'])->toBe(12000000)
+        ->and($eventData['financial_summary']['total_expenses'])->toBe(8000000)
+        ->and($eventData['financial_summary']['remaining_balance'])->toBe(4000000)
+        ->and($eventData['financial_summary']['budget_realization_pct'])->toBe(40.0);
+});
+
+it('creates an event via controller endpoint', function () {
+    actingAsRole(Role::Admin);
+
+    $response = $this->post(route('events.store'), [
+        'name' => 'Kemah Pemuda 2026',
+        'theme' => 'Teguh Berakar Bertumbuh',
+        'start_date' => '2026-07-20',
+        'end_date' => '2026-07-23',
+        'status' => EventStatus::Active->value,
+        'target_budget' => 35000000,
+        'description' => 'Kegiatan kemah rohani pemuda remaja di bumi perkemahan',
+    ]);
+
+    $response->assertRedirect();
+    $event = Event::where('name', 'Kemah Pemuda 2026')->first();
+
+    expect($event)->not->toBeNull()
+        ->and($event->fund_id)->not->toBeNull()
+        ->and($event->fund->name)->toBe('Dana Acara: Kemah Pemuda 2026');
+});
+
+it('manages committee members and categories via dedicated endpoints', function () {
+    $event = Event::create(['name' => 'Natal Sekolah Minggu 2026', 'start_date' => '2026-12-20']);
+    $user = User::factory()->create();
+
+    actingAsRole(Role::Admin);
+
+    // Add committee member
+    $memberResponse = $this->post(route('events.members.store', $event), [
+        'user_id' => $user->id,
+        'role_in_event' => EventRole::Ketua->value,
+        'notes' => 'Koordinator acara',
+    ]);
+    $memberResponse->assertRedirect();
+    expect($event->members)->toHaveCount(1)
+        ->and($event->members->first()->role_in_event)->toBe(EventRole::Ketua);
+
+    // Add event category
+    $categoryResponse = $this->post(route('events.categories.store', $event), [
+        'name' => 'Donasi Bingkisan Anak',
+        'direction' => \App\Enums\Direction::In->value,
+    ]);
+    $categoryResponse->assertRedirect();
+    expect($event->categories)->toHaveCount(1)
+        ->and($event->categories->first()->name)->toBe('Donasi Bingkisan Anak')
+        ->and($event->categories->first()->default_fund_id)->toBe($event->fund_id);
+});
+
+it('prevents deleting an event with ledger transactions', function () {
+    $event = Event::create(['name' => 'Piknik Gereja 2026', 'start_date' => '2026-08-01']);
+    $account = \App\Models\Account::create([
+        'code' => 'KAS-PIKNIK',
+        'name' => 'Kas Piknik',
+        'type' => 'cash',
+        'is_active' => true,
+    ]);
+
+    app(\App\Services\LedgerService::class)->record([
+        'entry_date' => '2026-08-01',
+        'account_id' => $account->id,
+        'fund_id' => $event->fund_id,
+        'amount' => 500000,
+        'direction' => \App\Enums\Direction::In,
+        'description' => 'Iuran piknik',
+        'source_type' => 'event',
+        'source_id' => $event->id,
+    ]);
+
+    actingAsRole(Role::Admin);
+
+    $response = $this->delete(route('events.destroy', $event));
+    $response->assertRedirect();
+    expect(Event::find($event->id))->not->toBeNull();
+});
