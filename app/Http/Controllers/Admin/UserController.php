@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\Role;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UserRequest;
+use App\Models\AuditLog;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
@@ -105,6 +106,12 @@ class UserController extends Controller
      */
     private function syncRoles(User $user, array $roles): void
     {
+        $old = $user->getRoleNames()->sort()->values()->all();
         $user->syncRoles($roles);
+        $new = $user->getRoleNames()->sort()->values()->all();
+
+        if ($old !== $new) {
+            AuditLog::record($user, 'roles_synced', ['roles' => $old], ['roles' => $new]);
+        }
     }
 }
