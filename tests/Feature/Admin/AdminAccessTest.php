@@ -4,6 +4,7 @@ use App\Enums\Role;
 
 dataset('admin_routes', [
     'admin.users.index',
+    'admin.settings.edit',
 ]);
 
 it('forbids non-admin roles from admin routes', function (Role $role, string $routeName) {
