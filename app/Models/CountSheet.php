@@ -53,6 +53,11 @@ class CountSheet extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    public function donations(): HasMany
+    {
+        return $this->hasMany(Donation::class);
+    }
+
     public function isLocked(): bool
     {
         return $this->status === CountSheetStatus::Locked;

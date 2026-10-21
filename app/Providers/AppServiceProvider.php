@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\ChurchSetting;
 use App\Models\CountLine;
 use App\Models\CountSheet;
+use App\Models\Donation;
 use App\Models\Fund;
 use App\Models\LedgerEntry;
 use App\Models\Member;
@@ -42,6 +43,7 @@ class AppServiceProvider extends ServiceProvider
             'service_session' => ServiceSession::class,
             'count_sheet' => CountSheet::class,
             'count_line' => CountLine::class,
+            'donation' => Donation::class,
         ]);
     }
 }
