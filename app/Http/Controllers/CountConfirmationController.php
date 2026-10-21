@@ -41,9 +41,11 @@ class CountConfirmationController extends Controller
         ]);
 
         $setting = ChurchSetting::current();
-        $required = $counting->type === CountSheetType::Service
-            ? $setting->min_confirmations_service
-            : $setting->min_confirmations_general;
+        $required = match ($counting->type) {
+            CountSheetType::Service => $setting->min_confirmations_service,
+            CountSheetType::Event => $setting->min_confirmations_event,
+            default => $setting->min_confirmations_general,
+        };
 
         $confirmationsCount = $counting->confirmations()->count();
 

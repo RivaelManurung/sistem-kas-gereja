@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\CountSheetStatus;
+use App\Enums\CountSheetType;
 use App\Enums\Direction;
 use App\Models\AllocationRule;
 use App\Models\CountSheet;
@@ -28,9 +29,42 @@ class AllocationService
         }
 
         return DB::transaction(function () use ($sheet) {
-            $sheet->load(['lines.category', 'serviceSession']);
+            $sheet->load(['lines.category', 'serviceSession', 'event']);
             $dateString = $sheet->date->toDateString();
             $ledgerEntries = [];
+
+            // Dedicated event count sheets post 100% directly to the event fund
+            if ($sheet->type === CountSheetType::Event && $sheet->event_id) {
+                $event = $sheet->event;
+                $targetFundId = $event->fund_id;
+
+                foreach ($sheet->lines as $line) {
+                    if ($line->amount <= 0) {
+                        continue;
+                    }
+
+                    $entry = $this->ledgerService->record([
+                        'entry_date' => $dateString,
+                        'account_id' => $sheet->account_id,
+                        'fund_id' => $targetFundId,
+                        'category_id' => $line->category_id,
+                        'amount' => $line->amount,
+                        'direction' => Direction::In,
+                        'description' => "Pemasukan Acara {$event->name}: {$line->category->name}",
+                        'source_type' => 'count_sheet',
+                        'source_id' => $sheet->id,
+                        'idempotency_key' => "cs-{$sheet->id}-line-{$line->id}-evt-{$targetFundId}",
+                    ]);
+
+                    $ledgerEntries[] = $entry;
+                }
+
+                $sheet->update([
+                    'status' => CountSheetStatus::Locked,
+                ]);
+
+                return $ledgerEntries;
+            }
 
             foreach ($sheet->lines as $line) {
                 if ($line->amount <= 0) {
