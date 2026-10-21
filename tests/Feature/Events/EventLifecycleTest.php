@@ -113,3 +113,66 @@ it('supports custom EAV attributes on events', function () {
     expect($attributes)->toHaveKey('lokasi_acara')
         ->and($attributes['lokasi_acara'])->toBe('Gedung Serbaguna Betlehem');
 });
+
+it('isolates event scoped categories from general categories', function () {
+    $event1 = Event::create(['name' => 'Konser Musik Rohani 2026', 'start_date' => '2026-07-01']);
+    $event2 = Event::create(['name' => 'Klinik Kesehatan 2026', 'start_date' => '2026-07-05']);
+
+    // General category
+    $generalCat = \App\Models\Category::create([
+        'name' => 'Kolekte Rutin',
+        'direction' => \App\Enums\Direction::In,
+        'default_fund_id' => Fund::where('code', 'UMUM')->first()->id ?? Fund::first()->id,
+        'scope_event_id' => null,
+    ]);
+
+    // Event 1 category
+    $event1Cat = \App\Models\Category::create([
+        'name' => 'Tiket Konser',
+        'direction' => \App\Enums\Direction::In,
+        'default_fund_id' => $event1->fund_id,
+        'scope_event_id' => $event1->id,
+    ]);
+
+    // Event 2 category with same name (allowed because different scope_event_id!)
+    $event2Cat = \App\Models\Category::create([
+        'name' => 'Tiket Konser',
+        'direction' => \App\Enums\Direction::In,
+        'default_fund_id' => $event2->fund_id,
+        'scope_event_id' => $event2->id,
+    ]);
+
+    // General query must NOT include event scoped categories
+    $generalCategories = \App\Models\Category::general()->get();
+    expect($generalCategories->pluck('id'))->toContain($generalCat->id)
+        ->and($generalCategories->pluck('id'))->not->toContain($event1Cat->id)
+        ->and($generalCategories->pluck('id'))->not->toContain($event2Cat->id);
+
+    // Query for event 1 must include event 1 category, but NOT event 2 category
+    $event1Categories = \App\Models\Category::forEvent($event1->id, includeGeneral: false)->get();
+    expect($event1Categories->pluck('id'))->toContain($event1Cat->id)
+        ->and($event1Categories->pluck('id'))->not->toContain($event2Cat->id);
+});
+
+it('supports custom attribute definitions scoped to an event', function () {
+    $event = Event::create(['name' => 'Porseni Remaja 2026', 'start_date' => '2026-09-01']);
+
+    $scopedDef = AttributeDefinition::create([
+        'entity_type' => AttributeEntity::CountSheet,
+        'key' => 'posko_lapangan',
+        'label' => 'Posko Lapangan',
+        'data_type' => AttributeType::Text,
+        'is_required' => false,
+        'is_active' => true,
+        'scope_event_id' => $event->id,
+    ]);
+
+    expect($event->attributeDefinitions)->toHaveCount(1)
+        ->and($event->attributeDefinitions->first()->key)->toBe('posko_lapangan');
+
+    $generalDefs = AttributeDefinition::forEntity(AttributeEntity::CountSheet, null)->get();
+    expect($generalDefs->pluck('id'))->not->toContain($scopedDef->id);
+
+    $eventDefs = AttributeDefinition::forEntity(AttributeEntity::CountSheet, $event->id)->get();
+    expect($eventDefs->pluck('id'))->toContain($scopedDef->id);
+});
