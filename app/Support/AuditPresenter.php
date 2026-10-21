@@ -49,6 +49,10 @@ class AuditPresenter
         'frozen_report' => 'Laporan keuangan',
         'report_approval' => 'Persetujuan laporan',
         'report_signatory' => 'Penanda tangan laporan',
+        'household' => 'Keluarga',
+        'member_milestone' => 'Peristiwa gerejawi',
+        'member_ministry' => 'Pelayanan jemaat',
+        'member_document' => 'Dokumen jemaat',
     ];
 
     private const FIELDS = [
@@ -76,6 +80,13 @@ class AuditPresenter
         'submitted_by' => 'Diajukan oleh', 'requested_by' => 'Pemohon', 'time' => 'Jam', 'day_of_week' => 'Hari', 'key' => 'Kunci', 'data_type' => 'Jenis isian',
         'entity_type' => 'Berlaku untuk', 'member_number' => 'Nomor anggota', 'count_sheet_id' => 'Berita acara', 'service_schedule_id' => 'Jadwal ibadah',
         'report_signatory_id' => 'Penanda tangan', 'frozen_report_id' => 'Laporan', 'denominations' => 'Pecahan uang', 'options' => 'Pilihan', 'bank_name' => 'Nama bank',
+        'nik' => 'NIK', 'place_of_birth' => 'Tempat lahir', 'marital_status' => 'Status pernikahan', 'education' => 'Pendidikan', 'occupation' => 'Pekerjaan',
+        'father_name' => 'Nama ayah', 'mother_name' => 'Nama ibu', 'ktp_address' => 'Alamat KTP', 'household_id' => 'Keluarga', 'family_role' => 'Status dalam keluarga',
+        'membership_status' => 'Status keanggotaan', 'membership_date' => 'Tanggal diterima', 'previous_church' => 'Gereja asal', 'wilayah' => 'Wilayah',
+        'emergency_name' => 'Kontak darurat', 'emergency_phone' => 'Telepon darurat', 'emergency_relation' => 'Hubungan kontak darurat',
+        'family_number' => 'Nomor keluarga', 'rt_rw' => 'RT/RW', 'kelurahan' => 'Kelurahan', 'kecamatan' => 'Kecamatan', 'postal_code' => 'Kode pos', 'housing_status' => 'Status tempat tinggal',
+        'ministry' => 'Pelayanan', 'role_title' => 'Jabatan', 'church' => 'Gereja', 'minister' => 'Pendeta', 'certificate_number' => 'Nomor surat', 'civil_number' => 'Nomor akta sipil',
+        'document_number' => 'Nomor dokumen', 'issued_date' => 'Tanggal terbit', 'original_name' => 'Nama berkas', 'mime' => 'Jenis berkas', 'size' => 'Ukuran',
     ];
 
     private const MONEY = ['amount', 'total_amount', 'target_budget', 'expense_approval_threshold', 'balance', 'opening_balance', 'closing_balance', 'debit', 'credit'];

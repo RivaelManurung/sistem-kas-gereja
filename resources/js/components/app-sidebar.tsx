@@ -18,6 +18,7 @@ import {
     FileText,
     HandCoins,
     HeartHandshake,
+    House,
     KeyRound,
     LayoutGrid,
     ListChecks,
@@ -138,6 +139,7 @@ const MODULES: NavModule[] = [
                     { title: 'Pengguna', url: '/admin/users', icon: Users, anyOf: ['users.manage'] },
                     { title: 'Peran & Hak Akses', url: '/admin/roles', icon: KeyRound, anyOf: ['roles.manage'] },
                     { title: 'Anggota Jemaat', url: '/admin/members', icon: UserCheck, anyOf: ['members.manage'] },
+                    { title: 'Keluarga', url: '/admin/households', icon: House, anyOf: ['members.manage'] },
                 ],
             },
             {

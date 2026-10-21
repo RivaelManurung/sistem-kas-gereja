@@ -1,4 +1,5 @@
 import { ConfirmDialog } from '@/components/app/confirm-dialog';
+import { LinkRow } from '@/components/app/link-row';
 import { RowActions } from '@/components/app/row-actions';
 import PageHeader from '@/components/page-header';
 import StatusBadge from '@/components/status-badge';
@@ -13,8 +14,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { FileSignature, Image as ImageIcon, Pencil, PlusCircle, Power, Trash2, Upload } from 'lucide-react';
-import { useState } from 'react';
+import { Eye, FileSignature, Image as ImageIcon, Pencil, PlusCircle, Power, Trash2, Upload } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface SignatoryRow {
     id: number;
@@ -76,6 +77,16 @@ export default function SignaturesIndex({
         setFormOrder(signatories.length + 1);
         setCreateDialogOpen(true);
     };
+
+    useEffect(() => {
+        const id = Number(new URLSearchParams(window.location.search).get('edit'));
+        const target = id ? signatories.find((s) => s.id === id) : null;
+        if (target) {
+            openEdit(target);
+            window.history.replaceState(null, '', window.location.pathname);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const openEdit = (sig: SignatoryRow) => {
         setEditingSignatory(sig);
@@ -233,7 +244,7 @@ export default function SignaturesIndex({
                                             </TableRow>
                                         ) : (
                                             signatories.map((sig) => (
-                                                <TableRow key={sig.id}>
+                                                <LinkRow key={sig.id} href={route('admin.signatures.show', sig.id)}>
                                                     <TableCell className="font-bold text-center">{sig.order}</TableCell>
                                                     <TableCell>
                                                         <div className="font-semibold text-sm">{sig.position}</div>
@@ -257,6 +268,7 @@ export default function SignaturesIndex({
                                                     <TableCell className="text-right">
                                                         <RowActions
                                                             actions={[
+                                                                { label: 'Lihat detail', icon: Eye, href: route('admin.signatures.show', sig.id) },
                                                                 { label: 'Ubah', icon: Pencil, onSelect: () => openEdit(sig) },
                                                                 {
                                                                     label: sig.is_active ? 'Nonaktifkan' : 'Aktifkan',
@@ -273,7 +285,7 @@ export default function SignaturesIndex({
                                                             ]}
                                                         />
                                                     </TableCell>
-                                                </TableRow>
+                                                </LinkRow>
                                             ))
                                         )}
                                     </TableBody>

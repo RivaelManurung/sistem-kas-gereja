@@ -1,3 +1,5 @@
+import { LinkRow } from '@/components/app/link-row';
+import { RowActions } from '@/components/app/row-actions';
 import PageHeader from '@/components/page-header';
 import Pagination from '@/components/pagination';
 import { Badge } from '@/components/ui/badge';
@@ -8,7 +10,7 @@ import { formatRupiah } from '@/lib/money';
 import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem, type Paginated } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowRight, PlusCircle } from 'lucide-react';
+import { ArrowRight, Eye, PlusCircle } from 'lucide-react';
 
 interface DepositRow {
     id: number;
@@ -62,11 +64,12 @@ export default function DepositsIndex({ deposits }: { deposits: Paginated<Deposi
                             <TableHead className="text-right">Nominal</TableHead>
                             <TableHead>Petugas</TableHead>
                             <TableHead>Status</TableHead>
+                            <TableHead className="w-12"><span className="sr-only">Aksi</span></TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {deposits.data.map((deposit) => (
-                            <TableRow key={deposit.id}>
+                            <LinkRow key={deposit.id} href={route('deposits.show', deposit.id)}>
                                 <TableCell className="text-sm">{formatDate(deposit.deposit_date)}</TableCell>
                                 <TableCell className="font-medium">{deposit.from_account.name}</TableCell>
                                 <TableCell className="text-muted-foreground">
@@ -90,11 +93,14 @@ export default function DepositsIndex({ deposits }: { deposits: Paginated<Deposi
                                 <TableCell>
                                     <Badge className="border-income/30 bg-income/10 text-income">Tercatat di Buku Besar</Badge>
                                 </TableCell>
-                            </TableRow>
+                                <TableCell className="text-right">
+                                    <RowActions actions={[{ label: 'Lihat detail', icon: Eye, href: route('deposits.show', deposit.id) }]} />
+                                </TableCell>
+                            </LinkRow>
                         ))}
                         {deposits.data.length === 0 && (
                             <TableRow>
-                                <TableCell colSpan={8} className="text-muted-foreground py-8 text-center">
+                                <TableCell colSpan={9} className="text-muted-foreground py-8 text-center">
                                                                         Belum ada catatan setoran bank.
                                 </TableCell>
                             </TableRow>

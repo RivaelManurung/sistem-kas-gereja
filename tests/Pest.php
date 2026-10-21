@@ -48,6 +48,12 @@ expect()->extend('toBeOne', function () {
 
 function actingAsRole(Role $role): User
 {
+    app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+
+    if (\Spatie\Permission\Models\Role::where('name', $role->value)->doesntExist()) {
+        (new \Database\Seeders\RolePermissionSeeder)->run();
+    }
+
     $user = User::factory()->create();
     $user->assignRole($role->value);
     test()->actingAs($user);

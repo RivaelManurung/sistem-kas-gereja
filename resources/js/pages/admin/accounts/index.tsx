@@ -3,13 +3,14 @@ import Pagination from '@/components/pagination';
 import StatusBadge from '@/components/status-badge';
 import { Badge } from '@/components/ui/badge';
 import { ConfirmDialog } from '@/components/app/confirm-dialog';
+import { LinkRow } from '@/components/app/link-row';
 import { RowActions } from '@/components/app/row-actions';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Paginated } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { Pencil, Power } from 'lucide-react';
+import { Eye, Pencil, Power } from 'lucide-react';
 import { useState } from 'react';
 
 interface AccountRow {
@@ -68,7 +69,7 @@ export default function AccountsIndex({ accounts }: { accounts: Paginated<Accoun
                     </TableHeader>
                     <TableBody>
                         {accounts.data.map((account) => (
-                            <TableRow key={account.id}>
+                            <LinkRow key={account.id} href={route('admin.accounts.show', account.id)}>
                                 <TableCell className="font-mono font-medium">{account.code}</TableCell>
                                 <TableCell>{account.name}</TableCell>
                                 <TableCell>
@@ -89,6 +90,7 @@ export default function AccountsIndex({ accounts }: { accounts: Paginated<Accoun
                                 <TableCell className="text-right">
                                     <RowActions
                                         actions={[
+                                            { label: 'Lihat detail', icon: Eye, href: route('admin.accounts.show', account.id) },
                                             { label: 'Ubah', icon: Pencil, href: route('admin.accounts.edit', account.id) },
                                             {
                                                 label: account.is_active ? 'Nonaktifkan' : 'Aktifkan',
@@ -100,7 +102,7 @@ export default function AccountsIndex({ accounts }: { accounts: Paginated<Accoun
                                         ]}
                                     />
                                 </TableCell>
-                            </TableRow>
+                            </LinkRow>
                         ))}
                         {accounts.data.length === 0 && (
                             <TableRow>

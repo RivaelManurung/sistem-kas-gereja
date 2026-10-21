@@ -2,13 +2,14 @@ import PageHeader from '@/components/page-header';
 import Pagination from '@/components/pagination';
 import StatusBadge from '@/components/status-badge';
 import { ConfirmDialog } from '@/components/app/confirm-dialog';
+import { LinkRow } from '@/components/app/link-row';
 import { RowActions } from '@/components/app/row-actions';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Paginated } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { Pencil, Power } from 'lucide-react';
+import { Eye, Pencil, Power } from 'lucide-react';
 import { useState } from 'react';
 
 interface FundRow {
@@ -58,7 +59,7 @@ export default function FundsIndex({ funds }: { funds: Paginated<FundRow> }) {
                     </TableHeader>
                     <TableBody>
                         {funds.data.map((fund) => (
-                            <TableRow key={fund.id}>
+                            <LinkRow key={fund.id} href={route('admin.funds.show', fund.id)}>
                                 <TableCell className="font-mono font-medium">{fund.code}</TableCell>
                                 <TableCell className="font-medium">{fund.name}</TableCell>
                                 <TableCell className="text-sm text-muted-foreground">{fund.description ?? '-'}</TableCell>
@@ -68,6 +69,7 @@ export default function FundsIndex({ funds }: { funds: Paginated<FundRow> }) {
                                 <TableCell className="text-right">
                                     <RowActions
                                         actions={[
+                                            { label: 'Lihat detail', icon: Eye, href: route('admin.funds.show', fund.id) },
                                             { label: 'Ubah', icon: Pencil, href: route('admin.funds.edit', fund.id) },
                                             {
                                                 label: fund.is_active ? 'Nonaktifkan' : 'Aktifkan',
@@ -79,7 +81,7 @@ export default function FundsIndex({ funds }: { funds: Paginated<FundRow> }) {
                                         ]}
                                     />
                                 </TableCell>
-                            </TableRow>
+                            </LinkRow>
                         ))}
                         {funds.data.length === 0 && (
                             <TableRow>

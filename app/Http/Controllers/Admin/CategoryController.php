@@ -11,6 +11,8 @@ use App\Models\Category;
 use App\Models\Fund;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use App\Models\LedgerEntry;
+use App\Models\AllocationRule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -31,6 +33,77 @@ class CategoryController extends Controller
         return Inertia::render('admin/categories/index', [
             'categories' => $categories,
             'currentDirection' => $direction,
+        ]);
+    }
+
+    public function show(Category $category): Response
+    {
+        $category->load('defaultFund:id,code,name');
+        $isIn = $category->direction === Direction::In;
+        $net = function (?int $year = null) use ($category, $isIn): int {
+            $q = LedgerEntry::where('category_id', $category->id);
+            if ($year !== null) {
+                $q->whereYear('entry_date', $year);
+            }
+            $in = (int) (clone $q)->where('direction', Direction::In->value)->sum('amount');
+            $out = (int) (clone $q)->where('direction', Direction::Out->value)->sum('amount');
+
+            return $isIn ? $in - $out : $out - $in;
+        };
+
+        $entries = LedgerEntry::query()
+            ->with(['fund:id,name', 'account:id,name'])
+            ->where('category_id', $category->id)
+            ->orderByDesc('entry_date')
+            ->orderByDesc('id')
+            ->limit(15)
+            ->get()
+            ->map(fn (LedgerEntry $e) => [
+                'id' => $e->id,
+                'entry_date' => $e->entry_date->toDateString(),
+                'description' => $e->description,
+                'direction' => $e->direction->value,
+                'amount' => $e->amount,
+                'fund_name' => $e->fund?->name,
+                'account_name' => $e->account?->name,
+            ]);
+
+        $rules = AllocationRule::query()
+            ->with('items.fund:id,name')
+            ->where('category_id', $category->id)
+            ->orderByDesc('valid_from')
+            ->orderByDesc('id')
+            ->get()
+            ->map(fn (AllocationRule $r) => [
+                'id' => $r->id,
+                'name' => $r->name,
+                'valid_from' => $r->valid_from->toDateString(),
+                'is_active' => $r->is_active,
+                'items' => $r->items->map(fn ($i) => ['id' => $i->id, 'fund_name' => $i->fund?->name, 'percentage' => $i->percentage])->values(),
+            ]);
+
+        return Inertia::render('admin/categories/show', [
+            'category' => [
+                'id' => $category->id,
+                'name' => $category->name,
+                'direction' => $category->direction->value,
+                'direction_label' => $category->direction->label(),
+                'default_fund' => $category->defaultFund ? ['id' => $category->defaultFund->id, 'code' => $category->defaultFund->code, 'name' => $category->defaultFund->name] : null,
+                'allows_named' => $category->allows_named,
+                'is_public' => $category->is_public,
+                'is_active' => $category->is_active,
+                'sort_order' => $category->sort_order,
+            ],
+            'totals' => ['year' => $net((int) now()->year), 'all_time' => $net(), 'year_label' => (string) now()->year],
+            'entries' => $entries,
+            'rules' => $rules,
+            'customFields' => [
+                'definitions' => AttributeDefinition::active()
+                    ->forEntity(AttributeEntity::Category)
+                    ->orderBy('sort_order')
+                    ->get(),
+                'values' => (object) $category->customAttributes(),
+            ],
         ]);
     }
 

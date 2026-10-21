@@ -1,4 +1,5 @@
 import { ConfirmDialog } from '@/components/app/confirm-dialog';
+import { LinkRow } from '@/components/app/link-row';
 import { RowActions } from '@/components/app/row-actions';
 import PageHeader from '@/components/page-header';
 import Pagination from '@/components/pagination';
@@ -9,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Paginated, type SharedData } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Pencil, Power } from 'lucide-react';
+import { Eye, Pencil, Power } from 'lucide-react';
 import { useState } from 'react';
 
 interface UserRow {
@@ -59,7 +60,7 @@ export default function UsersIndex({ users }: { users: Paginated<UserRow> }) {
                     </TableHeader>
                     <TableBody>
                         {users.data.map((user) => (
-                            <TableRow key={user.id}>
+                            <LinkRow key={user.id} href={route('admin.users.show', user.id)}>
                                 <TableCell className="font-medium">{user.name}</TableCell>
                                 <TableCell className="text-muted-foreground">{user.email}</TableCell>
                                 <TableCell>
@@ -81,6 +82,7 @@ export default function UsersIndex({ users }: { users: Paginated<UserRow> }) {
                                 <TableCell className="text-right">
                                     <RowActions
                                         actions={[
+                                            { label: 'Lihat detail', icon: Eye, href: route('admin.users.show', user.id) },
                                             { label: 'Ubah', icon: Pencil, href: route('admin.users.edit', user.id) },
                                             {
                                                 label: user.is_active ? 'Nonaktifkan' : 'Aktifkan',
@@ -93,7 +95,7 @@ export default function UsersIndex({ users }: { users: Paginated<UserRow> }) {
                                         ]}
                                     />
                                 </TableCell>
-                            </TableRow>
+                            </LinkRow>
                         ))}
                         {users.data.length === 0 && (
                             <TableRow>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\Role;
 use App\Http\Controllers\Controller;
 use App\Models\ChurchSetting;
+use App\Models\ReportApproval;
 use App\Models\ReportSignatory;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -25,6 +26,27 @@ class ReportSignatoryController extends Controller
             'users' => $users,
             'roles' => Role::options(),
             'stamp_url' => $setting->getStampBase64(),
+        ]);
+    }
+
+    public function show(ReportSignatory $signature): Response
+    {
+        $signature->load('user:id,name,email');
+        $roleLabel = $signature->role ? (Role::tryFrom($signature->role)?->label() ?? $signature->role) : null;
+
+        return Inertia::render('admin/signatures/show', [
+            'signatory' => [
+                'id' => $signature->id,
+                'title' => $signature->title,
+                'position' => $signature->position,
+                'role' => $signature->role,
+                'role_label' => $roleLabel,
+                'user' => $signature->user ? ['id' => $signature->user->id, 'name' => $signature->user->name, 'email' => $signature->user->email] : null,
+                'order' => $signature->order,
+                'is_active' => $signature->is_active,
+                'approvals_count' => ReportApproval::where('report_signatory_id', $signature->id)->count(),
+                'reports_count' => ReportApproval::where('report_signatory_id', $signature->id)->distinct('frozen_report_id')->count('frozen_report_id'),
+            ],
         ]);
     }
 

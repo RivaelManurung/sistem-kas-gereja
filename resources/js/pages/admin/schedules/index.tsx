@@ -3,13 +3,14 @@ import Pagination from '@/components/pagination';
 import StatusBadge from '@/components/status-badge';
 import { Badge } from '@/components/ui/badge';
 import { ConfirmDialog } from '@/components/app/confirm-dialog';
+import { LinkRow } from '@/components/app/link-row';
 import { RowActions } from '@/components/app/row-actions';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Paginated } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { Pencil, Power } from 'lucide-react';
+import { Eye, Pencil, Power } from 'lucide-react';
 import { useState } from 'react';
 
 interface ScheduleRow {
@@ -60,7 +61,7 @@ export default function SchedulesIndex({ schedules }: { schedules: Paginated<Sch
                     </TableHeader>
                     <TableBody>
                         {schedules.data.map((schedule) => (
-                            <TableRow key={schedule.id}>
+                            <LinkRow key={schedule.id} href={route('admin.schedules.show', schedule.id)}>
                                 <TableCell className="font-medium">{schedule.name}</TableCell>
                                 <TableCell>
                                     <Badge variant="outline">{dayNames[schedule.day_of_week]}</Badge>
@@ -72,6 +73,7 @@ export default function SchedulesIndex({ schedules }: { schedules: Paginated<Sch
                                 <TableCell className="text-right">
                                     <RowActions
                                         actions={[
+                                            { label: 'Lihat detail', icon: Eye, href: route('admin.schedules.show', schedule.id) },
                                             { label: 'Ubah', icon: Pencil, href: route('admin.schedules.edit', schedule.id) },
                                             {
                                                 label: schedule.is_active ? 'Nonaktifkan' : 'Aktifkan',
@@ -83,7 +85,7 @@ export default function SchedulesIndex({ schedules }: { schedules: Paginated<Sch
                                         ]}
                                     />
                                 </TableCell>
-                            </TableRow>
+                            </LinkRow>
                         ))}
                         {schedules.data.length === 0 && (
                             <TableRow>

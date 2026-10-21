@@ -1,4 +1,5 @@
 import { ConfirmDialog } from '@/components/app/confirm-dialog';
+import { LinkRow } from '@/components/app/link-row';
 import { RowActions } from '@/components/app/row-actions';
 import PageHeader from '@/components/page-header';
 import Pagination from '@/components/pagination';
@@ -11,7 +12,7 @@ import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem, type Paginated } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
-import { ArrowRight, CheckCircle2, PlusCircle, XCircle } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Eye, PlusCircle, XCircle } from 'lucide-react';
 
 interface TransferRow {
     id: number;
@@ -104,7 +105,7 @@ export default function TransfersIndex({
                                 (!currentUserId || transfer.requester.id !== currentUserId);
 
                             return (
-                                <TableRow key={transfer.id}>
+                                <LinkRow key={transfer.id} href={route('transfers.show', transfer.id)}>
                                     <TableCell className="text-sm">{formatDate(transfer.transfer_date)}</TableCell>
                                     <TableCell className="font-semibold text-expense">
                                         {transfer.from_fund.name}
@@ -129,6 +130,7 @@ export default function TransfersIndex({
                                     <TableCell className="text-right">
                                         <RowActions
                                             actions={[
+                                                { label: 'Lihat detail', icon: Eye, href: route('transfers.show', transfer.id) },
                                                 {
                                                     label: 'Setujui',
                                                     icon: CheckCircle2,
@@ -146,7 +148,7 @@ export default function TransfersIndex({
                                             ]}
                                         />
                                     </TableCell>
-                                </TableRow>
+                                </LinkRow>
                             );
                         })}
                         {transfers.data.length === 0 && (

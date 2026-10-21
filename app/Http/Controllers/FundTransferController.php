@@ -7,7 +7,6 @@ use App\Enums\FundTransferStatus;
 use App\Enums\Role;
 use App\Http\Requests\FundTransferRequest;
 use App\Models\Account;
-use App\Models\ChurchSetting;
 use App\Models\Fund;
 use App\Models\FundTransfer;
 use App\Models\LedgerEntry;
@@ -61,19 +60,24 @@ class FundTransferController extends Controller
     public function show(FundTransfer $transfer): Response
     {
         $transfer->load(['fromFund', 'toFund', 'account', 'requester', 'approver']);
-        $fromBalance = LedgerEntry::getBalance($transfer->from_fund_id);
-        $setting = ChurchSetting::current();
 
         $user = auth()->user();
         $isRequester = $user && $transfer->requested_by === $user->id;
         $canApproveRole = $user && $user->can(Permission::TransfersApprove->value);
         $canApprove = ! $isRequester && $transfer->status === FundTransferStatus::Pending && $canApproveRole;
 
-        return Inertia::render('transfers/index', [
-            'selectedTransfer' => $transfer,
-            'fromBalance' => $fromBalance,
-            'setting' => $setting,
+        $entries = LedgerEntry::query()
+            ->with(['account', 'fund'])
+            ->where('source_type', 'fund_transfer')
+            ->where('source_id', $transfer->id)
+            ->orderBy('id')
+            ->get();
+
+        return Inertia::render('transfers/show', [
+            'transfer' => $transfer,
+            'fromBalance' => LedgerEntry::getBalance($transfer->from_fund_id),
             'canApprove' => $canApprove,
+            'ledgerEntries' => $entries,
         ]);
     }
 

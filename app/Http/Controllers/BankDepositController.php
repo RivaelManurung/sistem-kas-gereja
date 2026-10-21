@@ -32,6 +32,23 @@ class BankDepositController extends Controller
         ]);
     }
 
+    public function show(BankDeposit $deposit): Response
+    {
+        $deposit->load(['fromAccount', 'toAccount', 'creator']);
+
+        $entries = LedgerEntry::query()
+            ->with(['account', 'fund'])
+            ->where('source_type', 'bank_deposit')
+            ->where('source_id', $deposit->id)
+            ->orderBy('id')
+            ->get();
+
+        return Inertia::render('deposits/show', [
+            'deposit' => $deposit,
+            'ledgerEntries' => $entries,
+        ]);
+    }
+
     public function create(): Response
     {
         $cashAccounts = Account::active()->whereIn('type', [AccountType::Cash, AccountType::PettyCash])->orderBy('name')->get();

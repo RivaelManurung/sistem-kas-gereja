@@ -26,6 +26,19 @@ class ServiceSessionController extends Controller
         ]);
     }
 
+    public function show(ServiceSession $session): Response
+    {
+        $session->load([
+            'schedule',
+            'countSheets' => fn ($q) => $q->orderBy('id'),
+        ]);
+
+        return Inertia::render('sessions/show', [
+            'session' => $session,
+            'totalCollected' => (int) $session->countSheets->sum('total_amount'),
+        ]);
+    }
+
     public function create(): Response
     {
         $schedules = ServiceSchedule::active()

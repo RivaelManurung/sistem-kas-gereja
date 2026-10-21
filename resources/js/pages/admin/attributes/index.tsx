@@ -3,6 +3,7 @@ import Pagination from '@/components/pagination';
 import StatusBadge from '@/components/status-badge';
 import { Badge } from '@/components/ui/badge';
 import { ConfirmDialog } from '@/components/app/confirm-dialog';
+import { LinkRow } from '@/components/app/link-row';
 import { RowActions } from '@/components/app/row-actions';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -10,7 +11,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Option, type Paginated } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { Pencil, Power } from 'lucide-react';
+import { Eye, Pencil, Power } from 'lucide-react';
 import { useState } from 'react';
 
 interface AttributeRow {
@@ -99,7 +100,7 @@ export default function AttributesIndex({
                     </TableHeader>
                     <TableBody>
                         {definitions.data.map((def) => (
-                            <TableRow key={def.id}>
+                            <LinkRow key={def.id} href={route('admin.attributes.show', def.id)}>
                                 <TableCell className="font-mono text-muted-foreground">{def.sort_order}</TableCell>
                                 <TableCell className="font-mono font-medium">{def.key}</TableCell>
                                 <TableCell className="font-medium">{def.label}</TableCell>
@@ -122,6 +123,7 @@ export default function AttributesIndex({
                                 <TableCell className="text-right">
                                     <RowActions
                                         actions={[
+                                            { label: 'Lihat detail', icon: Eye, href: route('admin.attributes.show', def.id) },
                                             { label: 'Ubah', icon: Pencil, href: route('admin.attributes.edit', def.id) },
                                             {
                                                 label: def.is_active ? 'Nonaktifkan' : 'Aktifkan',
@@ -133,7 +135,7 @@ export default function AttributesIndex({
                                         ]}
                                     />
                                 </TableCell>
-                            </TableRow>
+                            </LinkRow>
                         ))}
                         {definitions.data.length === 0 && (
                             <TableRow>

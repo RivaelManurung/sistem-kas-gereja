@@ -12,6 +12,11 @@ class UserPolicy
         return $actor->can(Permission::UsersManage->value);
     }
 
+    public function view(User $actor, User $user): bool
+    {
+        return $actor->can(Permission::UsersManage->value);
+    }
+
     public function create(User $actor): bool
     {
         return $actor->can(Permission::UsersManage->value);

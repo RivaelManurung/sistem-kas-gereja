@@ -1,6 +1,7 @@
 import PageHeader from '@/components/page-header';
 import Pagination from '@/components/pagination';
 import { ConfirmDialog } from '@/components/app/confirm-dialog';
+import { LinkRow } from '@/components/app/link-row';
 import { RowActions } from '@/components/app/row-actions';
 import StatusBadge from '@/components/status-badge';
 import { Badge } from '@/components/ui/badge';
@@ -10,7 +11,7 @@ import AppLayout from '@/layouts/app-layout';
 import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem, type Paginated } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { Pencil, PlusCircle, Power } from 'lucide-react';
+import { Eye, Pencil, PlusCircle, Power } from 'lucide-react';
 import { useState } from 'react';
 
 interface AllocationRuleRow {
@@ -78,7 +79,7 @@ export default function AllocationsIndex({ rules }: { rules: Paginated<Allocatio
                     </TableHeader>
                     <TableBody>
                         {rules.data.map((rule) => (
-                            <TableRow key={rule.id}>
+                            <LinkRow key={rule.id} href={route('admin.allocations.show', rule.id)}>
                                 <TableCell className="font-semibold">{rule.name}</TableCell>
                                 <TableCell>
                                     <Badge variant="outline">{rule.category.name}</Badge>
@@ -99,6 +100,7 @@ export default function AllocationsIndex({ rules }: { rules: Paginated<Allocatio
                                 <TableCell className="text-right">
                                     <RowActions
                                         actions={[
+                                            { label: 'Lihat detail', icon: Eye, href: route('admin.allocations.show', rule.id) },
                                             { label: 'Ubah', icon: Pencil, href: route('admin.allocations.edit', rule.id) },
                                             {
                                                 label: rule.is_active ? 'Nonaktifkan' : 'Aktifkan',
@@ -110,7 +112,7 @@ export default function AllocationsIndex({ rules }: { rules: Paginated<Allocatio
                                         ]}
                                     />
                                 </TableCell>
-                            </TableRow>
+                            </LinkRow>
                         ))}
                         {rules.data.length === 0 && (
                             <TableRow>

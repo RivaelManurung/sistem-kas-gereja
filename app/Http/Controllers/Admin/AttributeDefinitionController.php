@@ -7,6 +7,7 @@ use App\Enums\AttributeType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AttributeDefinitionRequest;
 use App\Models\AttributeDefinition;
+use App\Models\Event;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -32,6 +33,30 @@ class AttributeDefinitionController extends Controller
                 fn (AttributeEntity $e) => ['value' => $e->value, 'label' => $e->label()],
                 AttributeEntity::cases()
             ),
+        ]);
+    }
+
+    public function show(AttributeDefinition $attribute): Response
+    {
+        $event = $attribute->scope_event_id ? Event::find($attribute->scope_event_id) : null;
+
+        return Inertia::render('admin/attributes/show', [
+            'definition' => [
+                'id' => $attribute->id,
+                'key' => $attribute->key,
+                'label' => $attribute->label,
+                'entity_type' => $attribute->entity_type->value,
+                'entity_label' => $attribute->entity_type->label(),
+                'data_type' => $attribute->data_type->value,
+                'data_type_label' => $attribute->data_type->label(),
+                'options' => $attribute->options,
+                'is_required' => $attribute->is_required,
+                'is_public' => $attribute->is_public,
+                'is_active' => $attribute->is_active,
+                'sort_order' => $attribute->sort_order,
+                'scope_event' => $event ? ['id' => $event->id, 'name' => $event->name] : null,
+                'values_count' => $attribute->values()->count(),
+            ],
         ]);
     }
 

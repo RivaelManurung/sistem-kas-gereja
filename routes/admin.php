@@ -10,7 +10,6 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ChurchSettingController;
 use App\Http\Controllers\Admin\FundController;
 use App\Http\Controllers\Admin\LookupOptionController;
-use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\ReportSignatoryController;
 use App\Http\Controllers\Admin\ServiceScheduleController;
@@ -19,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::middleware('permission:'.Permission::UsersManage->value)->group(function () {
-        Route::resource('users', UserController::class)->except(['show', 'destroy']);
+        Route::resource('users', UserController::class)->except(['destroy']);
         Route::patch('users/{user}/toggle', [UserController::class, 'toggle'])->name('users.toggle');
     });
 
@@ -32,7 +31,7 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
         Route::get('settings', [ChurchSettingController::class, 'edit'])->name('settings.edit');
         Route::put('settings', [ChurchSettingController::class, 'update'])->name('settings.update');
 
-        Route::resource('signatures', ReportSignatoryController::class)->except(['create', 'show', 'edit']);
+        Route::resource('signatures', ReportSignatoryController::class)->except(['create', 'edit']);
         Route::patch('signatures/{signature}/toggle', [ReportSignatoryController::class, 'toggle'])->name('signatures.toggle');
     });
 
@@ -42,31 +41,29 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
         Route::put('options/{option}', [LookupOptionController::class, 'update'])->name('options.update');
         Route::patch('options/{option}/toggle', [LookupOptionController::class, 'toggle'])->name('options.toggle');
 
-        Route::resource('accounts', AccountController::class)->except(['show', 'destroy']);
+        Route::resource('accounts', AccountController::class)->except(['destroy']);
         Route::patch('accounts/{account}/toggle', [AccountController::class, 'toggle'])->name('accounts.toggle');
 
-        Route::resource('funds', FundController::class)->except(['show', 'destroy']);
+        Route::resource('funds', FundController::class)->except(['destroy']);
         Route::patch('funds/{fund}/toggle', [FundController::class, 'toggle'])->name('funds.toggle');
 
-        Route::resource('categories', CategoryController::class)->except(['show', 'destroy']);
+        Route::resource('categories', CategoryController::class)->except(['destroy']);
         Route::patch('categories/{category}/toggle', [CategoryController::class, 'toggle'])->name('categories.toggle');
 
-        Route::resource('attributes', AttributeDefinitionController::class)->except(['show', 'destroy']);
+        Route::resource('attributes', AttributeDefinitionController::class)->except(['destroy']);
         Route::patch('attributes/{attribute}/toggle', [AttributeDefinitionController::class, 'toggle'])->name('attributes.toggle');
 
-        Route::resource('schedules', ServiceScheduleController::class)->except(['show', 'destroy']);
+        Route::resource('schedules', ServiceScheduleController::class)->except(['destroy']);
         Route::patch('schedules/{schedule}/toggle', [ServiceScheduleController::class, 'toggle'])->name('schedules.toggle');
 
-        Route::resource('allocations', AllocationRuleController::class)->except(['show', 'destroy']);
+        Route::resource('allocations', AllocationRuleController::class)->except(['destroy']);
         Route::patch('allocations/{allocation}/toggle', [AllocationRuleController::class, 'toggle'])->name('allocations.toggle');
 
-        Route::resource('periods', AccountingPeriodController::class)->only(['index', 'create', 'store']);
+        Route::resource('periods', AccountingPeriodController::class)->only(['index', 'create', 'store', 'show']);
         Route::post('periods/{period}/close', [AccountingPeriodController::class, 'close'])->name('periods.close');
     });
 
     Route::middleware('permission:'.Permission::MembersManage->value)->group(function () {
-        Route::resource('members', MemberController::class)->except(['show', 'destroy']);
-        Route::patch('members/{member}/toggle', [MemberController::class, 'toggle'])->name('members.toggle');
     });
 
     Route::get('audit', [AuditLogController::class, 'index'])

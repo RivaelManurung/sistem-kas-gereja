@@ -2,6 +2,7 @@ import PageHeader from '@/components/page-header';
 import Pagination from '@/components/pagination';
 import { Badge } from '@/components/ui/badge';
 import { ConfirmDialog } from '@/components/app/confirm-dialog';
+import { LinkRow } from '@/components/app/link-row';
 import { RowActions } from '@/components/app/row-actions';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -9,7 +10,7 @@ import AppLayout from '@/layouts/app-layout';
 import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem, type Paginated } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { Lock, LockOpen, PlusCircle } from 'lucide-react';
+import { Eye, Lock, LockOpen, PlusCircle } from 'lucide-react';
 import { useState } from 'react';
 
 interface PeriodRow {
@@ -69,7 +70,7 @@ export default function PeriodsIndex({ periods }: { periods: Paginated<PeriodRow
                     </TableHeader>
                     <TableBody>
                         {periods.data.map((period) => (
-                            <TableRow key={period.id}>
+                            <LinkRow key={period.id} href={route('admin.periods.show', period.id)}>
                                 <TableCell className="font-semibold">{period.name}</TableCell>
                                 <TableCell className="text-sm">{formatDate(period.start_date)}</TableCell>
                                 <TableCell className="text-sm">{formatDate(period.end_date)}</TableCell>
@@ -93,6 +94,7 @@ export default function PeriodsIndex({ periods }: { periods: Paginated<PeriodRow
                                 <TableCell className="text-right">
                                     <RowActions
                                         actions={[
+                                            { label: 'Lihat detail', icon: Eye, href: route('admin.periods.show', period.id) },
                                             {
                                                 label: 'Tutup periode',
                                                 icon: Lock,
@@ -103,7 +105,7 @@ export default function PeriodsIndex({ periods }: { periods: Paginated<PeriodRow
                                         ]}
                                     />
                                 </TableCell>
-                            </TableRow>
+                            </LinkRow>
                         ))}
                         {periods.data.length === 0 && (
                             <TableRow>

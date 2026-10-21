@@ -27,17 +27,19 @@ it('creates member with custom attributes', function () {
     ])->assertSessionHasErrors(['attributes.sektor']);
 
     // Providing valid custom attribute succeeds
-    $this->post(route('admin.members.store'), [
+    $response = $this->post(route('admin.members.store'), [
         'name' => 'Jemaat A',
         'gender' => 'L',
         'attributes' => [
             'sektor' => 'Sektor 2',
         ],
-    ])->assertRedirect(route('admin.members.index'));
+    ]);
 
     $member = Member::where('name', 'Jemaat A')->first();
     expect($member)->not->toBeNull()
         ->and($member->customAttributes())->toHaveKey('sektor', 'Sektor 2');
+
+    $response->assertRedirect(route('admin.members.show', $member));
 });
 
 it('escapes search wildcards literally', function () {

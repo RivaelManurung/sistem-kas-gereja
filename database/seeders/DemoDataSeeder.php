@@ -24,6 +24,7 @@ use App\Models\CountSheet;
 use App\Models\Donation;
 use App\Models\Event;
 use App\Models\EventMember;
+use App\Models\Household;
 use App\Models\Expense;
 use App\Models\Fund;
 use App\Models\LedgerEntry;
@@ -302,17 +303,21 @@ class DemoDataSeeder extends Seeder
     private function members(): void
     {
         $this->as($this->users['admin']);
-        $male = ['Daniel', 'Yohanes', 'Samuel', 'Markus', 'Lukas', 'Petrus', 'Andreas', 'Timotius', 'Paulus', 'Yakub', 'Stefanus', 'Benyamin', 'Hendra', 'Agus', 'Budi', 'Wahyu', 'Jeffry', 'Stenly', 'Parlindungan', 'Hotma', 'Mangatas', 'Ferdinand', 'Rudy', 'Ivan', 'Gideon', 'Elias', 'Nathanael', 'Josua'];
-        $female = ['Maria', 'Debora', 'Ruth', 'Marta', 'Elisabeth', 'Hana', 'Lidia', 'Rebecca', 'Sarah', 'Yohana', 'Rosmawati', 'Linda', 'Meity', 'Sri', 'Rotua', 'Susi', 'Ratna', 'Natalia', 'Grace', 'Christine', 'Vera', 'Yuliana', 'Tabita', 'Priskila'];
-        $surnames = ['Simanjuntak', 'Siahaan', 'Nainggolan', 'Sitompul', 'Pasaribu', 'Harahap', 'Tambunan', 'Panjaitan', 'Sihombing', 'Gultom', 'Situmorang', 'Hutagalung', 'Purba', 'Sinaga', 'Wibowo', 'Santoso', 'Kusuma', 'Wijaya', 'Susilo', 'Lumempouw', 'Tumbelaka', 'Mamahit', 'Rumbayan', 'Kalalo', 'Tanuwijaya', 'Gunawan', 'Halim', 'Saputra', 'Hidayat', 'Nugroho'];
-        $jobs = ['Karyawan swasta', 'Guru', 'Wiraswasta', 'Perawat', 'Dokter', 'Pegawai negeri', 'Insinyur', 'Akuntan', 'Pensiunan', 'Mahasiswa', 'Pelajar', 'Ibu rumah tangga', 'Pengacara', 'Dosen'];
-        $streets = ['Jl. Kebon Jeruk Raya', 'Jl. Palmerah Barat', 'Jl. Meruya Ilir', 'Jl. Puri Indah', 'Jl. Taman Kota', 'Jl. Kembangan Utara', 'Jl. Srengseng Raya', 'Jl. Joglo Raya', 'Jl. Tanjung Duren', 'Jl. Green Garden'];
-        $faker = fake('id_ID');
-        $faker->seed(20261021);
 
-        $wilayah = AttributeDefinition::create(['entity_type' => 'member', 'key' => 'wilayah', 'label' => 'Wilayah pelayanan', 'data_type' => 'select', 'options' => ['Wilayah 1', 'Wilayah 2', 'Wilayah 3', 'Wilayah 4', 'Wilayah 5'], 'is_required' => false, 'is_public' => false, 'is_active' => true, 'sort_order' => 1]);
-        $baptis = AttributeDefinition::create(['entity_type' => 'member', 'key' => 'tanggal_baptis', 'label' => 'Tanggal baptis', 'data_type' => 'date', 'is_required' => false, 'is_public' => false, 'is_active' => true, 'sort_order' => 2]);
-        $pekerjaan = AttributeDefinition::create(['entity_type' => 'member', 'key' => 'pekerjaan', 'label' => 'Pekerjaan', 'data_type' => 'text', 'is_required' => false, 'is_public' => false, 'is_active' => true, 'sort_order' => 3]);
+        $male = ['Daniel', 'Yohanes', 'Samuel', 'Markus', 'Lukas', 'Petrus', 'Andreas', 'Timotius', 'Paulus', 'Yakub', 'Stefanus', 'Benyamin', 'Hendra', 'Agus', 'Budi', 'Wahyu', 'Jeffry', 'Stenly', 'Parlindungan', 'Hotma', 'Mangatas', 'Ferdinand', 'Rudy', 'Ivan', 'Gideon', 'Elias', 'Nathanael', 'Josua', 'Bonar', 'Riko'];
+        $female = ['Maria', 'Debora', 'Ruth', 'Marta', 'Elisabeth', 'Hana', 'Lidia', 'Rebecca', 'Sarah', 'Yohana', 'Rosmawati', 'Linda', 'Meity', 'Sri', 'Rotua', 'Susi', 'Ratna', 'Natalia', 'Grace', 'Christine', 'Vera', 'Yuliana', 'Tabita', 'Priskila', 'Lasma', 'Tiur'];
+        $surnames = ['Simanjuntak', 'Siahaan', 'Nainggolan', 'Sitompul', 'Pasaribu', 'Harahap', 'Tambunan', 'Panjaitan', 'Sihombing', 'Gultom', 'Situmorang', 'Hutagalung', 'Purba', 'Sinaga', 'Wibowo', 'Santoso', 'Kusuma', 'Wijaya', 'Susilo', 'Lumempouw', 'Tumbelaka', 'Mamahit', 'Rumbayan', 'Kalalo', 'Tanuwijaya', 'Gunawan', 'Halim', 'Saputra', 'Hidayat', 'Nugroho', 'Hutapea', 'Silalahi'];
+        $jobs = ['Karyawan swasta', 'Guru', 'Wiraswasta', 'Perawat', 'Dokter', 'Pegawai negeri', 'Insinyur', 'Akuntan', 'Pengacara', 'Dosen', 'Pedagang', 'Arsitek', 'Apoteker'];
+        $birthPlaces = ['Jakarta', 'Medan', 'Bandung', 'Surabaya', 'Manado', 'Pematang Siantar', 'Semarang', 'Makassar', 'Kupang', 'Yogyakarta', 'Tarutung', 'Ambon'];
+        $areas = [
+            ['Kebon Jeruk', 'Kebon Jeruk', '11530'], ['Palmerah', 'Palmerah', '11480'], ['Meruya Utara', 'Kembangan', '11620'], ['Srengseng', 'Kembangan', '11630'],
+            ['Joglo', 'Kembangan', '11640'], ['Duri Kepa', 'Kebon Jeruk', '11510'], ['Sukabumi Utara', 'Kebon Jeruk', '11540'],
+        ];
+        $streets = ['Jl. Kebon Jeruk Raya', 'Jl. Palmerah Barat', 'Jl. Meruya Ilir', 'Jl. Puri Indah', 'Jl. Taman Kota', 'Jl. Kembangan Utara', 'Jl. Srengseng Raya', 'Jl. Joglo Raya', 'Jl. Tanjung Duren', 'Jl. Green Garden'];
+        $churches = ['GKI Pondok Indah', 'HKBP Kebayoran', 'GPIB Immanuel', 'GKJ Bintaro', 'GBKP Jakarta', 'GKI Kebayoran Baru', 'GMIM Eben Haezer', 'HKBP Tanjung Priok'];
+        $ministers = ['Pdt. Daniel Simanjuntak', 'Pdt. Samuel Wijaya', 'Pdt. Ev. Rahel Gunawan', 'Pdt. Markus Hidayat', 'Pdt. Yohanes Silalahi'];
+
+        $bloodType = AttributeDefinition::create(['entity_type' => 'member', 'key' => 'golongan_darah', 'label' => 'Golongan darah', 'data_type' => 'select', 'options' => ['A', 'B', 'AB', 'O'], 'is_required' => false, 'is_public' => false, 'is_active' => true, 'sort_order' => 1]);
 
         $linkedUsers = [];
         foreach (range(1, 8) as $i) {
@@ -321,56 +326,249 @@ class DemoDataSeeder extends Seeder
             $linkedUsers[] = $user;
         }
 
-        $total = 148;
         $used = [];
-        for ($i = 1; $i <= $total; $i++) {
-            $isMale = $this->chance(48);
+        $seq = 0;
+        $familyNo = 0;
+        $docSeq = 0;
+        $married = [];
+
+        $makeName = function (bool $isMale, string $surname) use (&$used, $male, $female): string {
             do {
-                $name = $this->pick($isMale ? $male : $female).' '.$this->pick($surnames);
+                $name = $this->pick($isMale ? $male : $female).' '.$surname;
             } while (isset($used[$name]));
             $used[$name] = true;
 
-            $age = $this->chance(18) ? mt_rand(8, 24) : ($this->chance(70) ? mt_rand(25, 58) : mt_rand(59, 86));
-            $birth = Carbon::now()->subYears($age)->subDays(mt_rand(0, 364));
-            $slug = strtolower(preg_replace('/[^a-z]/i', '', str_replace(' ', '.', $name)));
+            return $name;
+        };
+
+        $create = function (array $a) use (&$seq, $bloodType, $birthPlaces, $jobs, $churches, $ministers, &$docSeq, &$linkedUsers): Member {
+            $seq++;
+            $birth = Carbon::now()->subYears($a['age'])->subDays(mt_rand(0, 360));
+            $age = $a['age'];
+            $isMale = $a['gender'] === 'L';
+
+            $status = $a['status'] ?? ($age < 17 ? 'anak' : 'tetap');
+            $education = match (true) {
+                $age < 6 => 'belum_sekolah', $age < 12 => 'sd', $age < 15 => 'smp', $age < 18 => 'sma',
+                default => $this->pick(['sma', 'diploma', 's1', 's1', 's1', 's2']),
+            };
+            $nikDay = $birth->day + ($isMale ? 0 : 40);
 
             $member = Member::create([
-                'member_number' => sprintf('JMT-%04d', $i),
-                'name' => $name,
-                'gender' => $isMale ? 'L' : 'P',
+                'member_number' => sprintf('JMT-%04d', $seq),
+                'nik' => '3173'.sprintf('%02d', mt_rand(1, 20)).sprintf('%02d%02d%02d', $nikDay, $birth->month, $birth->year % 100).sprintf('%04d', 1000 + $seq),
+                'name' => $a['name'],
+                'gender' => $a['gender'],
+                'place_of_birth' => $this->pick($birthPlaces),
                 'birth_date' => $birth->toDateString(),
-                'phone' => '08'.$this->pick(['11', '12', '13', '21', '31', '51', '52', '56', '77', '81', '95']).mt_rand(1000000, 9999999),
-                'email' => $this->chance(55) ? $slug.mt_rand(1, 99).'@'.$this->pick(['gmail.com', 'yahoo.co.id', 'outlook.com']) : null,
-                'address' => $this->pick($streets).' No. '.mt_rand(1, 120).', '.$faker->randomElement(['Kebon Jeruk', 'Palmerah', 'Kembangan', 'Meruya', 'Srengseng', 'Joglo', 'Duri Kepa']).', Jakarta Barat',
-                'is_active' => ! $this->chance(7),
+                'marital_status' => $a['marital'] ?? ($age < 22 ? 'belum_menikah' : 'menikah'),
+                'education' => $education,
+                'occupation' => $age < 6 ? null : ($age < 22 ? 'Pelajar/Mahasiswa' : ($age >= 62 ? 'Pensiunan' : $this->pick($jobs))),
+                'father_name' => $a['father'] ?? null,
+                'mother_name' => $a['mother'] ?? null,
+                'phone' => $age < 12 ? null : '08'.$this->pick(['11', '12', '13', '21', '31', '51', '52', '56', '77', '81', '95']).mt_rand(1000000, 9999999),
+                'email' => $age > 15 && $this->chance(55) ? strtolower(preg_replace('/[^a-z]/i', '', str_replace(' ', '.', $a['name']))).mt_rand(1, 99).'@'.$this->pick(['gmail.com', 'yahoo.co.id', 'outlook.com']) : null,
+                'address' => $a['address'],
+                'ktp_address' => $this->chance(80) ? $a['address'] : $this->pick(['Jl. Veteran No. 12, Medan', 'Jl. Merdeka No. 45, Bandung', 'Jl. Diponegoro No. 8, Surabaya', 'Jl. Sam Ratulangi No. 20, Manado']),
+                'household_id' => $a['household']->id,
+                'family_role' => $a['role'],
+                'membership_status' => $status,
+                'previous_church' => $a['previous_church'] ?? null,
+                'wilayah' => $a['wilayah'],
+                'emergency_name' => $a['emergency'][0] ?? null,
+                'emergency_phone' => $a['emergency'][1] ?? null,
+                'emergency_relation' => $a['emergency'][2] ?? null,
+                'is_active' => ! in_array($status, ['pindah', 'meninggal'], true),
             ]);
 
-            if ($i <= 8) {
-                $member->update(['user_id' => $linkedUsers[$i - 1]->id]);
-                $linkedUsers[$i - 1]->forceFill(['name' => $name])->save();
+            $first = $birth->copy()->addYears(match (true) { $age >= 15 => 17, default => 0 });
+            // Peristiwa gerejawi
+            $baptizedHere = $this->chance(72);
+            if ($baptizedHere) {
+                $member->milestones()->create(['type' => 'baptis_anak', 'date' => $birth->copy()->addMonths(mt_rand(3, 14))->toDateString(), 'church' => $this->chance(60) ? 'GKI Betlehem Sentosa' : $this->pick($churches), 'minister' => $this->pick($ministers), 'certificate_number' => 'BP/'.$birth->year.'/'.mt_rand(100, 999)]);
+            } elseif ($age >= 15 && $status === 'tetap') {
+                $member->milestones()->create(['type' => 'baptis_dewasa', 'date' => $birth->copy()->addYears(mt_rand(15, 30))->min(Carbon::now()->subYear())->toDateString(), 'church' => 'GKI Betlehem Sentosa', 'minister' => $this->pick($ministers), 'certificate_number' => 'BD/'.mt_rand(2005, 2024).'/'.mt_rand(10, 99)]);
+            }
+            $sidiDate = null;
+            if ($age >= 17 && $status === 'tetap') {
+                $sidiDate = $birth->copy()->addYears(mt_rand(17, 22))->min(Carbon::now()->subMonths(3));
+                $member->milestones()->create(['type' => 'sidi', 'date' => $sidiDate->toDateString(), 'church' => 'GKI Betlehem Sentosa', 'minister' => $this->pick($ministers), 'certificate_number' => 'SD/'.$sidiDate->year.'/'.mt_rand(100, 999)]);
+            }
+            $joined = null;
+            if (! empty($a['previous_church'])) {
+                $joined = Carbon::now()->subYears(mt_rand(1, 14))->subDays(mt_rand(0, 300));
+                $member->milestones()->create(['type' => 'atestasi_masuk', 'date' => $joined->toDateString(), 'church' => $a['previous_church'], 'certificate_number' => 'AT/'.$joined->year.'/'.mt_rand(10, 99)]);
+            }
+            $member->update(['membership_date' => ($joined ?? ($sidiDate ?? $birth->copy()->addMonths(6)))->toDateString()]);
+            if ($status === 'pindah') {
+                $member->milestones()->create(['type' => 'atestasi_keluar', 'date' => Carbon::now()->subMonths(mt_rand(2, 20))->toDateString(), 'church' => $this->pick($churches), 'certificate_number' => 'AK/'.mt_rand(2024, 2026).'/'.mt_rand(10, 99)]);
             }
 
-            $this->setAttr($wilayah, $member, 'value_option', 'Wilayah '.mt_rand(1, 5));
-            $this->setAttr($pekerjaan, $member, 'value_text', $age < 17 ? 'Pelajar' : $this->pick($jobs));
-            if ($age > 14) {
-                $this->setAttr($baptis, $member, 'value_date', $birth->copy()->addYears(mt_rand(13, 18))->toDateString());
+            if ($age > 14 && $this->chance(70)) {
+                AttributeValue::create(['attribute_definition_id' => $bloodType->id, 'entity_type' => 'member', 'entity_id' => $member->id, 'value_option' => $this->pick(['A', 'B', 'AB', 'O', 'O', 'B'])]);
             }
 
-            $this->members[] = $member;
-            if ($member->is_active && $age >= 22 && $age <= 70 && $this->chance(48)) {
-                $this->tithers[] = $member;
+            // Pelayanan
+            $ministry = function (string $key, ?string $title = null, int $yearsAgo = 3, bool $ended = false) use ($member) {
+                $start = Carbon::now()->subYears($yearsAgo)->subMonths(mt_rand(0, 11));
+                $member->ministries()->create(['ministry' => $key, 'role_title' => $title, 'start_date' => $start->toDateString(), 'end_date' => $ended ? $start->copy()->addYears(mt_rand(1, 2))->min(Carbon::now()->subMonth())->toDateString() : null]);
+            };
+            if ($status !== 'pindah' && $status !== 'meninggal') {
+                if ($age < 12) {
+                    $ministry('komisi_anak', 'Peserta', max(1, min($age, 5)));
+                } elseif ($age < 18) {
+                    $ministry('komisi_remaja', 'Anggota', 2);
+                } elseif ($age <= 30 && $this->chance(55)) {
+                    $ministry('komisi_pemuda', $this->chance(12) ? 'Ketua' : 'Anggota', mt_rand(1, 6));
+                } elseif ($age >= 60 && $this->chance(60)) {
+                    $ministry('komisi_lansia', 'Anggota', mt_rand(1, 8));
+                } elseif ($age > 30 && ! $isMale && $this->chance(45)) {
+                    $ministry('komisi_wanita', $this->chance(10) ? 'Bendahara' : 'Anggota', mt_rand(1, 10));
+                } elseif ($age > 30 && $isMale && $this->chance(35)) {
+                    $ministry('komisi_pria', 'Anggota', mt_rand(1, 10));
+                }
+                if ($age > 14 && $this->chance(14)) {
+                    $ministry('paduan_suara', $this->pick(['Sopran', 'Alto', 'Tenor', 'Bass']), mt_rand(1, 9));
+                }
+                if ($age > 14 && $age < 45 && $this->chance(5)) {
+                    $ministry('musik', $this->pick(['Pianis', 'Gitaris', 'Drummer', 'Pemain bass']), mt_rand(1, 5));
+                }
+                if ($age > 14 && $age < 50 && $this->chance(5)) {
+                    $ministry('multimedia', 'Operator', mt_rand(1, 4));
+                }
+                if ($age > 20 && $this->chance(8)) {
+                    $ministry('penyambut', 'Anggota', mt_rand(1, 6));
+                }
+                if ($age > 30 && $this->chance(6)) {
+                    $ministry('diakonia', 'Anggota', mt_rand(1, 6));
+                }
+                if ($age > 35 && $this->chance(10)) {
+                    $ministry('majelis', $this->pick(['Penatua', 'Penatua', 'Ketua Majelis', 'Sekretaris Majelis']), mt_rand(1, 8), $this->chance(35));
+                } elseif ($age > 32 && $this->chance(7)) {
+                    $ministry('diaken', $this->pick(['Diaken', 'Diaken', 'Ketua Diaken']), mt_rand(1, 8), $this->chance(30));
+                }
+            }
+
+            // Dokumen
+            $docs = [];
+            if ($age >= 17 && $this->chance(82)) {
+                $docs[] = ['ktp', 'KTP', null, null];
+            }
+            if ($a['role'] === 'kepala_keluarga' && $this->chance(85)) {
+                $docs[] = ['kk', 'Kartu Keluarga', sprintf('317304%010d', mt_rand(1, 9999999999)), null];
+            }
+            if ($baptizedHere && $this->chance(75)) {
+                $docs[] = ['surat_baptis', 'Surat Baptis', 'BP/'.$birth->year.'/'.mt_rand(100, 999), $birth->copy()->addMonths(6)->toDateString()];
+            }
+            if ($sidiDate && $this->chance(70)) {
+                $docs[] = ['surat_sidi', 'Surat Sidi', 'SD/'.$sidiDate->year.'/'.mt_rand(100, 999), $sidiDate->toDateString()];
+            }
+            if ($joined && $this->chance(90)) {
+                $docs[] = ['atestasi', 'Surat Atestasi dari '.$a['previous_church'], 'AT/'.$joined->year.'/'.mt_rand(10, 99), $joined->toDateString()];
+            }
+            if (($a['marital'] ?? 'menikah') === 'menikah' && $age >= 22 && $a['role'] === 'kepala_keluarga' && $this->chance(70)) {
+                $docs[] = ['akta_nikah', 'Akta Nikah', 'AN/'.mt_rand(1995, 2024).'/'.mt_rand(100, 999), null];
+            }
+            foreach ($docs as [$type, $title, $number, $issued]) {
+                $docSeq++;
+                $path = "members/{$member->id}/documents/demo-{$docSeq}.pdf";
+                Storage::disk('local')->put($path, file_get_contents(__DIR__.'/demo-assets/dokumen-demo.pdf'));
+                $member->documents()->create([
+                    'type' => $type, 'title' => $title, 'document_number' => $number, 'issued_date' => $issued, 'file_path' => $path,
+                    'original_name' => str_replace(' ', '-', $title).'-'.str_replace(' ', '-', $member->name).'.pdf', 'mime' => 'application/pdf', 'size' => 760, 'uploaded_by' => $this->users['admin']->id,
+                ]);
+            }
+
+            return $member;
+        };
+
+        $wilayahKeys = ['wilayah_1', 'wilayah_2', 'wilayah_3', 'wilayah_4', 'wilayah_5'];
+        $families = 0;
+        while ($seq < 148) {
+            $surname = $this->pick($surnames);
+            $familyNo++;
+            [$kelurahan, $kecamatan, $postal] = $this->pick($areas);
+            $address = $this->pick($streets).' No. '.mt_rand(1, 120);
+            $wilayah = $this->pick($wilayahKeys);
+            $type = mt_rand(1, 100);
+
+            $household = Household::create([
+                'name' => 'Keluarga '.$surname,
+                'family_number' => sprintf('KEL-%04d', $familyNo),
+                'address' => $address,
+                'rt_rw' => sprintf('%03d/%03d', mt_rand(1, 12), mt_rand(1, 15)),
+                'kelurahan' => $kelurahan,
+                'kecamatan' => $kecamatan,
+                'city' => 'Jakarta Barat',
+                'postal_code' => $postal,
+                'housing_status' => $this->pick(['milik_sendiri', 'milik_sendiri', 'milik_sendiri', 'kontrak', 'kontrak', 'keluarga', 'kost']),
+                'phone' => '021-5'.mt_rand(100000, 999999),
+            ]);
+            $fullAddress = "{$address}, {$kelurahan}, {$kecamatan}, Jakarta Barat";
+            $base = ['household' => $household, 'address' => $fullAddress, 'wilayah' => $wilayah];
+            $families++;
+
+            if ($type <= 62) { // keluarga inti: ayah, ibu, 0-3 anak
+                $fatherAge = mt_rand(30, 68);
+                $father = $makeName(true, $surname);
+                $motherName = $makeName(false, $surname);
+                $prev = $this->chance(22) ? $this->pick($churches) : null;
+                $head = $create([...$base, 'name' => $father, 'gender' => 'L', 'age' => $fatherAge, 'role' => 'kepala_keluarga', 'marital' => 'menikah', 'previous_church' => $prev, 'emergency' => [$motherName, '08'.mt_rand(100000000, 999999999), 'Istri']]);
+                $mother = $create([...$base, 'name' => $motherName, 'gender' => 'P', 'age' => max(26, $fatherAge - mt_rand(0, 6)), 'role' => 'pasangan', 'marital' => 'menikah', 'previous_church' => $prev, 'emergency' => [$father, $head->phone, 'Suami']]);
+                $married[] = [$head, $mother];
+                $kids = $fatherAge < 36 ? mt_rand(0, 2) : mt_rand(0, 3);
+                for ($k = 0; $k < $kids && $seq < 148; $k++) {
+                    $kidAge = max(0, $fatherAge - mt_rand(24, 38));
+                    if ($kidAge < 0 || $kidAge > 40) {
+                        continue;
+                    }
+                    $kidMale = $this->chance(50);
+                    $create([...$base, 'name' => $makeName($kidMale, $surname), 'gender' => $kidMale ? 'L' : 'P', 'age' => $kidAge, 'role' => 'anak', 'marital' => $kidAge > 28 && $this->chance(40) ? 'menikah' : 'belum_menikah', 'father' => $father, 'mother' => $motherName, 'emergency' => [$father, $head->phone, 'Ayah']]);
+                }
+            } elseif ($type <= 80) { // lajang atau pelajar
+                $isMale = $this->chance(50);
+                $create([...$base, 'name' => $makeName($isMale, $surname), 'gender' => $isMale ? 'L' : 'P', 'age' => mt_rand(19, 38), 'role' => 'kepala_keluarga', 'marital' => 'belum_menikah', 'previous_church' => $this->chance(30) ? $this->pick($churches) : null, 'emergency' => ['Orang tua', '08'.mt_rand(100000000, 999999999), 'Orang tua']]);
+            } elseif ($type <= 92) { // lansia, mungkin janda/duda
+                $isMale = $this->chance(40);
+                $head = $create([...$base, 'name' => $makeName($isMale, $surname), 'gender' => $isMale ? 'L' : 'P', 'age' => mt_rand(66, 88), 'role' => 'kepala_keluarga', 'marital' => 'cerai_mati', 'emergency' => ['Anak kandung', '08'.mt_rand(100000000, 999999999), 'Anak']]);
+                if ($this->chance(50) && $seq < 148) {
+                    $create([...$base, 'name' => $makeName(! $isMale, $surname), 'gender' => $isMale ? 'P' : 'L', 'age' => $head->age + mt_rand(-5, 5), 'role' => 'pasangan', 'marital' => 'menikah', 'emergency' => ['Anak kandung', '08'.mt_rand(100000000, 999999999), 'Anak']]);
+                    $head->update(['marital_status' => 'menikah']);
+                }
+            } else { // simpatisan / tamu
+                $isMale = $this->chance(50);
+                $create([...$base, 'name' => $makeName($isMale, $surname), 'gender' => $isMale ? 'L' : 'P', 'age' => mt_rand(24, 55), 'role' => 'kepala_keluarga', 'marital' => $this->pick(['menikah', 'belum_menikah']), 'status' => $this->pick(['simpatisan', 'simpatisan', 'tamu']), 'previous_church' => $this->pick($churches)]);
             }
         }
-        foreach (array_slice($this->members, 0, 6) as $linked) {
-            if (! in_array($linked, $this->tithers, true)) {
-                $this->tithers[] = $linked;
+
+        // Pemberkatan nikah untuk pasangan yang tercatat.
+        foreach ($married as [$head, $spouse]) {
+            if (! $this->chance(88)) {
+                continue;
+            }
+            $date = Carbon::now()->subYears(max(1, $head->age - mt_rand(24, 34)))->subDays(mt_rand(0, 300));
+            foreach ([$head, $spouse] as $partner) {
+                $partner->milestones()->create(['type' => 'pemberkatan_nikah', 'date' => $date->toDateString(), 'church' => $this->chance(65) ? 'GKI Betlehem Sentosa' : $this->pick($churches), 'minister' => $this->pick($ministers), 'certificate_number' => 'PN/'.$date->year.'/'.mt_rand(100, 999), 'civil_number' => '3173-KW-'.$date->format('Ymd').'-'.mt_rand(1000, 9999)]);
             }
         }
-    }
 
-    private function setAttr(AttributeDefinition $def, Member $member, string $column, mixed $value): void
-    {
-        AttributeValue::create(['attribute_definition_id' => $def->id, 'entity_type' => 'member', 'entity_id' => $member->id, $column => $value]);
+        // Dua kasus khusus agar status pindah dan meninggal ada contohnya.
+        $adults = Member::where('membership_status', 'tetap')->where('family_role', '!=', 'kepala_keluarga')->whereNull('user_id')->orderBy('id', 'desc')->get();
+        if ($adults->count() >= 2) {
+            $adults[0]->update(['membership_status' => 'pindah', 'is_active' => false]);
+            $adults[0]->milestones()->create(['type' => 'atestasi_keluar', 'date' => Carbon::now()->subMonths(5)->toDateString(), 'church' => 'GKI Pondok Indah', 'certificate_number' => 'AK/2026/17']);
+            $adults[1]->update(['membership_status' => 'meninggal', 'is_active' => false]);
+        }
+
+        // Hubungkan 8 jemaat dewasa aktif ke akun portal.
+        $candidates = Member::where('is_active', true)->where('membership_status', 'tetap')->whereNull('user_id')->orderBy('id')->take(8)->get();
+        foreach ($candidates as $i => $member) {
+            $member->update(['user_id' => $linkedUsers[$i]->id]);
+            $linkedUsers[$i]->forceFill(['name' => $member->name])->save();
+        }
+
+        $this->members = Member::all()->all();
+        $this->tithers = Member::where('is_active', true)->where('membership_status', 'tetap')->whereNotNull('phone')->get()->filter(fn (Member $m) => $m->age >= 22 && $m->age <= 72)->shuffle(mt_rand())->take(52)->values()->all();
     }
 
     // ------------------------------------------------------------------ periode & saldo awal

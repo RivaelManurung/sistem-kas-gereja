@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AccountingPeriodRequest;
+use App\Enums\Direction;
 use App\Models\Account;
 use App\Models\AccountingPeriod;
 use App\Models\Fund;
@@ -27,6 +28,31 @@ class AccountingPeriodController extends Controller
 
         return Inertia::render('admin/periods/index', [
             'periods' => $periods,
+        ]);
+    }
+
+    public function show(AccountingPeriod $period): Response
+    {
+        $period->load('closer');
+
+        $openings = LedgerEntry::query()
+            ->with(['account', 'fund'])
+            ->where('source_type', 'accounting_period')
+            ->where('source_id', $period->id)
+            ->orderBy('id')
+            ->get();
+
+        $inRange = LedgerEntry::query()
+            ->whereBetween('entry_date', [$period->start_date->toDateString(), $period->end_date->toDateString()])
+            ->where(fn ($q) => $q->whereNull('source_type')->orWhere('source_type', '!=', 'accounting_period'));
+
+        $totals = fn (string $direction) => (int) (clone $inRange)->where('direction', $direction)->sum('amount');
+
+        return Inertia::render('admin/periods/show', [
+            'period' => $period,
+            'openingBalances' => $openings,
+            'totalIncome' => $totals(Direction::In->value),
+            'totalExpense' => $totals(Direction::Out->value),
         ]);
     }
 

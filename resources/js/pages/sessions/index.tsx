@@ -1,3 +1,4 @@
+import { LinkRow } from '@/components/app/link-row';
 import { RowActions } from '@/components/app/row-actions';
 import PageHeader from '@/components/page-header';
 import Pagination from '@/components/pagination';
@@ -8,7 +9,7 @@ import AppLayout from '@/layouts/app-layout';
 import { formatDate } from '@/lib/date';
 import { type BreadcrumbItem, type Paginated } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { Calculator, PlusCircle } from 'lucide-react';
+import { Calculator, Eye, PlusCircle } from 'lucide-react';
 
 interface ScheduleSummary {
     id: number;
@@ -65,7 +66,7 @@ export default function SessionsIndex({ sessions }: { sessions: Paginated<Sessio
                     </TableHeader>
                     <TableBody>
                         {sessions.data.map((session) => (
-                            <TableRow key={session.id}>
+                            <LinkRow key={session.id} href={route('sessions.show', session.id)}>
                                 <TableCell className="text-sm">{formatDate(session.date)}</TableCell>
                                 <TableCell className="font-medium">{session.name}</TableCell>
                                 <TableCell>
@@ -93,10 +94,10 @@ export default function SessionsIndex({ sessions }: { sessions: Paginated<Sessio
                                 </TableCell>
                                 <TableCell className="text-right">
                                     <RowActions
-                                        actions={[{ label: 'Hitung Kolekte', icon: Calculator, href: `/counting/create?session_id=${session.id}` }]}
+                                        actions={[{ label: 'Lihat detail', icon: Eye, href: route('sessions.show', session.id) }, { label: 'Hitung Kolekte', icon: Calculator, href: `/counting/create?session_id=${session.id}` }]}
                                     />
                                 </TableCell>
-                            </TableRow>
+                            </LinkRow>
                         ))}
                         {sessions.data.length === 0 && (
                             <TableRow>

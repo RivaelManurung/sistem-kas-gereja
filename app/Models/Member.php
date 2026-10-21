@@ -5,12 +5,17 @@ namespace App\Models;
 use App\Models\Concerns\Audited;
 use App\Models\Concerns\HasCustomAttributes;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Member extends Model
 {
-    use Audited, HasCustomAttributes;
+    use Audited, HasCustomAttributes, HasFactory;
+
+    /** Berkas foto tidak perlu tampil di jejak aktivitas. */
+    protected array $auditExclude = ['photo_path'];
 
     protected $guarded = ['id'];
 
@@ -18,6 +23,7 @@ class Member extends Model
     {
         return [
             'birth_date' => 'date:Y-m-d',
+            'membership_date' => 'date:Y-m-d',
             'is_active' => 'boolean',
         ];
     }
@@ -25,6 +31,36 @@ class Member extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function household(): BelongsTo
+    {
+        return $this->belongsTo(Household::class);
+    }
+
+    public function milestones(): HasMany
+    {
+        return $this->hasMany(MemberMilestone::class)->orderBy('date');
+    }
+
+    public function ministries(): HasMany
+    {
+        return $this->hasMany(MemberMinistry::class)->orderByRaw('end_date is not null')->orderByDesc('start_date');
+    }
+
+    public function documents(): HasMany
+    {
+        return $this->hasMany(MemberDocument::class)->latest();
+    }
+
+    public function donations(): HasMany
+    {
+        return $this->hasMany(Donation::class);
+    }
+
+    public function getAgeAttribute(): ?int
+    {
+        return $this->birth_date?->age;
     }
 
     public static function forUser(User $user): ?self
@@ -47,8 +83,11 @@ class Member extends Model
         $escaped = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $search);
 
         return $query->where(function (Builder $q) use ($escaped) {
-            $q->where('name', 'LIKE', "%{$escaped}%")
-                ->orWhere('member_number', 'LIKE', "%{$escaped}%");
+            $likeOp = config('database.default') === 'pgsql' ? 'ilike' : 'like';
+            $q->where('name', $likeOp, "%{$escaped}%")
+                ->orWhere('member_number', $likeOp, "%{$escaped}%")
+                ->orWhere('phone', $likeOp, "%{$escaped}%")
+                ->orWhere('nik', $likeOp, "%{$escaped}%");
         });
     }
 }

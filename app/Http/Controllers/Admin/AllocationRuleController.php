@@ -30,6 +30,29 @@ class AllocationRuleController extends Controller
         ]);
     }
 
+    public function show(AllocationRule $allocation): Response
+    {
+        $allocation->load(['category:id,name', 'items.fund:id,code,name']);
+
+        return Inertia::render('admin/allocations/show', [
+            'rule' => [
+                'id' => $allocation->id,
+                'name' => $allocation->name,
+                'valid_from' => $allocation->valid_from->toDateString(),
+                'is_active' => $allocation->is_active,
+                'category' => $allocation->category ? ['id' => $allocation->category->id, 'name' => $allocation->category->name] : null,
+                'items' => $allocation->items->map(fn ($i) => [
+                    'id' => $i->id,
+                    'fund_id' => $i->fund_id,
+                    'fund_code' => $i->fund?->code,
+                    'fund_name' => $i->fund?->name,
+                    'percentage' => $i->percentage,
+                    'sort_order' => $i->sort_order,
+                ])->values(),
+            ],
+        ]);
+    }
+
     public function create(): Response
     {
         $categories = Category::active()

@@ -25,6 +25,19 @@ class ServiceScheduleController extends Controller
         ]);
     }
 
+    public function show(ServiceSchedule $schedule): Response
+    {
+        $categoryIds = $schedule->default_category_ids ?? [];
+
+        return Inertia::render('admin/schedules/show', [
+            'schedule' => $schedule,
+            'dayName' => $schedule->dayName(),
+            'categories' => Category::whereIn('id', $categoryIds)->orderBy('sort_order')->get(['id', 'name']),
+            'sessions' => $schedule->sessions()->orderByDesc('date')->orderByDesc('id')->limit(20)->get(['id', 'date', 'name', 'is_completed']),
+            'sessionsCount' => $schedule->sessions()->count(),
+        ]);
+    }
+
     public function create(): Response
     {
         $categories = Category::active()

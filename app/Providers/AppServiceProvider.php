@@ -45,6 +45,10 @@ class AppServiceProvider extends ServiceProvider
         Relation::enforceMorphMap([
             'user' => User::class,
             'role' => Role::class,
+            'household' => \App\Models\Household::class,
+            'member_milestone' => \App\Models\MemberMilestone::class,
+            'member_ministry' => \App\Models\MemberMinistry::class,
+            'member_document' => \App\Models\MemberDocument::class,
             'lookup_option' => \App\Models\LookupOption::class,
             'church_setting' => ChurchSetting::class,
             'account' => Account::class,

@@ -3,6 +3,7 @@ import Pagination from '@/components/pagination';
 import StatusBadge from '@/components/status-badge';
 import { Badge } from '@/components/ui/badge';
 import { ConfirmDialog } from '@/components/app/confirm-dialog';
+import { LinkRow } from '@/components/app/link-row';
 import { RowActions } from '@/components/app/row-actions';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -10,7 +11,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Paginated } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { Pencil, Power } from 'lucide-react';
+import { Eye, Pencil, Power } from 'lucide-react';
 import { useState } from 'react';
 
 interface FundSummary {
@@ -89,7 +90,7 @@ export default function CategoriesIndex({
                     </TableHeader>
                     <TableBody>
                         {categories.data.map((cat) => (
-                            <TableRow key={cat.id}>
+                            <LinkRow key={cat.id} href={route('admin.categories.show', cat.id)}>
                                 <TableCell className="font-mono text-muted-foreground">{cat.sort_order}</TableCell>
                                 <TableCell className="font-medium">{cat.name}</TableCell>
                                 <TableCell>
@@ -115,6 +116,7 @@ export default function CategoriesIndex({
                                 <TableCell className="text-right">
                                     <RowActions
                                         actions={[
+                                            { label: 'Lihat detail', icon: Eye, href: route('admin.categories.show', cat.id) },
                                             { label: 'Ubah', icon: Pencil, href: route('admin.categories.edit', cat.id) },
                                             {
                                                 label: cat.is_active ? 'Nonaktifkan' : 'Aktifkan',
@@ -126,7 +128,7 @@ export default function CategoriesIndex({
                                         ]}
                                     />
                                 </TableCell>
-                            </TableRow>
+                            </LinkRow>
                         ))}
                         {categories.data.length === 0 && (
                             <TableRow>

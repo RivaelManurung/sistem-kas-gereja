@@ -52,7 +52,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Counting & Worship Sessions (Penghitung, Bendahara, Admin)
     Route::middleware(['permission:'.Permission::CountingManage->value])->group(function () {
-        Route::resource('sessions', ServiceSessionController::class)->only(['index', 'create', 'store']);
+        Route::resource('sessions', ServiceSessionController::class)->only(['index', 'create', 'store', 'show']);
         Route::resource('counting', CountSheetController::class)->only(['index', 'create', 'store', 'show', 'edit', 'update']);
         Route::post('counting/{counting}/verify', [CountConfirmationController::class, 'verify'])->name('counting.verify');
         Route::post('counting/{counting}/lock', [CountConfirmationController::class, 'lock'])->name('counting.lock');
@@ -61,7 +61,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Bank Deposits (Bendahara, Admin)
     Route::middleware(['permission:'.Permission::DepositsManage->value])->group(function () {
-        Route::resource('deposits', BankDepositController::class)->only(['index', 'create', 'store']);
+        Route::resource('deposits', BankDepositController::class)->only(['index', 'create', 'store', 'show']);
     });
 
     // Expenses (Pengeluaran)
