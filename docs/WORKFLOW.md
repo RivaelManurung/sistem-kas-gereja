@@ -120,8 +120,8 @@ Commit di branch `fase-N`; jangan merge ke `main` (itu tugas agen merge).
 
 - [x] Scaffold, PostgreSQL, locale id, registrasi dimatikan (Fase 1 Task 1)
 - [x] Fase 1 Task 2 — peran, izin, manajemen pengguna (`e8bf0b7`)
-- [ ] Fase 1 Task 3 — jejak audit: **setengah jalan, belum di-commit** (`AuditLog`, trait `Audited`, migrasi, controller, halaman, test sudah ada di working tree — periksa & selesaikan)
-- [ ] Fase 1 — Task 4–9
+- [x] Fase 1 Task 3 — jejak audit (`9e55b6b`)
+- [x] Fase 1 Task 4–9 — Pengaturan, Rekening, Dana, Kategori, EAV, Form Dinamis, Jemaat (`d605443`)
 - [ ] Fase 2
 - [ ] Fase 3
 - [ ] Fase 4
