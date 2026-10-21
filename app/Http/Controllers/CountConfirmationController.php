@@ -8,6 +8,7 @@ use App\Enums\Role;
 use App\Models\ChurchSetting;
 use App\Models\CountConfirmation;
 use App\Models\CountSheet;
+use App\Services\AllocationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -75,5 +76,24 @@ class CountConfirmationController extends Controller
 
         return redirect()->route('counting.show', $counting)
             ->with('success', 'Berita acara berhasil diverifikasi oleh Bendahara.');
+    }
+
+    public function lock(Request $request, CountSheet $counting, AllocationService $allocationService): RedirectResponse
+    {
+        $user = $request->user();
+
+        if (! $user->hasAnyRole([Role::Bendahara->value, Role::Admin->value])) {
+            abort(403, 'Hanya Bendahara atau Admin yang berhak mengunci berita acara ke buku besar.');
+        }
+
+        if ($counting->status !== CountSheetStatus::Verified) {
+            return redirect()->route('counting.show', $counting)
+                ->with('error', 'Berita acara harus berstatus terverifikasi bendahara sebelum dapat dibukukan.');
+        }
+
+        $allocationService->apply($counting);
+
+        return redirect()->route('counting.show', $counting)
+            ->with('success', 'Berita acara berhasil dikunci dan dibukukan ke buku besar.');
     }
 }

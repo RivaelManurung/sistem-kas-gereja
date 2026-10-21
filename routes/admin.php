@@ -2,6 +2,7 @@
 
 use App\Enums\Permission;
 use App\Http\Controllers\Admin\AccountController;
+use App\Http\Controllers\Admin\AllocationRuleController;
 use App\Http\Controllers\Admin\AttributeDefinitionController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\CategoryController;
@@ -38,6 +39,9 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 
         Route::resource('schedules', ServiceScheduleController::class)->except(['show', 'destroy']);
         Route::patch('schedules/{schedule}/toggle', [ServiceScheduleController::class, 'toggle'])->name('schedules.toggle');
+
+        Route::resource('allocations', AllocationRuleController::class)->except(['show', 'destroy']);
+        Route::patch('allocations/{allocation}/toggle', [AllocationRuleController::class, 'toggle'])->name('allocations.toggle');
     });
 
     Route::middleware('permission:'.Permission::MembersManage->value)->group(function () {

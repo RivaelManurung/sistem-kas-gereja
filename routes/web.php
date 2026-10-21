@@ -20,6 +20,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('counting', CountSheetController::class);
     Route::post('counting/{counting}/confirm', [CountConfirmationController::class, 'confirm'])->name('counting.confirm');
     Route::post('counting/{counting}/verify', [CountConfirmationController::class, 'verify'])->name('counting.verify');
+    Route::post('counting/{counting}/lock', [CountConfirmationController::class, 'lock'])->name('counting.lock');
     Route::resource('donations', DonationController::class);
 });
 
