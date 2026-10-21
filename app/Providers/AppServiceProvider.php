@@ -8,6 +8,7 @@ use App\Models\AttributeValue;
 use App\Models\Category;
 use App\Models\ChurchSetting;
 use App\Models\Fund;
+use App\Models\LedgerEntry;
 use App\Models\Member;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -32,6 +33,7 @@ class AppServiceProvider extends ServiceProvider
             'attribute_definition' => AttributeDefinition::class,
             'attribute_value' => AttributeValue::class,
             'member' => Member::class,
+            'ledger_entry' => LedgerEntry::class,
         ]);
     }
 }
