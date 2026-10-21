@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Models\Account;
+use App\Models\AttributeDefinition;
+use App\Models\AttributeValue;
 use App\Models\Category;
 use App\Models\ChurchSetting;
 use App\Models\Fund;
@@ -26,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
             'account' => Account::class,
             'fund' => Fund::class,
             'category' => Category::class,
+            'attribute_definition' => AttributeDefinition::class,
+            'attribute_value' => AttributeValue::class,
         ]);
     }
 }

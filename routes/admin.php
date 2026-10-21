@@ -2,6 +2,7 @@
 
 use App\Enums\Permission;
 use App\Http\Controllers\Admin\AccountController;
+use App\Http\Controllers\Admin\AttributeDefinitionController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ChurchSettingController;
@@ -29,6 +30,9 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 
         Route::resource('categories', CategoryController::class)->except(['show', 'destroy']);
         Route::patch('categories/{category}/toggle', [CategoryController::class, 'toggle'])->name('categories.toggle');
+
+        Route::resource('attributes', AttributeDefinitionController::class)->except(['show', 'destroy']);
+        Route::patch('attributes/{attribute}/toggle', [AttributeDefinitionController::class, 'toggle'])->name('attributes.toggle');
     });
 
     Route::get('audit', [AuditLogController::class, 'index'])

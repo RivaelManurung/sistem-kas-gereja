@@ -4,13 +4,14 @@ namespace App\Models;
 
 use App\Enums\Direction;
 use App\Models\Concerns\Audited;
+use App\Models\Concerns\HasCustomAttributes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Category extends Model
 {
-    use Audited;
+    use Audited, HasCustomAttributes;
 
     protected $guarded = ['id'];
 

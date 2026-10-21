@@ -8,6 +8,7 @@ dataset('admin_routes', [
     'admin.accounts.index',
     'admin.funds.index',
     'admin.categories.index',
+    'admin.attributes.index',
 ]);
 
 it('forbids non-admin roles from admin routes', function (Role $role, string $routeName) {

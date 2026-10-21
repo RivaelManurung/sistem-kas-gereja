@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Enums\AttributeEntity;
 use App\Enums\Direction;
+use App\Support\Attributes\AttributeRules;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
@@ -19,7 +21,7 @@ class CategoryRequest extends FormRequest
         $categoryId = $this->route('category')?->id;
         $direction = $this->input('direction');
 
-        return [
+        $rules = [
             'name' => [
                 'required',
                 'string',
@@ -37,7 +39,10 @@ class CategoryRequest extends FormRequest
             'is_public' => ['boolean'],
             'is_active' => ['boolean'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
+            'attributes' => ['nullable', 'array'],
         ];
+
+        return array_merge($rules, AttributeRules::for(AttributeEntity::Category));
     }
 
     public function after(): array
@@ -56,7 +61,7 @@ class CategoryRequest extends FormRequest
 
     public function attributes(): array
     {
-        return [
+        $attrs = [
             'name' => 'nama kategori',
             'direction' => 'arah kas',
             'default_fund_id' => 'pos dana default',
@@ -64,5 +69,7 @@ class CategoryRequest extends FormRequest
             'is_public' => 'tampil di publik',
             'sort_order' => 'urutan',
         ];
+
+        return array_merge($attrs, AttributeRules::attributes(AttributeEntity::Category));
     }
 }

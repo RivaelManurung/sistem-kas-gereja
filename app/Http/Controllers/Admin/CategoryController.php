@@ -46,7 +46,15 @@ class CategoryController extends Controller
 
     public function store(CategoryRequest $request): RedirectResponse
     {
-        Category::create($request->validated());
+        $validated = $request->validated();
+        $attributes = $request->input('attributes', []);
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($validated, $attributes) {
+            $cat = Category::create($validated);
+            if (! empty($attributes)) {
+                $cat->syncCustomAttributes($attributes);
+            }
+        });
 
         return redirect()->route('admin.categories.index', ['direction' => $request->input('direction')])
             ->with('success', 'Kategori berhasil ditambahkan.');
@@ -66,7 +74,15 @@ class CategoryController extends Controller
 
     public function update(CategoryRequest $request, Category $category): RedirectResponse
     {
-        $category->update($request->validated());
+        $validated = $request->validated();
+        $attributes = $request->input('attributes', []);
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($category, $validated, $attributes) {
+            $category->update($validated);
+            if ($attributes !== null) {
+                $category->syncCustomAttributes($attributes);
+            }
+        });
 
         return redirect()->route('admin.categories.index', ['direction' => $category->direction->value])
             ->with('success', 'Kategori berhasil diperbarui.');
