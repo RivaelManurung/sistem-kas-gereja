@@ -2,6 +2,7 @@
 
 use App\Enums\Permission;
 use App\Http\Controllers\Admin\AccountController;
+use App\Http\Controllers\Admin\AccountingPeriodController;
 use App\Http\Controllers\Admin\AllocationRuleController;
 use App\Http\Controllers\Admin\AttributeDefinitionController;
 use App\Http\Controllers\Admin\AuditLogController;
@@ -42,6 +43,9 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
 
         Route::resource('allocations', AllocationRuleController::class)->except(['show', 'destroy']);
         Route::patch('allocations/{allocation}/toggle', [AllocationRuleController::class, 'toggle'])->name('allocations.toggle');
+
+        Route::resource('periods', AccountingPeriodController::class)->only(['index', 'create', 'store']);
+        Route::post('periods/{period}/close', [AccountingPeriodController::class, 'close'])->name('periods.close');
     });
 
     Route::middleware('permission:'.Permission::MembersManage->value)->group(function () {

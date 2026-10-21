@@ -7,13 +7,16 @@ use App\Models\AttributeDefinition;
 use App\Models\AttributeValue;
 use App\Models\Category;
 use App\Models\ChurchSetting;
+use App\Models\AccountingPeriod;
 use App\Models\AllocationRule;
 use App\Models\BankDeposit;
 use App\Models\CountConfirmation;
 use App\Models\CountLine;
 use App\Models\CountSheet;
 use App\Models\Donation;
+use App\Models\Expense;
 use App\Models\Fund;
+use App\Models\FundTransfer;
 use App\Models\LedgerEntry;
 use App\Models\Member;
 use App\Models\ServiceSchedule;
@@ -50,6 +53,9 @@ class AppServiceProvider extends ServiceProvider
             'allocation_rule' => AllocationRule::class,
             'bank_deposit' => BankDeposit::class,
             'donation' => Donation::class,
+            'expense' => Expense::class,
+            'fund_transfer' => FundTransfer::class,
+            'accounting_period' => AccountingPeriod::class,
         ]);
     }
 }

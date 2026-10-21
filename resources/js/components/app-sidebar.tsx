@@ -8,9 +8,11 @@ import {
     Calculator,
     Calendar,
     CalendarCheck,
+    CalendarDays,
     FileText,
     LayoutGrid,
     PieChart,
+    Receipt,
     Settings,
     ShieldCheck,
     Sliders,
@@ -50,6 +52,16 @@ const mainNavItems: NavItem[] = [
         url: '/deposits',
         icon: ArrowRightLeft,
     },
+    {
+        title: 'Pengeluaran Kas',
+        url: '/expenses',
+        icon: Receipt,
+    },
+    {
+        title: 'Pindah Dana',
+        url: '/transfers',
+        icon: ArrowRightLeft,
+    },
 ];
 
 const adminNavItems: PermittedNavItem[] = [
@@ -60,6 +72,7 @@ const adminNavItems: PermittedNavItem[] = [
     { title: 'Kategori Kas', url: '/admin/categories', icon: Tag, permission: 'master.manage' },
     { title: 'Aturan Alokasi', url: '/admin/allocations', icon: Split, permission: 'master.manage' },
     { title: 'Jadwal Ibadah', url: '/admin/schedules', icon: CalendarCheck, permission: 'master.manage' },
+    { title: 'Periode Akuntansi', url: '/admin/periods', icon: CalendarDays, permission: 'master.manage' },
     { title: 'Field Kustom (EAV)', url: '/admin/attributes', icon: Sliders, permission: 'master.manage' },
     { title: 'Pengaturan Gereja', url: '/admin/settings', icon: Settings, permission: 'settings.manage' },
     { title: 'Audit Trail', url: '/admin/audit', icon: ShieldCheck, permission: 'audit.view' },
