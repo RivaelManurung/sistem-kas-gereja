@@ -124,8 +124,8 @@ Commit di branch `fase-N`; jangan merge ke `main` (itu tugas agen merge).
 - [x] Fase 1 Task 4–9 — Pengaturan, Rekening, Dana, Kategori, EAV, Form Dinamis, Jemaat (`d605443`)
 - [x] Fase 2 — Buku Besar, Sesi Ibadah, Berita Acara, Aturan Alokasi, Persembahan Atas Nama, Setoran Bank (`c302054`)
 - [x] Fase 3
-- [ ] Fase 4
-- [ ] Merge 3+4
+- [x] Fase 4
+- [x] Merge 3+4
 - [ ] Fase 5
 - [ ] Fase 6
 - [ ] Merge 5+6

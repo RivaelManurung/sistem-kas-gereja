@@ -25,6 +25,11 @@ class CountSheetRequest extends FormRequest
                 'nullable',
                 'exists:service_sessions,id',
             ],
+            'event_id' => [
+                Rule::requiredIf($this->input('type') === CountSheetType::Event->value),
+                'nullable',
+                'exists:events,id',
+            ],
             'account_id' => ['required', 'exists:accounts,id'],
             'date' => ['required', 'date'],
             'notes' => ['nullable', 'string', 'max:2000'],
@@ -49,6 +54,7 @@ class CountSheetRequest extends FormRequest
         return [
             'type.required' => 'Jenis berita acara wajib dipilih.',
             'service_session_id.required' => 'Sesi ibadah wajib dipilih untuk berita acara ibadah.',
+            'event_id.required' => 'Acara wajib dipilih untuk berita acara kepanitiaan / acara.',
             'account_id.required' => 'Rekening tujuan wajib dipilih.',
             'date.required' => 'Tanggal penghitungan wajib diisi.',
             'idempotency_key.unique' => 'Formulir ini sudah pernah dikirimkan sebelumnya (mencegah duplikasi).',

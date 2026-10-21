@@ -10,6 +10,7 @@ use App\Models\Account;
 use App\Models\Category;
 use App\Models\ChurchSetting;
 use App\Models\CountSheet;
+use App\Models\Event;
 use App\Models\ServiceSession;
 use App\Services\CountCalculationService;
 use Illuminate\Http\RedirectResponse;
@@ -28,9 +29,10 @@ class CountSheetController extends Controller
     public function index(Request $request): Response
     {
         $sheets = CountSheet::query()
-            ->with(['serviceSession', 'account', 'creator', 'lines.category'])
+            ->with(['serviceSession', 'event', 'account', 'creator', 'lines.category'])
             ->when($request->query('status'), fn ($q, $status) => $q->where('status', $status))
             ->when($request->query('type'), fn ($q, $type) => $q->where('type', $type))
+            ->when($request->query('event_id'), fn ($q, $eventId) => $q->where('event_id', $eventId))
             ->orderByDesc('date')
             ->orderByDesc('id')
             ->paginate(20)
@@ -38,7 +40,7 @@ class CountSheetController extends Controller
 
         return Inertia::render('counting/index', [
             'sheets' => $sheets,
-            'filters' => $request->only(['status', 'type']),
+            'filters' => $request->only(['status', 'type', 'event_id']),
         ]);
     }
 
@@ -46,18 +48,35 @@ class CountSheetController extends Controller
     {
         $sessionId = $request->query('session_id');
         $session = $sessionId ? ServiceSession::with('schedule')->find($sessionId) : null;
-        $type = $request->query('type', $session ? CountSheetType::Service->value : CountSheetType::General->value);
+        $eventId = $request->query('event_id');
+        $event = $eventId ? Event::find($eventId) : null;
+
+        $type = $request->query('type');
+        if (! $type) {
+            if ($session) {
+                $type = CountSheetType::Service->value;
+            } elseif ($event) {
+                $type = CountSheetType::Event->value;
+            } else {
+                $type = CountSheetType::General->value;
+            }
+        }
 
         $accounts = Account::active()->orderBy('name')->get();
-        $categories = Category::active()
-            ->where('direction', Direction::In)
-            ->orderBy('name')
-            ->get();
+
+        $categoriesQuery = Category::active()->where('direction', Direction::In);
+        if ($type === CountSheetType::Event->value && $eventId) {
+            $categoriesQuery->forEvent((int) $eventId);
+        } else {
+            $categoriesQuery->general();
+        }
+        $categories = $categoriesQuery->orderBy('name')->get();
         $setting = ChurchSetting::current();
 
         return Inertia::render('counting/form', [
             'sheet' => null,
             'session' => $session,
+            'event' => $event,
             'type' => $type,
             'accounts' => $accounts,
             'categories' => $categories,
@@ -75,6 +94,7 @@ class CountSheetController extends Controller
             $sheet = CountSheet::create([
                 'type' => $data['type'],
                 'service_session_id' => $data['service_session_id'] ?? null,
+                'event_id' => $data['event_id'] ?? null,
                 'account_id' => $data['account_id'],
                 'date' => $data['date'],
                 'status' => CountSheetStatus::Draft,
@@ -99,6 +119,7 @@ class CountSheetController extends Controller
     {
         $sheet = $counting->load([
             'serviceSession.schedule',
+            'event',
             'account',
             'creator',
             'lines.category',
@@ -126,17 +147,22 @@ class CountSheetController extends Controller
                 ->with('error', 'Berita acara yang sudah dikunci ke buku besar tidak dapat diedit.');
         }
 
-        $sheet = $counting->load(['lines.category', 'serviceSession']);
+        $sheet = $counting->load(['lines.category', 'serviceSession', 'event']);
         $accounts = Account::active()->orderBy('name')->get();
-        $categories = Category::active()
-            ->where('direction', Direction::In)
-            ->orderBy('name')
-            ->get();
+
+        $categoriesQuery = Category::active()->where('direction', Direction::In);
+        if ($sheet->type === CountSheetType::Event && $sheet->event_id) {
+            $categoriesQuery->forEvent($sheet->event_id);
+        } else {
+            $categoriesQuery->general();
+        }
+        $categories = $categoriesQuery->orderBy('name')->get();
         $setting = ChurchSetting::current();
 
         return Inertia::render('counting/form', [
             'sheet' => $sheet,
             'session' => $sheet->serviceSession,
+            'event' => $sheet->event,
             'type' => $sheet->type->value,
             'accounts' => $accounts,
             'categories' => $categories,
@@ -159,6 +185,7 @@ class CountSheetController extends Controller
             $counting->update([
                 'type' => $data['type'],
                 'service_session_id' => $data['service_session_id'] ?? null,
+                'event_id' => $data['event_id'] ?? null,
                 'account_id' => $data['account_id'],
                 'date' => $data['date'],
                 'status' => CountSheetStatus::Draft, // Reset to draft if edited!

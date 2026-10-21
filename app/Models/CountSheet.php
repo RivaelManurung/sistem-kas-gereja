@@ -17,6 +17,7 @@ class CountSheet extends Model
     protected $fillable = [
         'type',
         'service_session_id',
+        'event_id',
         'account_id',
         'date',
         'status',
@@ -50,6 +51,16 @@ class CountSheet extends Model
     public function serviceSession(): BelongsTo
     {
         return $this->belongsTo(ServiceSession::class);
+    }
+
+    public function event(): BelongsTo
+    {
+        return $this->belongsTo(Event::class);
+    }
+
+    public function isEvent(): bool
+    {
+        return $this->type === CountSheetType::Event;
     }
 
     public function account(): BelongsTo

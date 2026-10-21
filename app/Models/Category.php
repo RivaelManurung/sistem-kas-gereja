@@ -31,9 +31,35 @@ class Category extends Model
         return $this->belongsTo(Fund::class, 'default_fund_id');
     }
 
+    public function event(): BelongsTo
+    {
+        return $this->belongsTo(Event::class, 'scope_event_id');
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
+    }
+
+    public function scopeGeneral(Builder $query): Builder
+    {
+        return $query->whereNull('scope_event_id');
+    }
+
+    public function scopeForEvent(Builder $query, ?int $eventId, bool $includeGeneral = true): Builder
+    {
+        if ($eventId === null) {
+            return $query->whereNull('scope_event_id');
+        }
+
+        if ($includeGeneral) {
+            return $query->where(function ($q) use ($eventId) {
+                $q->whereNull('scope_event_id')
+                    ->orWhere('scope_event_id', $eventId);
+            });
+        }
+
+        return $query->where('scope_event_id', $eventId);
     }
 
     public function scopeDirection(Builder $query, Direction|string $direction): Builder

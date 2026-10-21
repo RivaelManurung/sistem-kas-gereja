@@ -43,6 +43,7 @@ class ExpenseService
             'account_id' => $data['account_id'],
             'fund_id' => $data['fund_id'],
             'category_id' => $data['category_id'],
+            'event_id' => $data['event_id'] ?? null,
             'description' => $data['description'] ?? null,
             'proof_path' => $proofPath,
             'status' => ExpenseStatus::Pending,

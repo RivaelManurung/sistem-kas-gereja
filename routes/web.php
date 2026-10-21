@@ -4,6 +4,11 @@ use App\Http\Controllers\BankDepositController;
 use App\Http\Controllers\CountConfirmationController;
 use App\Http\Controllers\CountSheetController;
 use App\Http\Controllers\DonationController;
+use App\Http\Controllers\EventCategoryController;
+use App\Http\Controllers\EventClosingController;
+use App\Http\Controllers\EventController;
+use App\Http\Controllers\EventExpenseController;
+use App\Http\Controllers\EventMemberController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\FundTransferController;
 use App\Http\Controllers\ServiceSessionController;
@@ -38,6 +43,14 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('transfers', FundTransferController::class);
     Route::post('transfers/{transfer}/approve', [FundTransferController::class, 'approve'])->name('transfers.approve');
     Route::post('transfers/{transfer}/reject', [FundTransferController::class, 'reject'])->name('transfers.reject');
+
+    // Events (Acara & Kepanitiaan)
+    Route::resource('events', EventController::class);
+    Route::post('events/{event}/close', [EventClosingController::class, 'close'])->name('events.close');
+    Route::post('events/{event}/expenses', [EventExpenseController::class, 'store'])->name('events.expenses.store');
+    Route::post('events/{event}/members', [EventMemberController::class, 'store'])->name('events.members.store');
+    Route::delete('events/{event}/members/{member}', [EventMemberController::class, 'destroy'])->name('events.members.destroy');
+    Route::post('events/{event}/categories', [EventCategoryController::class, 'store'])->name('events.categories.store');
 });
 
 require __DIR__.'/settings.php';

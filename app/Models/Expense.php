@@ -20,6 +20,7 @@ class Expense extends Model
         'account_id',
         'fund_id',
         'category_id',
+        'event_id',
         'description',
         'proof_path',
         'status',
@@ -63,6 +64,11 @@ class Expense extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function event(): BelongsTo
+    {
+        return $this->belongsTo(Event::class);
     }
 
     public function submitter(): BelongsTo
