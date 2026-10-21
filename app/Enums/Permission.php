@@ -8,5 +8,6 @@ enum Permission: string
     case MasterManage = 'master.manage';
     case UsersManage = 'users.manage';
     case MembersManage = 'members.manage';
+    case EventsManage = 'events.manage';
     case AuditView = 'audit.view';
 }

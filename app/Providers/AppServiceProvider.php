@@ -13,6 +13,8 @@ use App\Models\CountConfirmation;
 use App\Models\CountLine;
 use App\Models\CountSheet;
 use App\Models\Donation;
+use App\Models\Event;
+use App\Models\EventMember;
 use App\Models\Fund;
 use App\Models\LedgerEntry;
 use App\Models\Member;
@@ -48,6 +50,8 @@ class AppServiceProvider extends ServiceProvider
             'count_line' => CountLine::class,
             'count_confirmation' => CountConfirmation::class,
             'allocation_rule' => AllocationRule::class,
+            'event' => Event::class,
+            'event_member' => EventMember::class,
             'bank_deposit' => BankDeposit::class,
             'donation' => Donation::class,
         ]);
