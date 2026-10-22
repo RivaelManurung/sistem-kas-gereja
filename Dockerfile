@@ -14,10 +14,10 @@ COPY routes ./routes
 RUN composer dump-autoload --optimize --no-dev --no-scripts
 
 # ---- 2. Frontend assets -----------------------------------------------------
-FROM node:22-alpine AS assets
+FROM node:22-bookworm-slim AS assets
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci --no-audit --no-fund
+RUN npm ci --no-audit --no-fund --prefer-offline || (rm -rf node_modules && npm ci --no-audit --no-fund)
 COPY vite.config.js tsconfig.json components.json ./
 COPY resources ./resources
 COPY public ./public
