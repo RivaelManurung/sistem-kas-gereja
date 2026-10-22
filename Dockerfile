@@ -14,7 +14,7 @@ COPY routes ./routes
 RUN composer dump-autoload --optimize --no-dev --no-scripts
 
 # ---- 2. Frontend assets -----------------------------------------------------
-FROM node:20-alpine AS assets
+FROM node:22-alpine AS assets
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
