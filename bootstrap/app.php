@@ -22,6 +22,9 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // The app runs behind Coolify's proxy, which terminates TLS and forwards the original scheme and host.
+        $middleware->trustProxies(at: '*');
+
         $middleware->web(append: [
             EnsureUserIsActive::class,
             HandleInertiaRequests::class,
