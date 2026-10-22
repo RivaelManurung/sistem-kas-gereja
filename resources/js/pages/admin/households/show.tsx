@@ -33,6 +33,7 @@ interface Household {
     is_active: boolean;
     housing_status: Opt | null;
     full_address: string | null;
+    wilayah: { id: number; name: string } | null;
 }
 
 interface MemberRow {
@@ -97,6 +98,14 @@ export default function HouseholdShow({ household, members, availableMembers, fa
                         columns={3}
                         items={[
                             { label: 'Alamat lengkap', value: household.full_address ?? household.address },
+                            {
+                                label: 'Wilayah',
+                                value: household.wilayah ? (
+                                    <Link href={route('admin.wilayah.show', household.wilayah.id)} className="hover:underline underline-offset-4">
+                                        {household.wilayah.name}
+                                    </Link>
+                                ) : null,
+                            },
                             { label: 'Telepon', value: household.phone },
                             { label: 'Status tempat tinggal', value: household.housing_status?.label },
                             { label: 'RT/RW', value: household.rt_rw },

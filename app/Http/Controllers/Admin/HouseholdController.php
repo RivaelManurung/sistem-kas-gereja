@@ -21,7 +21,7 @@ class HouseholdController extends Controller
 
         $households = Household::query()
             ->withCount('members')
-            ->with('head:id,household_id,name')
+            ->with('head:id,household_id,name', 'wilayah:id,name')
             ->search($filters['search'] ?? null)
             ->when(isset($filters['aktif']), fn ($q) => $q->where('is_active', $filters['aktif'] === '1'))
             ->orderBy('name')
@@ -35,6 +35,7 @@ class HouseholdController extends Controller
                 'members_count' => $h->members_count,
                 'address' => $h->fullAddress(),
                 'phone' => $h->phone,
+                'wilayah' => $h->wilayah?->name,
                 'is_active' => $h->is_active,
             ]);
 
@@ -46,6 +47,7 @@ class HouseholdController extends Controller
 
     public function show(Household $household): Response
     {
+        $household->load('wilayah:id,name');
         $members = $household->members()
             ->orderByRaw("case family_role when 'kepala_keluarga' then 0 when 'pasangan' then 1 else 2 end")
             ->orderBy('birth_date')
@@ -55,6 +57,7 @@ class HouseholdController extends Controller
             'household' => [
                 ...$household->only(['id', 'name', 'family_number', 'address', 'rt_rw', 'kelurahan', 'kecamatan', 'city', 'postal_code', 'phone', 'notes', 'is_active']),
                 'housing_status' => Lookups::pair('housing_status', $household->housing_status),
+                'wilayah' => $household->wilayah ? ['id' => $household->wilayah->id, 'name' => $household->wilayah->name] : null,
                 'full_address' => $household->fullAddress(),
             ],
             'members' => $members->map(fn (Member $m) => [
@@ -74,7 +77,7 @@ class HouseholdController extends Controller
 
     public function create(): Response
     {
-        return Inertia::render('admin/households/form', ['household' => null, 'housingStatus' => LookupOption::options('housing_status'), 'nextNumber' => $this->nextNumber()]);
+        return Inertia::render('admin/households/form', ['household' => null, 'housingStatus' => LookupOption::options('housing_status'), 'wilayahs' => $this->wilayahOptions(), 'nextNumber' => $this->nextNumber()]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -87,8 +90,9 @@ class HouseholdController extends Controller
     public function edit(Household $household): Response
     {
         return Inertia::render('admin/households/form', [
-            'household' => $household->only(['id', 'name', 'family_number', 'address', 'rt_rw', 'kelurahan', 'kecamatan', 'city', 'postal_code', 'housing_status', 'phone', 'notes', 'is_active']),
+            'household' => $household->only(['id', 'name', 'family_number', 'address', 'rt_rw', 'kelurahan', 'kecamatan', 'city', 'postal_code', 'housing_status', 'wilayah_id', 'phone', 'notes', 'is_active']),
             'housingStatus' => LookupOption::options('housing_status'),
+            'wilayahs' => $this->wilayahOptions(),
             'nextNumber' => null,
         ]);
     }
@@ -144,6 +148,7 @@ class HouseholdController extends Controller
             'city' => ['nullable', 'string', 'max:100'],
             'postal_code' => ['nullable', 'digits:5'],
             'housing_status' => ['nullable', Lookups::rule('housing_status')],
+            'wilayah_id' => ['nullable', 'integer', Rule::exists('wilayahs', 'id')],
             'phone' => ['nullable', 'string', 'max:50', 'regex:/^[0-9+\-\s()]+$/'],
             'notes' => ['nullable', 'string', 'max:1000'],
             'is_active' => ['boolean'],
@@ -154,6 +159,12 @@ class HouseholdController extends Controller
             'postal_code.digits' => 'Kode pos harus 5 digit angka.',
             'phone.regex' => 'Nomor telepon hanya boleh berisi angka, spasi, tanda + dan -.',
         ], ['name' => 'nama keluarga', 'family_number' => 'nomor keluarga']);
+    }
+
+    /** @return list<array{id: int, name: string}> */
+    private function wilayahOptions(): array
+    {
+        return \App\Models\Wilayah::where('is_active', true)->orderBy('code')->orderBy('name')->get(['id', 'name'])->map(fn ($w) => ['id' => $w->id, 'name' => $w->name])->all();
     }
 
     private function nextNumber(): string

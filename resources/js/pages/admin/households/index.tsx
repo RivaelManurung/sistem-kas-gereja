@@ -20,6 +20,7 @@ interface HouseholdRow {
     name: string;
     family_number: string | null;
     head: string | null;
+    wilayah: string | null;
     members_count: number;
     address: string | null;
     phone: string | null;
@@ -89,6 +90,7 @@ export default function HouseholdsIndex({ households, filters }: { households: P
                             <TableRow>
                                 <TableHead>Keluarga</TableHead>
                                 <TableHead>Kepala keluarga</TableHead>
+                                <TableHead>Wilayah</TableHead>
                                 <TableHead>Anggota</TableHead>
                                 <TableHead>Alamat</TableHead>
                                 <TableHead>Status</TableHead>
@@ -105,6 +107,7 @@ export default function HouseholdsIndex({ households, filters }: { households: P
                                         {h.family_number && <span className="text-muted-foreground block text-xs">{h.family_number}</span>}
                                     </TableCell>
                                     <TableCell>{h.head ?? <span className="text-muted-foreground">-</span>}</TableCell>
+                                    <TableCell>{h.wilayah ?? <span className="text-muted-foreground">-</span>}</TableCell>
                                     <TableCell className="tabular-nums">{h.members_count}</TableCell>
                                     <TableCell className="text-muted-foreground max-w-xs truncate">{h.address ?? '-'}</TableCell>
                                     <TableCell>
@@ -123,7 +126,7 @@ export default function HouseholdsIndex({ households, filters }: { households: P
                             ))}
                             {households.data.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="text-muted-foreground py-10 text-center">
+                                    <TableCell colSpan={7} className="text-muted-foreground py-10 text-center">
                                         Tidak ada keluarga yang cocok.
                                     </TableCell>
                                 </TableRow>

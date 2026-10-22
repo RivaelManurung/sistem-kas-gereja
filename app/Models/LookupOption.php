@@ -20,7 +20,7 @@ class LookupOption extends Model
             'description' => 'Pilihan cara jemaat memberikan persembahan pada formulir persembahan atas nama.',
         ],
         'membership_status' => ['label' => 'Status keanggotaan', 'description' => 'Status jemaat di gereja. "Pindah" dan "Meninggal" dipakai untuk menandai anggota yang tidak lagi aktif.'],
-        'wilayah' => ['label' => 'Wilayah pelayanan', 'description' => 'Pembagian jemaat per wilayah, rayon, atau kelompok kategorial.'],
+        'wilayah_role' => ['label' => 'Jabatan pengurus wilayah', 'description' => 'Jabatan yang bisa diberikan kepada pengurus sebuah wilayah, misalnya penatua (sintua), diaken, atau ketua wilayah.'],
         'family_role' => ['label' => 'Status dalam keluarga', 'description' => 'Peran anggota di dalam satu keluarga, misalnya kepala keluarga, pasangan, atau anak.'],
         'marital_status' => ['label' => 'Status pernikahan', 'description' => 'Pilihan status pernikahan pada data jemaat.'],
         'education' => ['label' => 'Pendidikan terakhir', 'description' => 'Pilihan jenjang pendidikan terakhir.'],

@@ -26,10 +26,13 @@ interface HouseholdData {
     housing_status: string | { value: string; label: string } | null;
     phone: string | null;
     notes: string | null;
+    wilayah_id: number | null;
     is_active: boolean;
 }
 
-export default function HouseholdForm({ household, housingStatus, nextNumber }: { household: HouseholdData | null; housingStatus: Array<{ value: string; label: string }>; nextNumber: string | null }) {
+const NONE = '__none__';
+
+export default function HouseholdForm({ household, housingStatus, nextNumber, wilayahs }: { household: HouseholdData | null; wilayahs: Array<{ id: number; name: string }>; housingStatus: Array<{ value: string; label: string }>; nextNumber: string | null }) {
     const isEdit = household !== null;
     const hs = household?.housing_status;
     const { data, setData, post, put, processing, errors } = useForm({
@@ -43,6 +46,7 @@ export default function HouseholdForm({ household, housingStatus, nextNumber }: 
         postal_code: household?.postal_code ?? '',
         housing_status: (typeof hs === 'object' && hs ? hs.value : hs) ?? '',
         phone: household?.phone ?? '',
+        wilayah_id: household?.wilayah_id ? String(household.wilayah_id) : '',
         notes: household?.notes ?? '',
         is_active: household?.is_active ?? true,
     });
@@ -96,6 +100,23 @@ export default function HouseholdForm({ household, housingStatus, nextNumber }: 
                                     </SelectContent>
                                 </Select>
                                 <InputError message={errors.housing_status} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="wilayah_id">Wilayah</Label>
+                                <Select value={data.wilayah_id || NONE} onValueChange={(v) => setData('wilayah_id', v === NONE ? '' : v)}>
+                                    <SelectTrigger id="wilayah_id">
+                                        <SelectValue placeholder="Pilih wilayah" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value={NONE}>Belum ditentukan</SelectItem>
+                                        {wilayahs.map((w) => (
+                                            <SelectItem key={w.id} value={String(w.id)}>
+                                                {w.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <InputError message={errors.wilayah_id} />
                             </div>
                             <div className="flex items-center justify-between gap-4 rounded-lg border p-3 md:col-span-2 xl:col-span-2">
                                 <div>

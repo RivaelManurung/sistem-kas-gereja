@@ -46,6 +46,8 @@ class AppServiceProvider extends ServiceProvider
             'user' => User::class,
             'role' => Role::class,
             'household' => \App\Models\Household::class,
+            'wilayah' => \App\Models\Wilayah::class,
+            'wilayah_officer' => \App\Models\WilayahOfficer::class,
             'member_milestone' => \App\Models\MemberMilestone::class,
             'member_ministry' => \App\Models\MemberMinistry::class,
             'member_document' => \App\Models\MemberDocument::class,

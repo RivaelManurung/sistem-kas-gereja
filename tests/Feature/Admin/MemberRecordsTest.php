@@ -3,6 +3,7 @@
 use App\Enums\Role;
 use App\Models\Household;
 use App\Models\Member;
+use App\Models\Wilayah;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
@@ -37,7 +38,6 @@ it('stores the complete member profile with lookups and a household', function (
         'family_role' => 'kepala_keluarga',
         'membership_date' => '2010-05-01',
         'previous_church' => 'HKBP Kebayoran',
-        'wilayah' => 'wilayah_2',
         'emergency_name' => 'Rotua Simanjuntak',
         'emergency_phone' => '081234567891',
     ]))->assertSessionHasNoErrors();
@@ -188,13 +188,15 @@ it('shows the member profile with household, history, documents and giving', fun
 
 it('filters the member list by status, wilayah and search', function () {
     actingAsRole(Role::Admin);
-    Member::factory()->create(['name' => 'Aaron Tambunan', 'membership_status' => 'tetap', 'wilayah' => 'wilayah_1']);
-    Member::factory()->create(['name' => 'Bella Purba', 'membership_status' => 'simpatisan', 'wilayah' => 'wilayah_2']);
+    $a = Wilayah::create(['name' => 'Wilayah A', 'code' => 'A']);
+    $b = Wilayah::create(['name' => 'Wilayah B', 'code' => 'B']);
+    Member::factory()->create(['name' => 'Aaron Tambunan', 'membership_status' => 'tetap', 'household_id' => Household::create(['name' => 'Keluarga Tambunan', 'wilayah_id' => $a->id])->id]);
+    Member::factory()->create(['name' => 'Bella Purba', 'membership_status' => 'simpatisan', 'household_id' => Household::create(['name' => 'Keluarga Purba', 'wilayah_id' => $b->id])->id]);
 
     $names = fn (array $q) => collect($this->get(route('admin.members.index', $q))->assertOk()->viewData('page')['props']['members']['data'])->pluck('name')->all();
 
     expect($names(['status' => 'simpatisan']))->toBe(['Bella Purba'])
-        ->and($names(['wilayah' => 'wilayah_1']))->toBe(['Aaron Tambunan'])
+        ->and($names(['wilayah' => $a->id]))->toBe(['Aaron Tambunan'])
         ->and($names(['search' => 'purba']))->toBe(['Bella Purba'])
         ->and($names([]))->toHaveCount(2);
 });

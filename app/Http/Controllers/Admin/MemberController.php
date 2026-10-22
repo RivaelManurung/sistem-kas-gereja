@@ -10,6 +10,7 @@ use App\Models\Household;
 use App\Models\LookupOption;
 use App\Models\Member;
 use App\Models\User;
+use App\Models\Wilayah;
 use App\Support\Lookups;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -29,16 +30,16 @@ class MemberController extends Controller
         $filters = $request->validate([
             'search' => ['nullable', 'string', 'max:100'],
             'status' => ['nullable', 'string', 'max:40'],
-            'wilayah' => ['nullable', 'string', 'max:60'],
+            'wilayah' => ['nullable', 'integer'],
             'gender' => ['nullable', 'in:L,P'],
             'aktif' => ['nullable', 'in:1,0'],
         ]);
 
         $members = Member::query()
-            ->with('household:id,name')
+            ->with('household:id,name,wilayah_id', 'household.wilayah:id,name')
             ->search($filters['search'] ?? null)
             ->when($filters['status'] ?? null, fn ($q, $v) => $q->where('membership_status', $v))
-            ->when($filters['wilayah'] ?? null, fn ($q, $v) => $q->where('wilayah', $v))
+            ->when($filters['wilayah'] ?? null, fn ($q, $v) => $q->whereHas('household', fn ($h) => $h->where('wilayah_id', $v)))
             ->when($filters['gender'] ?? null, fn ($q, $v) => $q->where('gender', $v))
             ->when(isset($filters['aktif']), fn ($q) => $q->where('is_active', $filters['aktif'] === '1'))
             ->orderBy('name')
@@ -52,7 +53,7 @@ class MemberController extends Controller
                 'age' => $m->age,
                 'phone' => $m->phone,
                 'household' => $m->household ? ['id' => $m->household->id, 'name' => $m->household->name] : null,
-                'wilayah' => Lookups::label('wilayah', $m->wilayah),
+                'wilayah' => $m->household?->wilayah?->name,
                 'status' => Lookups::pair('membership_status', $m->membership_status),
                 'is_active' => $m->is_active,
             ]);
@@ -67,7 +68,7 @@ class MemberController extends Controller
                 'aktif' => $filters['aktif'] ?? '',
             ],
             'statusOptions' => LookupOption::options('membership_status'),
-            'wilayahOptions' => LookupOption::options('wilayah'),
+            'wilayahOptions' => Wilayah::orderBy('code')->orderBy('name')->get(['id', 'name'])->map(fn ($w) => ['value' => (string) $w->id, 'label' => $w->name])->all(),
             'totals' => [
                 'all' => Member::count(),
                 'active' => Member::where('is_active', true)->count(),
@@ -77,12 +78,13 @@ class MemberController extends Controller
 
     public function show(Member $member): Response
     {
-        $member->load(['household', 'user:id,name,email', 'milestones', 'ministries', 'documents.uploader:id,name']);
+        $member->load(['household.wilayah', 'user:id,name,email', 'milestones', 'ministries', 'documents.uploader:id,name']);
 
         $household = $member->household ? [
             'id' => $member->household->id,
             'name' => $member->household->name,
             'family_number' => $member->household->family_number,
+            'wilayah' => $member->household->wilayah?->name,
             'address' => $member->household->fullAddress(),
             'members' => $member->household->members()->orderByRaw("case family_role when 'kepala_keluarga' then 0 when 'pasangan' then 1 else 2 end")->orderBy('birth_date')->get()->map(fn (Member $m) => [
                 'id' => $m->id,
@@ -108,7 +110,7 @@ class MemberController extends Controller
                 'education' => Lookups::pair('education', $member->education),
                 'family_role' => Lookups::pair('family_role', $member->family_role),
                 'membership_status' => Lookups::pair('membership_status', $member->membership_status),
-                'wilayah' => Lookups::pair('wilayah', $member->wilayah),
+                'wilayah' => $member->household?->wilayah ? ['value' => (string) $member->household->wilayah->id, 'label' => $member->household->wilayah->name, 'id' => $member->household->wilayah->id] : null,
                 'has_photo' => (bool) $member->photo_path,
                 'photo_version' => $member->updated_at?->timestamp,
                 'user' => $member->user,
@@ -207,7 +209,7 @@ class MemberController extends Controller
     {
         return Inertia::render('admin/members/form', [
             'member' => [
-                ...$member->only(['id', 'member_number', 'nik', 'name', 'gender', 'place_of_birth', 'marital_status', 'education', 'occupation', 'father_name', 'mother_name', 'phone', 'email', 'address', 'ktp_address', 'household_id', 'family_role', 'membership_status', 'previous_church', 'wilayah', 'emergency_name', 'emergency_phone', 'emergency_relation', 'notes', 'user_id', 'is_active']),
+                ...$member->only(['id', 'member_number', 'nik', 'name', 'gender', 'place_of_birth', 'marital_status', 'education', 'occupation', 'father_name', 'mother_name', 'phone', 'email', 'address', 'ktp_address', 'household_id', 'family_role', 'membership_status', 'previous_church', 'emergency_name', 'emergency_phone', 'emergency_relation', 'notes', 'user_id', 'is_active']),
                 'birth_date' => $member->birth_date?->toDateString(),
                 'membership_date' => $member->membership_date?->toDateString(),
                 'has_photo' => (bool) $member->photo_path,
@@ -286,7 +288,6 @@ class MemberController extends Controller
                 'education' => LookupOption::options('education'),
                 'familyRole' => LookupOption::options('family_role'),
                 'membershipStatus' => LookupOption::options('membership_status'),
-                'wilayah' => LookupOption::options('wilayah'),
             ],
             'customFields' => [
                 'definitions' => AttributeDefinition::active()->forEntity(AttributeEntity::Member)->orderBy('sort_order')->get(),

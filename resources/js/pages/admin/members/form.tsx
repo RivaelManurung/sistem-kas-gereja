@@ -38,7 +38,6 @@ interface MemberData {
     family_role: string | null;
     membership_status: string | null;
     previous_church: string | null;
-    wilayah: string | null;
     emergency_name: string | null;
     emergency_phone: string | null;
     emergency_relation: string | null;
@@ -56,7 +55,6 @@ interface Lookups {
     education: Option[];
     familyRole: Option[];
     membershipStatus: Option[];
-    wilayah: Option[];
 }
 
 const NONE = '__none__';
@@ -64,7 +62,7 @@ const FIELD_ORDER = [
     'photo', 'member_number', 'nik', 'name', 'gender', 'place_of_birth', 'birth_date', 'marital_status', 'education', 'occupation',
     'household_id', 'family_role', 'father_name', 'mother_name',
     'phone', 'email', 'address', 'ktp_address',
-    'membership_status', 'membership_date', 'previous_church', 'wilayah', 'user_id', 'is_active',
+    'membership_status', 'membership_date', 'previous_church', 'user_id', 'is_active',
     'emergency_name', 'emergency_phone', 'emergency_relation', 'notes',
 ];
 
@@ -140,7 +138,6 @@ export default function MemberForm({
         membership_status: member?.membership_status ?? 'tetap',
         membership_date: s(member?.membership_date),
         previous_church: s(member?.previous_church),
-        wilayah: s(member?.wilayah),
         emergency_name: s(member?.emergency_name),
         emergency_phone: s(member?.emergency_phone),
         emergency_relation: s(member?.emergency_relation),
@@ -287,9 +284,12 @@ export default function MemberForm({
                                 id="household_id"
                                 error={err.household_id}
                                 hint={
-                                    <Link href={route('admin.households.create')} className="hover:text-foreground underline underline-offset-2">
-                                        Buat keluarga baru
-                                    </Link>
+                                    <>
+                                        <Link href={route('admin.households.create')} className="hover:text-foreground underline underline-offset-2">
+                                            Buat keluarga baru
+                                        </Link>
+                                        <span className="mt-1 block">Wilayah mengikuti keluarga. Atur wilayah di data keluarga.</span>
+                                    </>
                                 }
                             >
                                 <Select value={data.household_id || NONE} onValueChange={(v) => setData('household_id', v === NONE ? '' : v)}>
@@ -388,9 +388,6 @@ export default function MemberForm({
                             </Field>
                             <Field label="Gereja asal" id="previous_church" error={err.previous_church}>
                                 <Input {...text('previous_church')} />
-                            </Field>
-                            <Field label="Wilayah" id="wilayah" error={err.wilayah}>
-                                {choice('wilayah', lookups.wilayah, 'Pilih wilayah')}
                             </Field>
                             <Field
                                 label="Akun pengguna"

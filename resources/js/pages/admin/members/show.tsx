@@ -3,7 +3,7 @@ import { DefinitionList, DetailCard, StatTiles } from '@/components/app/detail';
 import { LinkRow } from '@/components/app/link-row';
 import { RowActions } from '@/components/app/row-actions';
 import InputError from '@/components/input-error';
-import { BackButton } from '@/components/page-header';
+import { BackIconButton } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
@@ -55,7 +55,7 @@ interface Member {
     education: OptOrNull;
     family_role: OptOrNull;
     membership_status: OptOrNull;
-    wilayah: OptOrNull;
+    wilayah: { value: string; label: string; id: number } | null;
     has_photo: boolean;
     photo_version: string | number | null;
     user: { id: number; name: string; email: string } | null;
@@ -67,6 +67,7 @@ interface Household {
     name: string;
     family_number: string | null;
     address: string | null;
+    wilayah: string | null;
     members: Array<{ id: number; name: string; age: number | null; family_role: OptOrNull; status: OptOrNull; is_self: boolean }>;
 }
 
@@ -259,9 +260,9 @@ export default function MemberShow({ member, household, milestones, ministries, 
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={member.name} />
             <div className="space-y-6 p-4 md:p-6 lg:p-8">
-                <BackButton href={route('admin.members.index')} />
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
-                    <div className="flex min-w-0 items-center gap-4">
+                    <div className="flex min-w-0 items-center gap-3">
+                        <BackIconButton href={route('admin.members.index')} />
                         {member.has_photo ? (
                             <img src={route('admin.members.photo', member.id) + '?v=' + member.photo_version} alt={member.name} className="size-16 shrink-0 rounded-full object-cover" />
                         ) : (
@@ -392,7 +393,8 @@ export default function MemberShow({ member, household, milestones, ministries, 
                                 }
                                 flush
                             >
-                                {household.address && <p className="text-muted-foreground px-5 pb-4 text-sm md:px-6">{household.address}</p>}
+                                {household.address && <p className="text-muted-foreground px-5 pb-1 text-sm md:px-6">{household.address}</p>}
+                                {household.wilayah && <p className="text-muted-foreground px-5 pb-4 text-sm md:px-6">Wilayah: {household.wilayah}</p>}
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
@@ -456,7 +458,14 @@ export default function MemberShow({ member, household, milestones, ministries, 
                                     { label: 'Status', value: member.membership_status?.label },
                                     { label: 'Tanggal diterima', value: member.membership_date ? formatDate(member.membership_date) : null },
                                     { label: 'Gereja asal', value: member.previous_church },
-                                    { label: 'Wilayah', value: member.wilayah?.label },
+                                    {
+                                        label: 'Wilayah',
+                                        value: member.wilayah ? (
+                                            <Link href={route('admin.wilayah.show', member.wilayah.id)} className="hover:underline underline-offset-4">
+                                                {member.wilayah.label}
+                                            </Link>
+                                        ) : null,
+                                    },
                                 ]}
                             />
                         </DetailCard>

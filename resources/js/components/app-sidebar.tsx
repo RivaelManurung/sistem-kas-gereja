@@ -23,6 +23,7 @@ import {
     LayoutGrid,
     ListChecks,
     Lock,
+    MapPin,
     type LucideIcon,
     Newspaper,
     Palette,
@@ -140,6 +141,7 @@ const MODULES: NavModule[] = [
                     { title: 'Peran & Hak Akses', url: '/admin/roles', icon: KeyRound, anyOf: ['roles.manage'] },
                     { title: 'Anggota Jemaat', url: '/admin/members', icon: UserCheck, anyOf: ['members.manage'] },
                     { title: 'Keluarga', url: '/admin/households', icon: House, anyOf: ['members.manage'] },
+                    { title: 'Wilayah', url: '/admin/wilayah', icon: MapPin, anyOf: ['members.manage'] },
                 ],
             },
             {
@@ -388,7 +390,7 @@ export function AppSidebar() {
     const { panelOpen } = useSidebarNav();
 
     return (
-        <aside className="fixed inset-y-0 left-0 z-30 hidden md:flex">
+        <aside className="fixed inset-y-0 left-0 z-30 hidden md:flex print:hidden">
             <SidebarRail />
             {panelOpen && <SidebarPanel />}
         </aside>

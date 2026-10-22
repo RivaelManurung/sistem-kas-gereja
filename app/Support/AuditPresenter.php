@@ -50,6 +50,8 @@ class AuditPresenter
         'report_approval' => 'Persetujuan laporan',
         'report_signatory' => 'Penanda tangan laporan',
         'household' => 'Keluarga',
+        'wilayah_id' => 'Wilayah', 'coverage' => 'Cakupan wilayah', 'meeting_info' => 'Jadwal persekutuan', 'code' => 'Kode', 'wilayah' => 'Wilayah',
+        'wilayah_officer' => 'Pengurus wilayah',
         'member_milestone' => 'Peristiwa gerejawi',
         'member_ministry' => 'Pelayanan jemaat',
         'member_document' => 'Dokumen jemaat',

@@ -34,6 +34,7 @@ use App\Models\ReportSignatory;
 use App\Models\ServiceSchedule;
 use App\Models\ServiceSession;
 use App\Models\User;
+use App\Models\Wilayah;
 use App\Services\AccountingPeriodService;
 use App\Services\AllocationService;
 use App\Services\CountCalculationService;
@@ -374,7 +375,6 @@ class DemoDataSeeder extends Seeder
                 'family_role' => $a['role'],
                 'membership_status' => $status,
                 'previous_church' => $a['previous_church'] ?? null,
-                'wilayah' => $a['wilayah'],
                 'emergency_name' => $a['emergency'][0] ?? null,
                 'emergency_phone' => $a['emergency'][1] ?? null,
                 'emergency_relation' => $a['emergency'][2] ?? null,
@@ -482,14 +482,23 @@ class DemoDataSeeder extends Seeder
             return $member;
         };
 
-        $wilayahKeys = ['wilayah_1', 'wilayah_2', 'wilayah_3', 'wilayah_4', 'wilayah_5'];
+        $wilayahDefs = [
+            ['A', 'Wilayah A', 'Kebon Jeruk dan sekitarnya', 'Jl. Kebon Jeruk Raya, Jl. Puri Indah, Perumahan Taman Kota', 'Persekutuan wilayah setiap Jumat pukul 19.00'],
+            ['B', 'Wilayah B', 'Palmerah dan Duri Kepa', 'Jl. Palmerah Barat, Jl. Tanjung Duren, Duri Kepa', 'Persekutuan wilayah setiap Rabu pukul 19.30'],
+            ['C', 'Wilayah C', 'Kembangan dan Meruya', 'Jl. Meruya Ilir, Jl. Kembangan Utara, Joglo', 'Persekutuan wilayah setiap Kamis pukul 19.00'],
+            ['D', 'Wilayah D', 'Srengseng dan Green Garden', 'Jl. Srengseng Raya, Green Garden, Sukabumi Utara', 'Persekutuan wilayah minggu kedua dan keempat, Sabtu pukul 18.00'],
+        ];
+        $wilayahs = [];
+        foreach ($wilayahDefs as [$code, $name, $description, $coverage, $meeting]) {
+            $wilayahs[] = Wilayah::create(['code' => $code, 'name' => $name, 'description' => $description, 'coverage' => $coverage, 'meeting_info' => $meeting]);
+        }
         $families = 0;
         while ($seq < 148) {
             $surname = $this->pick($surnames);
             $familyNo++;
             [$kelurahan, $kecamatan, $postal] = $this->pick($areas);
             $address = $this->pick($streets).' No. '.mt_rand(1, 120);
-            $wilayah = $this->pick($wilayahKeys);
+            $wilayah = $this->pick($wilayahs);
             $type = mt_rand(1, 100);
 
             $household = Household::create([
@@ -502,10 +511,11 @@ class DemoDataSeeder extends Seeder
                 'city' => 'Jakarta Barat',
                 'postal_code' => $postal,
                 'housing_status' => $this->pick(['milik_sendiri', 'milik_sendiri', 'milik_sendiri', 'kontrak', 'kontrak', 'keluarga', 'kost']),
+                'wilayah_id' => $wilayah->id,
                 'phone' => '021-5'.mt_rand(100000, 999999),
             ]);
             $fullAddress = "{$address}, {$kelurahan}, {$kecamatan}, Jakarta Barat";
-            $base = ['household' => $household, 'address' => $fullAddress, 'wilayah' => $wilayah];
+            $base = ['household' => $household, 'address' => $fullAddress];
             $families++;
 
             if ($type <= 62) { // keluarga inti: ayah, ibu, 0-3 anak
@@ -565,6 +575,31 @@ class DemoDataSeeder extends Seeder
         foreach ($candidates as $i => $member) {
             $member->update(['user_id' => $linkedUsers[$i]->id]);
             $linkedUsers[$i]->forceFill(['name' => $member->name])->save();
+        }
+
+        // Pengurus wilayah: penatua (sintua), diaken, ketua, sekretaris, dan bendahara per wilayah.
+        $roles = [['penatua', 2], ['diaken', 2], ['ketua', 1], ['sekretaris', 1], ['bendahara', 1]];
+        foreach ($wilayahs as $wilayah) {
+            $pool = Member::whereHas('household', fn ($q) => $q->where('wilayah_id', $wilayah->id))
+                ->where('is_active', true)->where('membership_status', 'tetap')->get()
+                ->filter(fn (Member $m) => $m->age >= 30 && $m->age <= 72)->shuffle(mt_rand())->values();
+            $i = 0;
+            foreach ($roles as [$role, $count]) {
+                for ($n = 0; $n < $count && $i < $pool->count(); $n++, $i++) {
+                    $member = $pool[$i];
+                    $start = Carbon::now()->subYears(mt_rand(1, 4))->subMonths(mt_rand(0, 11));
+                    $wilayah->officers()->create(['member_id' => $member->id, 'role' => $role, 'start_date' => $start->toDateString()]);
+                    if (in_array($role, ['penatua', 'diaken'], true) && ! $member->ministries()->where('ministry', $role === 'penatua' ? 'majelis' : 'diaken')->exists()) {
+                        $member->ministries()->create(['ministry' => $role === 'penatua' ? 'majelis' : 'diaken', 'role_title' => $role === 'penatua' ? 'Penatua wilayah' : 'Diaken wilayah', 'start_date' => $start->toDateString()]);
+                    }
+                }
+            }
+            // Satu penatua periode sebelumnya sudah selesai, sebagai riwayat.
+            if ($i < $pool->count()) {
+                $former = $pool[$i];
+                $from = Carbon::now()->subYears(7);
+                $wilayah->officers()->create(['member_id' => $former->id, 'role' => 'penatua', 'start_date' => $from->toDateString(), 'end_date' => $from->copy()->addYears(3)->toDateString(), 'notes' => 'Purna tugas, masa pelayanan periode sebelumnya.']);
+            }
         }
 
         $this->members = Member::all()->all();
