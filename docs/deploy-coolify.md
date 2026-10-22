@@ -51,3 +51,17 @@ Volume `db-data` menyimpan database. Keduanya bertahan saat redeploy.
 - Log dikirim ke `stderr`, bisa dilihat di tab Logs Coolify.
 - Health check memakai `/up`.
 - Tidak ada queue worker atau scheduler yang diperlukan saat ini.
+
+## Memakai image dari GHCR (tanpa build di server)
+
+Workflow `.github/workflows/docker-publish.yml` membangun image setiap push ke `main` dan
+mengirimnya ke `ghcr.io/rivaelmanurung/sistem-kas-gereja` (tag `latest` dan `sha`). Di Coolify,
+pilih build pack **Docker Compose** dengan lokasi `/docker-compose.ghcr.yml` sehingga server
+hanya menarik image, tidak membangun (hemat RAM di VPS kecil).
+
+- Setelah workflow pertama selesai, buka GitHub → Packages → `sistem-kas-gereja` → Package
+  settings → ubah visibility ke **Public** agar server bisa menarik tanpa login. Jika tetap
+  private, tambahkan GHCR di Coolify → Registries memakai token dengan izin `read:packages`.
+- Akses lewat `http://IP:port` (tanpa HTTPS): set `SESSION_SECURE_COOKIE=false`, jika tidak
+  login akan gagal. Kembalikan ke `true` setelah memakai domain HTTPS.
+- Untuk memakai tag tertentu: set `APP_IMAGE=ghcr.io/rivaelmanurung/sistem-kas-gereja:<sha>`.

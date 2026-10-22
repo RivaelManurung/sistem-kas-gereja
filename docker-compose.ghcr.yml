@@ -1,0 +1,56 @@
+# Same stack as docker-compose.yml, but pulls the image built by the "Publish image" workflow
+# instead of building on the server (useful on small VPSes). Use this file in Coolify.
+# Required variables: APP_KEY, APP_URL, ADMIN_EMAIL, ADMIN_PASSWORD. See docs/deploy-coolify.md.
+services:
+  app:
+    image: ${APP_IMAGE:-ghcr.io/rivaelmanurung/sistem-kas-gereja:latest}
+    pull_policy: always
+    restart: unless-stopped
+    environment:
+      APP_NAME: ${APP_NAME:-Kas Gereja}
+      APP_ENV: production
+      APP_DEBUG: "false"
+      APP_KEY: ${APP_KEY:?Isi APP_KEY (php artisan key:generate --show)}
+      APP_URL: ${APP_URL:?Isi APP_URL, misalnya https://kas.gereja.id}
+      APP_LOCALE: id
+      APP_TIMEZONE: Asia/Jakarta
+      APP_DEMO_LOGIN: ${APP_DEMO_LOGIN:-false}
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: ${POSTGRES_DB:-kas_gereja}
+      DB_USERNAME: ${POSTGRES_USER:-kas_gereja}
+      DB_PASSWORD: ${SERVICE_PASSWORD_POSTGRES:?Isi password database}
+      SESSION_DRIVER: database
+      SESSION_SECURE_COOKIE: ${SESSION_SECURE_COOKIE:-true}
+      CACHE_STORE: database
+      QUEUE_CONNECTION: database
+      ADMIN_NAME: ${ADMIN_NAME:-Admin Gereja}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?Isi email admin pertama}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Isi password admin pertama}
+    volumes:
+      - app-storage:/app/storage/app
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "80"
+
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-kas_gereja}
+      POSTGRES_USER: ${POSTGRES_USER:-kas_gereja}
+      POSTGRES_PASSWORD: ${SERVICE_PASSWORD_POSTGRES:?Isi password database}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  app-storage:
+  db-data:
