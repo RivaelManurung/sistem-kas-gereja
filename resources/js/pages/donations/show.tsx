@@ -1,4 +1,4 @@
-import { BackButton } from '@/components/page-header';
+import { BackIconButton } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -43,7 +43,7 @@ export default function DonationShow({ donation }: { donation: DonationDetail })
             <Head title={`Tanda Terima ${donation.receipt_number}`} />
             <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 <div className="flex items-center justify-between no-print">
-                    <BackButton href={route('donations.index')} />
+                    <BackIconButton href={route('donations.index')} />
                     <Button onClick={() => window.print()}>
                         <Printer className="mr-2 h-4 w-4" />
                         Cetak Tanda Terima

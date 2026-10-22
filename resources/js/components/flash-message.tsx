@@ -14,6 +14,7 @@ export default function FlashMessage() {
     return (
         <div
             role={error ? 'alert' : 'status'}
+            data-print="hide"
             className={
                 error
                     ? 'border-expense/30 bg-expense/10 text-expense mx-4 mt-4 flex items-center gap-2 rounded-md border px-4 py-2 text-sm md:mx-6 lg:mx-8'

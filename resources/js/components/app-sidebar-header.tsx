@@ -11,7 +11,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
     const { panelOpen, togglePanel, mobileOpen, setMobileOpen } = useSidebarNav();
 
     return (
-        <header className="bg-background/85 sticky top-0 z-20 flex h-14 shrink-0 items-center justify-between gap-3 border-b px-4 backdrop-blur md:px-6">
+        <header className="bg-background/85 sticky top-0 z-20 print:hidden flex h-14 shrink-0 items-center justify-between gap-3 border-b px-4 backdrop-blur md:px-6">
             <div className="flex min-w-0 items-center gap-2">
                 <Button variant="ghost" size="icon" className="size-9 md:hidden" onClick={() => setMobileOpen(true)} aria-label="Buka menu">
                     <Menu className="size-5" />

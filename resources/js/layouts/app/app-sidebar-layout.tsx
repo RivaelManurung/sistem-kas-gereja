@@ -12,7 +12,7 @@ function Frame({ children, breadcrumbs }: { children: React.ReactNode; breadcrum
     return (
         <div className="bg-background min-h-dvh">
             <AppSidebar />
-            <div className={cn('flex min-h-dvh flex-col transition-[padding] duration-200', panelOpen ? 'md:pl-[340px]' : 'md:pl-[84px]')}>
+            <div className={cn('flex min-h-dvh flex-col transition-[padding] duration-200 print:block print:min-h-0 print:pl-0', panelOpen ? 'md:pl-[340px]' : 'md:pl-[84px]')}>
                 <AppSidebarHeader breadcrumbs={breadcrumbs} />
                 <main className="flex flex-1 flex-col">
                     <FlashMessage />

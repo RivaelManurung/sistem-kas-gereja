@@ -38,7 +38,8 @@ boleh dilanggar**. Kalau sebuah aturan perlu dilanggar, tulis alasannya di PR.
 - Tujuan kembali sama dengan tombol "Batal": form tambah ke halaman daftar, form
   ubah ke halaman detail, halaman detail ke halaman daftar.
 - Halaman dengan header khusus (misalnya detail jemaat atau acara) memakai
-  `<BackButton href={...} />` di atas header.
+  `<BackIconButton href={...} />` di baris judul yang sama, bukan baris sendiri,
+  supaya tidak menambah ruang kosong di atas halaman.
 
 ## 4. Form
 

@@ -327,3 +327,20 @@ a[data-pending='true']::before,
         animation-duration: 2s;
     }
 }
+
+/* Halaman cetak: ukuran kertas dan elemen yang tidak ikut tercetak */
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 12mm 14mm;
+    }
+
+    [data-print='hide'] {
+        display: none !important;
+    }
+
+    html,
+    body {
+        background: #fff !important;
+    }
+}

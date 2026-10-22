@@ -2,7 +2,7 @@ import { ConfirmDialog } from '@/components/app/confirm-dialog';
 import { LinkRow } from '@/components/app/link-row';
 import { RowActions } from '@/components/app/row-actions';
 import InputError from '@/components/input-error';
-import { BackButton } from '@/components/page-header';
+import { BackIconButton } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -174,10 +174,10 @@ export default function EventShow({
             <Head title={event.name} />
             <div className="space-y-6 p-4 md:p-6 lg:p-8">
                 {/* Header Section */}
-                <BackButton href={route('events.index')} />
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-5">
                     <div>
                         <div className="flex items-center gap-3">
+                            <BackIconButton href={route('events.index')} />
                             <h1 className="text-2xl font-bold tracking-tight text-foreground">{event.name}</h1>
                             <Badge variant={statusVariants[event.status]}>
                                 {statusLabels[event.status]}

@@ -247,7 +247,8 @@ class ReportController extends Controller
                 ? $session->date->format('d M')
                 : Carbon::parse($session->date)->translatedFormat('d M');
             $sessionTitle = ($session->schedule?->name ?? $session->name ?? 'Ibadah').' ('.$sessionDate.')';
-            foreach ($session->countSheets as $sheet) {
+            // Only locked sheets are posted to the ledger, so the breakdown always adds up to the printed total.
+            foreach ($session->countSheets->filter(fn ($sheet) => $sheet->status === \App\Enums\CountSheetStatus::Locked) as $sheet) {
                 foreach ($sheet->lines as $line) {
                     if ($line->amount > 0) {
                         $sessionsBreakdown[] = [
@@ -258,6 +259,11 @@ class ReportController extends Controller
                     }
                 }
             }
+        }
+
+        // The per-service table is only shown when it adds up to the ledger total; otherwise show totals per category.
+        if (array_sum(array_column($sessionsBreakdown, 'amount')) !== (int) $financial['incomes']['total']) {
+            $sessionsBreakdown = [];
         }
 
         $church = ChurchSetting::current();
@@ -274,13 +280,41 @@ class ReportController extends Controller
             'total_expense' => $financial['expenses']['total'],
             'opening_balance' => $financial['opening_balances']['total'],
             'closing_balance' => $financial['closing_balances']['total'],
+            'place_date' => trim(($church->city ?: '').', '.$end->translatedFormat('d F Y'), ', '),
+            'signatories' => $this->bulletinSignatories(),
             'church' => [
                 'name' => $church->name ?? 'Gereja',
                 'address' => $church->address,
                 'city' => $church->city,
                 'phone' => $church->phone,
                 'email' => $church->email,
+                'logo_url' => $church->brand()['logo_url'],
             ],
         ];
+    }
+
+    /**
+     * Names printed under the bulletin. Uses the configured report signatories, otherwise the
+     * first active user holding the treasurer and council-chair roles.
+     *
+     * @return list<array{title: string, position: string, name: string}>
+     */
+    protected function bulletinSignatories(): array
+    {
+        $configured = \App\Models\ReportSignatory::active()->with('user:id,name')->orderBy('order')->get()
+            ->filter(fn ($sig) => $sig->user?->name)
+            ->map(fn ($sig) => ['title' => $sig->title, 'position' => $sig->position, 'name' => $sig->user->name])
+            ->values();
+
+        if ($configured->isNotEmpty()) {
+            return $configured->take(3)->all();
+        }
+
+        $byRole = fn (string $role) => \App\Models\User::role($role)->where('is_active', true)->orderBy('id')->value('name');
+
+        return array_values(array_filter([
+            ($n = $byRole('bendahara')) ? ['title' => 'Dibuat oleh', 'position' => 'Bendahara', 'name' => $n] : null,
+            ($n = $byRole('majelis')) ? ['title' => 'Mengetahui', 'position' => 'Ketua Majelis', 'name' => $n] : null,
+        ]));
     }
 }
