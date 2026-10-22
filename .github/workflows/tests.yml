@@ -1,18 +1,30 @@
 name: tests
 
 on:
-  push:
-    branches:
-      - develop
-      - main
   pull_request:
     branches:
       - develop
       - main
+  workflow_call:
 
 jobs:
   ci:
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: kas_gereja_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
 
     steps:
       - name: Checkout
@@ -22,8 +34,9 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.4
+          extensions: pdo_pgsql, gd, intl, bcmath
           tools: composer:v2
-          coverage: xdebug
+          coverage: none
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -34,20 +47,18 @@ jobs:
       - name: Install Node Dependencies
         run: npm ci
 
+      # Blade's @vite needs the manifest when feature tests render Inertia pages.
       - name: Build Assets
         run: npm run build
-
-      - name: Create SQLite Database
-        run: touch database/database.sqlite
 
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      - name: Copy Environment File
-        run: cp .env.example .env
+      - name: Prepare Environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
 
-      - name: Generate Application Key
-        run: php artisan key:generate
-
+      # Connection settings come from phpunit.xml (kas_gereja_test on 127.0.0.1).
       - name: Tests
-        run: ./vendor/bin/phpunit
+        run: php artisan test
